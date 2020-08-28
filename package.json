@@ -1,0 +1,40 @@
+{
+  "name": "certseccheck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "make:pretty": "npx prettier --write .",
+    "lint": "npx eslint ./src/ --max-warnings 0",
+    "test": "npx jest ./tests --coverage true",
+    "build:prod": "npx webpack --mode production",
+    "build:dev": "npx webpack --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vec7or/certSecCheck.git"
+  },
+  "author": "Carlo Kirchmeier, Yannick Vogt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Vec7or/certSecCheck/issues"
+  },
+  "homepage": "https://github.com/Vec7or/certSecCheck#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "eslint": "^7.7.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-tsdoc": "^0.2.6",
+    "jest": "^26.4.2",
+    "prettier": "2.1.1",
+    "ts-jest": "^26.3.0",
+    "ts-loader": "^8.0.3",
+    "typedoc": "^0.18.0",
+    "typescript": "^4.0.2",
+    "typescript-eslint": "0.0.1-alpha.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  }
+}
