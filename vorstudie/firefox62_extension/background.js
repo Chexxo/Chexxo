@@ -1,37 +1,23 @@
-console.log(`\n\nTLS browser extension loaded`);
+(function() {
+  const tabStorage = {};
+  const ALL_SITES = { urls: ['<all_urls>'] };
+  const extraInfoSpec = ['blocking'];
+  
+  browser.webRequest.onHeadersReceived.addListener(async function(details) {
+    const { url, tabId, requestId, timeStamp } = details;
+    if (!tabStorage.hasOwnProperty(tabId)) {
+      tabStorage[tabId] = {};
+    }
 
-var ALL_SITES = { urls: ['<all_urls>'] };
-var extraInfoSpec = ['blocking'];
+    const securityInfo = await browser.webRequest.getSecurityInfo(requestId, {
+      certificateChain: false,
+      rawDER: false
+    });
+    tabStorage[tabId][requestId] = securityInfo;
+  }, ALL_SITES, extraInfoSpec);
 
-browser.webRequest.onHeadersReceived.addListener(async function(details) {
-  var { url, tabId, requestId, timeStamp } = details;
-
-  console.log(`\n\nGot a request for ${url} with ID ${requestId}`);
-
-  var securityInfo = await browser.webRequest.getSecurityInfo(requestId, {
-    certificateChain: false,
-    rawDER: false
+  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    const currentTab = tabStorage[message.tabId];
+    sendResponse(currentTab[Object.keys(currentTab)[0]]);
   });
-
-  console.log(`securityInfo: ${JSON.stringify(securityInfo, null, 2)}`);
-
-  /*
-  if (!tabStorage.hasOwnProperty(tabId)) {
-    return;
-  }
-
-  tabStorage[tabId].requests[requestId] = {
-    requestId,
-    url,
-    startTime: timeStamp
-  };
-  */
-}, ALL_SITES, extraInfoSpec);
-
-console.log('Added listener');
-
-/*
-browser.runtime.onMessage.addListener((message, sender, response) => {
-  response(tabStorage[message.tabId]);
-});
-*/
+})();

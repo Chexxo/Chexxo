@@ -1,9 +1,12 @@
-var tabId = chrome.tabs.query({
+browser.tabs.query({
   active: true,
   currentWindow: true
 }, (tabs) => {
-  browser.runtime.sendMessage({ tabId: tabs[0] }, (response) => {
-    document.getElementById('certificate').innerText = response;
+  const currentTab = tabs[0];
+  browser.runtime.sendMessage({ tabId: currentTab.id }, (response) => {
+    console.log(response);
+    if (response) {
+      document.getElementById('certificate').innerText = JSON.stringify(response);
+    }
   });
-})
-
+});
