@@ -1,4 +1,10 @@
 module.exports = {
+  coveragePathIgnorePatterns: [".+\\.(css|styl|less|sass|scss)$"],
   preset: "ts-jest",
-  testEnvironment: "node",
+  roots: ["<rootDir>/src/"],
+  setupFiles: ["jest-webextension-mock"],
+  testEnvironment: "jsdom",
+  transform: {
+    ".+\\.(css|styl|less|sass|scss)$": "jest-css-modules-transform",
+  }
 };
