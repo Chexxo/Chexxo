@@ -1,0 +1,24 @@
+import Certificate from "../models/Certificate";
+import CertificateProvider from "./CertificateProvider";
+
+export default class CertificateService {
+  private certificateCache: Map<number, Certificate>;
+
+  constructor(private realCertificateProvider: CertificateProvider) {
+    this.certificateCache = new Map<number, Certificate>();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+  async fetchCertificate(requestDetails: any) {
+    const { tabId } = requestDetails;
+    const certificate = await this.realCertificateProvider.getCertificate(
+      requestDetails
+    );
+
+    this.certificateCache.set(tabId, certificate);
+  }
+
+  getCertificate(key: number): Certificate | undefined {
+    return this.certificateCache.get(key);
+  }
+}

@@ -9,7 +9,13 @@ export default class Popup extends Component {
    * Broadcasts a message when the component is mounted
    */
   componentDidMount(): void {
-    browser.runtime.sendMessage({ data: "Hello from Popup!" });
+    this.fetchCertificate();
+  }
+
+  fetchCertificate(): void {
+    browser.runtime.sendMessage({
+      type: "fetchCertificate",
+    });
   }
 
   /**
