@@ -1,3 +1,4 @@
+import { WebRequest } from "webextension-polyfill-ts";
 import Certificate from "../models/Certificate";
 import CertificateProvider from "./CertificateProvider";
 
@@ -8,8 +9,9 @@ export default class CertificateService {
     this.certificateCache = new Map<number, Certificate>();
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
-  async fetchCertificate(requestDetails: any) {
+  async fetchCertificate(
+    requestDetails: WebRequest.OnHeadersReceivedDetailsType
+  ): Promise<void> {
     const { tabId } = requestDetails;
     const certificate = await this.realCertificateProvider.getCertificate(
       requestDetails

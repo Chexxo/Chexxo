@@ -1,3 +1,5 @@
+import { Events, Runtime, WebRequest } from "webextension-polyfill-ts";
+
 import CertificateService from "./CertificateService";
 import InBrowserProvider from "./InBrowserProvider";
 
@@ -5,25 +7,40 @@ export default class App {
   private certificateService: CertificateService;
 
   constructor(
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
-    private webRequestEmitter: any,
-    private messageEmitter: EvListener<browser.runtime.onMessageEvent>
+    private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
+    private messageEmitter: Events.Event<
+      (
+        message: { type: string },
+        sender: Runtime.MessageSender,
+        sendResponse: (response: unknown) => void
+      ) => void | Promise<unknown>
+    >
   ) {
     this.certificateService = new CertificateService(new InBrowserProvider());
   }
 
   init(): void {
-    this.webRequestEmitter.addListener(this.receiveWebRequest);
+    const filter = { urls: ["<all_urls>"] };
+    const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
+    this.webRequestEmitter.addListener(
+      this.receiveWebRequest,
+      filter,
+      extraInfoSpec
+    );
     this.messageEmitter.addListener(this.receiveMessage);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async receiveWebRequest(requestDetails: any) {
+  private receiveWebRequest(
+    requestDetails: WebRequest.OnHeadersReceivedDetailsType
+  ) {
     this.certificateService.fetchCertificate(requestDetails);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private receiveMessage(message: any, _: any, sendResponse: any): void {
+  private receiveMessage(
+    message: { type: string },
+    _: Runtime.MessageSender,
+    sendResponse: (response: unknown) => void
+  ): void {
     switch (message.type) {
       case "fetchCertificate":
         break;

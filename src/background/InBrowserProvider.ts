@@ -1,11 +1,14 @@
+import { browser, WebRequest } from "webextension-polyfill-ts";
+
 import Certificate from "../models/Certificate";
 import Issuer from "../models/Issuer";
 import Subject from "../models/Subject";
 import CertificateProvider from "./CertificateProvider";
 
 export default class InBrowserProvider implements CertificateProvider {
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
-  async getCertificate(requestDetails: any): Promise<Certificate> {
+  async getCertificate(
+    requestDetails: WebRequest.OnHeadersReceivedDetailsType
+  ): Promise<Certificate> {
     return new Promise(async function (resolve) {
       const { requestId, url } = requestDetails;
 
@@ -20,12 +23,12 @@ export default class InBrowserProvider implements CertificateProvider {
           certificateInfo.fingerprint.sha1,
           certificateInfo.fingerprint.sha256,
           Issuer.fromString(certificateInfo.issuer),
-          certificateInfo.serialNumber,
+          +certificateInfo.serialNumber,
           Subject.fromString(certificateInfo.subject),
-          url,
+          [url],
           0,
           0,
-          securityInfo.isExtendedValidation
+          securityInfo.isExtendedValidation || false
         )
       );
     });
