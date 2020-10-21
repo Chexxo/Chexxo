@@ -1,40 +1,66 @@
 {
-  "name": "certseccheck",
-  "version": "1.0.0",
+  "name": "chexxo",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "make:pretty": "npx prettier --write .",
-    "lint": "npx eslint ./src/ --max-warnings 0",
-    "test": "npx jest ./tests --coverage true",
-    "build:prod": "npx webpack --mode production",
-    "build:dev": "npx webpack --mode development"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Vec7or/certSecCheck.git"
-  },
   "author": "Carlo Kirchmeier, Yannick Vogt",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Vec7or/certSecCheck/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chexxo/Chexxo.git"
   },
-  "homepage": "https://github.com/Vec7or/certSecCheck#readme",
+  "bugs": {
+    "url": "https://github.com/Chexxo/Chexxo/issues"
+  },
+  "homepage": "https://github.com/Chexxo/Chexxo#readme",
+  "scripts": {
+    "format": "npx prettier --write ./src/",
+    "lint:eslint": "npx eslint ./src/ --max-warnings 0",
+    "lint:webext": "npx web-ext lint --source-dir ./dist/",
+    "test": "npx jest --coverage true",
+    "test:watch": "npx jest --watch",
+    "build:dev": "npx webpack --config webpack.dev.js",
+    "build:prod": "npx webpack --config webpack.prod.js",
+    "build:documentation": "npx typedoc --options ./typedoc.config.js"
+  },
   "devDependencies": {
-    "@types/jest": "^26.0.10",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@types/jest": "^26.0.14",
+    "@types/react": "^16.9.52",
+    "@types/react-dom": "^16.9.8",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
+    "css-loader": "^5.0.0",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.21.4",
+    "eslint-plugin-react-hooks": "^4.1.2",
     "eslint-plugin-tsdoc": "^0.2.6",
-    "jest": "^26.4.2",
+    "jest": "^26.5.3",
+    "jest-css-modules-transform": "^4.0.1",
+    "jest-webextension-mock": "^3.7.0",
+    "node-sass": "^4.14.1",
     "prettier": "2.1.1",
-    "ts-jest": "^26.3.0",
+    "sass-loader": "^10.0.3",
+    "style-loader": "^2.0.0",
+    "ts-jest": "^26.4.1",
     "ts-loader": "^8.0.3",
     "typedoc": "^0.18.0",
+    "typedoc-plugin-no-inherit": "^1.2.0",
     "typescript": "^4.0.2",
     "typescript-eslint": "0.0.1-alpha.0",
+    "web-ext": "^5.2.0",
+    "web-ext-types": "^3.2.1",
     "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-merge": "^5.2.0"
+  },
+  "dependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   }
 }

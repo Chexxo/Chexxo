@@ -1,7 +1,0 @@
-{
-  "plugins": ["@typescript-eslint/eslint-plugin", "eslint-plugin-tsdoc"],
-  "extends": ["plugin:@typescript-eslint/recommended"],
-  "rules": {
-    "tsdoc/syntax": "warn"
-  }
-}
