@@ -1,11 +1,8 @@
 import { Events, Runtime, WebRequest } from "webextension-polyfill-ts";
 
 import CertificateService from "./CertificateService";
-import InBrowserProvider from "./InBrowserProvider";
 
 export default class App {
-  private certificateService: CertificateService;
-
   constructor(
     private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
     private messageEmitter: Events.Event<
@@ -14,10 +11,9 @@ export default class App {
         sender: Runtime.MessageSender,
         sendResponse: (response: unknown) => void
       ) => void | Promise<unknown>
-    >
-  ) {
-    this.certificateService = new CertificateService(new InBrowserProvider());
-  }
+    >,
+    private certificateService: CertificateService
+  ) {}
 
   init(): void {
     const filter = { urls: ["<all_urls>"] };
