@@ -19,5 +19,9 @@
   },
 
   "content_security_policy": "script-src 'self'; object-src 'self';",
-  "permissions": []
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ]
 }

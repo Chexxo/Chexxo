@@ -1,0 +1,5 @@
+/coverage/*
+/dist/js/*
+/docs/*
+/node_modules/*
+/.eslintrc.js

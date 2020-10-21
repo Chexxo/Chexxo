@@ -23,7 +23,7 @@
     "build:prod": "npx webpack --config webpack.prod.js",
     "build:watch": "npx webpack --config webpack.dev.js --watch",
     "build:documentation": "npx typedoc --options ./typedoc.config.js",
-    "run": "npx web-ext --source-dir ./dist/ --browser-console --start-url www.google.com"
+    "run": "npx web-ext run --source-dir ./dist/ --browser-console --start-url www.google.com"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",

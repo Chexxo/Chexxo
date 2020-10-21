@@ -10,7 +10,6 @@ type PopupProps = {
  * Represents a popup window
  * @noInheritDoc
  */
-
 export default class Popup extends Component<unknown, PopupProps> {
   constructor(props: PopupProps) {
     super(props);
@@ -22,20 +21,26 @@ export default class Popup extends Component<unknown, PopupProps> {
   /**
    * Broadcasts a message when the component is mounted
    */
-  componentDidMount(): void {
-    this.fetchCertificate();
-  }
-
-  fetchCertificate(): void {
-    browser.runtime.sendMessage({
-      type: "fetchCertificate",
-    });
+  async componentDidMount(): Promise<void> {
+    const certificate = await this.getCertificate();
+    this.setState({ certificate });
   }
 
   async getCertificate(): Promise<Certificate> {
+    const tabId = await this.getCurrentTabId();
     return await browser.runtime.sendMessage({
       type: "getCertificate",
+      params: { tabId },
     });
+  }
+
+  async getCurrentTabId(): Promise<number | undefined> {
+    const tabs = await browser.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    const currentTab = tabs[0];
+    return currentTab.id;
   }
 
   /**
@@ -43,6 +48,10 @@ export default class Popup extends Component<unknown, PopupProps> {
    * @returns the rendered popup component
    */
   render(): JSX.Element {
-    return <div className="popup-container">{this.state.certificate}</div>;
+    return (
+      <div className="popup-container">
+        {this.state.certificate?.subjectAltName}
+      </div>
+    );
   }
 }

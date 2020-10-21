@@ -4,8 +4,10 @@ import App from "./App";
 import CertificateService from "./CertificateService";
 import InBrowserProvider from "./InBrowserProvider";
 
-new App(
+const app = new App(
   browser.webRequest.onHeadersReceived,
   browser.runtime.onMessage,
   new CertificateService(new InBrowserProvider())
 );
+
+app.init();

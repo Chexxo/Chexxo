@@ -16,7 +16,6 @@ export default class CertificateService {
     const certificate = await this.realCertificateProvider.getCertificate(
       requestDetails
     );
-
     this.certificateCache.set(tabId, certificate);
   }
 
