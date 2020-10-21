@@ -16,12 +16,13 @@ export default class App {
   ) {}
 
   init(): void {
-    const filter = { urls: ["<all_urls>"] };
-    const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
+    const filter: WebRequest.RequestFilter = {
+      urls: ["<all_urls>"],
+      types: ["main_frame"],
+    };
     this.webRequestEmitter.addListener(
       this.receiveWebRequest.bind(this),
-      filter,
-      extraInfoSpec
+      filter
     );
     this.messageEmitter.addListener(this.receiveMessage.bind(this));
   }
@@ -29,6 +30,7 @@ export default class App {
   private receiveWebRequest(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
+    console.log(requestDetails.url);
     this.certificateService.fetchCertificate(requestDetails);
   }
 
