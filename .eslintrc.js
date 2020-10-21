@@ -28,6 +28,12 @@ module.exports = {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly",
   },
+  overrides: {
+    files: ["*.js"],
+    rules: {
+      "@typescript-eslint/no-var-requires": false,
+    }
+  },
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaFeatures: {
