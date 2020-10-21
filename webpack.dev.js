@@ -1,7 +1,9 @@
-const { merge } = require('webpack-merge');
-const common = require('./webpack.common');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { merge } = require("webpack-merge");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const common = require("./webpack.common");
 
 module.exports = merge(common, {
-  mode: 'development',
-  devtool: 'inline-source-map'
+  mode: "development",
+  devtool: "inline-source-map",
 });
