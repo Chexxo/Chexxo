@@ -54,6 +54,7 @@ typings/
 .eslintcache
 
 # Output
+dist/assets
 dist/js
 docs
 coverage

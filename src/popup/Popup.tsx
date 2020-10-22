@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import { browser } from "webextension-polyfill-ts";
+import { Container } from "semantic-ui-react";
+
 import Certificate from "../models/Certificate";
 
 type PopupProps = {
   certificate: Certificate | null;
+  certificateRepresentation: string;
 };
 
 /**
@@ -15,6 +18,7 @@ export default class Popup extends Component<unknown, PopupProps> {
     super(props);
     this.state = {
       certificate: null,
+      certificateRepresentation: "",
     };
   }
 
@@ -23,7 +27,11 @@ export default class Popup extends Component<unknown, PopupProps> {
    */
   async componentDidMount(): Promise<void> {
     const certificate = await this.getCertificate();
-    this.setState({ certificate });
+    const certificateRepresentation = JSON.stringify(certificate, null, 2);
+    this.setState({
+      certificate,
+      certificateRepresentation,
+    });
   }
 
   async getCertificate(): Promise<Certificate> {
@@ -49,9 +57,11 @@ export default class Popup extends Component<unknown, PopupProps> {
    */
   render(): JSX.Element {
     return (
-      <div className="popup-container">
-        {this.state.certificate?.subjectAltName}
-      </div>
+      <Container text>
+        <pre>
+          {this.state.certificateRepresentation || "No certificate found"}
+        </pre>
+      </Container>
     );
   }
 }

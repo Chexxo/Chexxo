@@ -20,9 +20,11 @@ export default class App {
       urls: ["<all_urls>"],
       types: ["main_frame"],
     };
+    const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
     this.webRequestEmitter.addListener(
       this.receiveWebRequest.bind(this),
-      filter
+      filter,
+      extraInfoSpec
     );
     this.messageEmitter.addListener(this.receiveMessage.bind(this));
   }
@@ -30,7 +32,6 @@ export default class App {
   private receiveWebRequest(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
-    console.log(requestDetails.url);
     this.certificateService.fetchCertificate(requestDetails);
   }
 

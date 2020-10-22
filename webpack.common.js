@@ -13,8 +13,7 @@ module.exports = {
         use: "ts-loader",
       },
       {
-        exclude: /node_modules/,
-        test: /\.scss$/,
+        test: /\.(scss|css)$/,
         use: [
           {
             loader: "style-loader",
@@ -24,6 +23,18 @@ module.exports = {
           },
           {
             loader: "sass-loader",
+          },
+        ],
+      },
+      {
+        test: /\.(ttf|woff(2)?|eot|svg|png)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              outputPath: "../assets/",
+              name: "[name].[ext]",
+            },
           },
         ],
       },
