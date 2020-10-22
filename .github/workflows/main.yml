@@ -44,4 +44,10 @@ jobs:
           name: Documentation
           path: docs/*
           if-no-files-found: error
-          
+      
+      - name: Upload coverage
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: Coverage
+          path: coverage/*
+          if-no-files-found: error
