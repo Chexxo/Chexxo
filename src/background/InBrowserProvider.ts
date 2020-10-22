@@ -23,11 +23,11 @@ export default class InBrowserProvider implements CertificateProvider {
           certificateInfo.fingerprint.sha1,
           certificateInfo.fingerprint.sha256,
           Issuer.fromString(certificateInfo.issuer),
-          +certificateInfo.serialNumber,
+          certificateInfo.serialNumber,
           Subject.fromString(certificateInfo.subject),
           [url],
-          0,
-          0,
+          certificateInfo.validity.start,
+          certificateInfo.validity.end,
           securityInfo.isExtendedValidation || false
         )
       );

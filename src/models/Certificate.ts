@@ -6,7 +6,7 @@ export default class Certificate {
     readonly fingerprint: string,
     readonly fingerprint256: string,
     readonly issuer: Issuer,
-    readonly serialNumber: number,
+    readonly serialNumber: string,
     readonly subject: Subject,
     readonly subjectAltName: [string],
     readonly validFrom: number,
