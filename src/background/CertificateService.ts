@@ -1,5 +1,5 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import Certificate from "../models/Certificate";
+import Certificate from "../types/CommonTypes/certificate/Certificate";
 import CertificateProvider from "./CertificateProvider";
 
 export default class CertificateService {
