@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path");
 
 module.exports = {
@@ -14,8 +13,7 @@ module.exports = {
         use: "ts-loader",
       },
       {
-        exclude: /node_modules/,
-        test: /\.scss$/,
+        test: /\.(scss|css)$/,
         use: [
           {
             loader: "style-loader",
@@ -25,6 +23,18 @@ module.exports = {
           },
           {
             loader: "sass-loader",
+          },
+        ],
+      },
+      {
+        test: /\.(ttf|woff(2)?|eot|svg|png)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              outputPath: "../assets/",
+              name: "[name].[ext]",
+            },
           },
         ],
       },

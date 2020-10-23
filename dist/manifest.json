@@ -18,5 +18,10 @@
     "128": "icons/icon_128"
   },
 
-  "permissions": []
+  "content_security_policy": "script-src 'self'; object-src 'self';",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ]
 }

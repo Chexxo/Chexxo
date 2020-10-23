@@ -1,8 +1,13 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-browser.runtime.onMessage.addListener((message: any) => {
-  if (message.data) {
-    console.log(message.data);
-  } else {
-    console.log("Request did not contain any message!");
-  }
-});
+import { browser } from "webextension-polyfill-ts";
+
+import App from "./App";
+import CertificateService from "./CertificateService";
+import InBrowserProvider from "./InBrowserProvider";
+
+const app = new App(
+  browser.webRequest.onHeadersReceived,
+  browser.runtime.onMessage,
+  new CertificateService(new InBrowserProvider())
+);
+
+app.init();

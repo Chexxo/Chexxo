@@ -10,8 +10,7 @@
     "target": "es2015",
     "typeRoots": [
       "node_modules/@types",
-      "node_modules/web-ext-types"
-    ],
+    ]
   },
   "exclude": ["node_modules"]
 }

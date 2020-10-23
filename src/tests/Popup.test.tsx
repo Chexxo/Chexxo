@@ -6,6 +6,6 @@ import Popup from "../popup/Popup";
 describe("<Popup />", () => {
   test("should pass", async () => {
     const { getByText } = render(<Popup />);
-    expect(getByText("Hello, world!")).toBeDefined();
+    expect(getByText("No certificate found")).toBeDefined();
   });
 });
