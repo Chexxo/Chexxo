@@ -4,7 +4,9 @@ import { Container } from "semantic-ui-react";
 
 import Certificate from "../models/Certificate";
 
-/** Represent the required props for the Popup component */
+/**
+ * Represent the required props for the Popup component
+ */
 interface PopupProps {
   certificate: Certificate | null;
   certificateRepresentation: string;
