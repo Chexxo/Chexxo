@@ -9,8 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Fix up git URLs
+        run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
+
       - uses: actions/checkout@v2
-      
+        with:
+          submodules: true
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.2
         with:

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { browser } from "webextension-polyfill-ts";
 import { Container } from "semantic-ui-react";
 
-import Certificate from "../models/Certificate";
+import Certificate from "../types/CommonTypes/certificate/Certificate";
 
 /**
  * Represent the required props for the Popup component

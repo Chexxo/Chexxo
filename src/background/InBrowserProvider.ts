@@ -1,8 +1,8 @@
 import { browser, WebRequest } from "webextension-polyfill-ts";
 
-import Certificate from "../models/Certificate";
-import Issuer from "../models/Issuer";
-import Subject from "../models/Subject";
+import Certificate from "../types/CommonTypes/certificate/Certificate";
+import Issuer from "../types/CommonTypes/certificate/Issuer";
+import Subject from "../types/CommonTypes/certificate/Subject";
 import CertificateProvider from "./CertificateProvider";
 
 export default class InBrowserProvider implements CertificateProvider {
