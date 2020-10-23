@@ -6,13 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vec7or/certSecCheck.git"
+    "url": "git+https://github.com/Chexxo/Chexxo.git"
   },
   "bugs": {
-    "url": "https://github.com/Vec7or/certSecCheck/issues"
+    "url": "https://github.com/Chexxo/Chexxo/issues"
   },
-  "homepage": "https://github.com/Vec7or/certSecCheck#readme",
-  "type": "module",
+  "homepage": "https://github.com/Chexxo/Chexxo#readme",
   "scripts": {
     "format": "npx prettier --write ./src/",
     "lint:eslint": "npx eslint ./src/ --max-warnings 0",
