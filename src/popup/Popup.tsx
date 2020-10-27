@@ -1,13 +1,21 @@
 import React, { Component } from "react";
-import { browser } from "webextension-polyfill-ts";
+import { Tabs, Runtime } from "webextension-polyfill-ts";
 import { Container } from "semantic-ui-react";
 
 import Certificate from "../types/CommonTypes/certificate/Certificate";
 
 /**
- * Represent the required props for the Popup component
+ * Represents the required props for the Popup component
  */
-interface PopupProps {
+interface Props {
+  getTabs: (queryInfo: Tabs.QueryQueryInfoType) => Promise<Tabs.Tab[]>;
+  sendMessage: (
+    message: { type: string; params: unknown },
+    options?: Runtime.SendMessageOptionsType | undefined
+  ) => Promise<unknown>;
+}
+
+interface State {
   certificate: Certificate | null;
   certificateRepresentation: string;
 }
@@ -16,13 +24,18 @@ interface PopupProps {
  * Represents a popup window
  * @noInheritDoc
  */
-export default class Popup extends Component<unknown, PopupProps> {
+export default class Popup extends Component<Props, State> {
+  private sendMessage;
+  private getTabs;
+
   /**
    * Initializes the component's default state
    * @param props the required props for the component
    */
-  constructor(props: PopupProps) {
+  constructor(props: Props) {
     super(props);
+    this.sendMessage = props.sendMessage;
+    this.getTabs = props.getTabs;
     this.state = {
       certificate: null,
       certificateRepresentation: "",
@@ -47,10 +60,11 @@ export default class Popup extends Component<unknown, PopupProps> {
    */
   async getCertificate(): Promise<Certificate> {
     const tabId = await this.getCurrentTabId();
-    return await browser.runtime.sendMessage({
+    const certificate = (await this.sendMessage({
       type: "getCertificate",
-      params: { tabId },
-    });
+      params: { tabId }
+    })) as Certificate;
+    return certificate;
   }
 
   /**
@@ -58,7 +72,7 @@ export default class Popup extends Component<unknown, PopupProps> {
    * @returns the current tab's id
    */
   async getCurrentTabId(): Promise<number | undefined> {
-    const tabs = await browser.tabs.query({
+    const tabs = await this.getTabs({
       active: true,
       currentWindow: true,
     });
