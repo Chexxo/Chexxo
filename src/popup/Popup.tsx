@@ -3,6 +3,7 @@ import { Tabs, Runtime } from "webextension-polyfill-ts";
 import { Container } from "semantic-ui-react";
 
 import Certificate from "../types/CommonTypes/certificate/Certificate";
+import { Quality } from "../types/Quality";
 
 /**
  * Represents the required props for the Popup component
@@ -16,8 +17,11 @@ interface Props {
 }
 
 interface State {
-  certificate: Certificate | null;
+  tabId: number | undefined;
+  certificate: Certificate | undefined;
   certificateRepresentation: string;
+  qualityRepresentation: string;
+  errorRepresentation: string;
 }
 
 /**
@@ -37,8 +41,11 @@ export default class Popup extends Component<Props, State> {
     this.sendMessage = props.sendMessage;
     this.getTabs = props.getTabs;
     this.state = {
-      certificate: null,
+      tabId: undefined,
+      certificate: undefined,
       certificateRepresentation: "",
+      qualityRepresentation: "",
+      errorRepresentation: "",
     };
   }
 
@@ -46,11 +53,19 @@ export default class Popup extends Component<Props, State> {
    * Fetches the certificate when the component is mounted
    */
   async componentDidMount(): Promise<void> {
+    const tabId = await this.getCurrentTabId();
+    this.setState({ tabId });
     const certificate = await this.getCertificate();
+    const quality = await this.getQuality();
+    const error = await this.getError();
     const certificateRepresentation = JSON.stringify(certificate, null, 2);
+    const qualityRepresentation = JSON.stringify(quality, null, 2);
+    const errorRepresentation = JSON.stringify(error, null, 2);
     this.setState({
       certificate,
       certificateRepresentation,
+      qualityRepresentation,
+      errorRepresentation,
     });
   }
 
@@ -59,12 +74,28 @@ export default class Popup extends Component<Props, State> {
    * @returns the current tab's certificate
    */
   async getCertificate(): Promise<Certificate> {
-    const tabId = await this.getCurrentTabId();
     const certificate = (await this.sendMessage({
       type: "getCertificate",
-      params: { tabId }
+      params: { tabId: this.state.tabId },
     })) as Certificate;
     return certificate;
+  }
+
+  async getQuality(): Promise<Quality> {
+    const quality = (await this.sendMessage({
+      type: "getQuality",
+      params: { tabId: this.state.tabId },
+    })) as Quality;
+    return quality;
+  }
+
+  async getError(): Promise<Error> {
+    const error = (await this.sendMessage({
+      type: "getError",
+      params: { tabId: this.state.tabId },
+    })) as Error;
+    console.log(error);
+    return error;
   }
 
   /**
@@ -90,6 +121,8 @@ export default class Popup extends Component<Props, State> {
         <pre>
           {this.state.certificateRepresentation || "No certificate found"}
         </pre>
+        <pre>{this.state.qualityRepresentation || "No quality found"}</pre>
+        <pre>{this.state.errorRepresentation || "No error found"}</pre>
       </Container>
     );
   }

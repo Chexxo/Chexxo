@@ -1,6 +1,7 @@
 import { browser } from "webextension-polyfill-ts";
 
 import App from "./App";
+import CertificateAnalyzer from "./CertificateAnalyzer";
 import CertificateService from "./CertificateService";
 import InBrowserProvider from "./InBrowserProvider";
 
@@ -10,7 +11,11 @@ const {
 } = browser;
 
 const certificateProvider = new InBrowserProvider(getSecurityInfo);
-const certificateService = new CertificateService(certificateProvider);
+const certificateAnalyzer = new CertificateAnalyzer();
+const certificateService = new CertificateService(
+  certificateProvider,
+  certificateAnalyzer
+);
 
 const app = new App(onHeadersReceived, onMessage, certificateService);
 

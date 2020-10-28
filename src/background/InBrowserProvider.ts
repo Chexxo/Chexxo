@@ -20,6 +20,14 @@ export default class InBrowserProvider implements CertificateProvider {
       rawDER: false,
     });
 
+    if (securityInfo.state === "broken") {
+      throw new Error("securityInfo.state = broken");
+    }
+
+    if (securityInfo.state === "insecure") {
+      throw new Error("securityInfo.state = insecure");
+    }
+
     return Certificate.fromSecurityInfo(securityInfo);
   }
 }

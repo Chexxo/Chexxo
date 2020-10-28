@@ -3,6 +3,8 @@ import { Events, Runtime, WebRequest } from "webextension-polyfill-ts";
 import CertificateService from "./CertificateService";
 
 export default class App {
+  public test = "poop";
+
   constructor(
     private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
     private messageEmitter: Events.Event<
@@ -40,13 +42,24 @@ export default class App {
     _: Runtime.MessageSender,
     sendResponse: (response: unknown) => void
   ): void {
+    let params;
     switch (message.type) {
+      case "getError":
+        params = message.params as { tabId: number };
+        const error = this.certificateService.getError(params.tabId);
+        sendResponse(error);
+        break;
       case "getCertificate":
-        const params = message.params as { tabId: number };
+        params = message.params as { tabId: number };
         const certificate = this.certificateService.getCertificate(
           params.tabId
         );
         sendResponse(certificate);
+        break;
+      case "getQuality":
+        params = message.params as { tabId: number };
+        const quality = this.certificateService.getQuality(params.tabId);
+        sendResponse(quality);
         break;
     }
   }
