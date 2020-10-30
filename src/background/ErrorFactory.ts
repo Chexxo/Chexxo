@@ -2,27 +2,31 @@ import ExpiredError from "../types/CommonTypes/errors/certificate/ExpiredError";
 import InvalidDomainError from "../types/CommonTypes/errors/certificate/InvalidDomainError";
 import SelfSignedError from "../types/CommonTypes/errors/certificate/SelfSignedError";
 import UntrustedRootError from "../types/CommonTypes/errors/certificate/UntrustedRootError";
+import CodedError from "../types/CommonTypes/errors/CodedError";
 import InvalidResponseError from "../types/CommonTypes/errors/InvalidResponseError";
 import NoHostError from "../types/CommonTypes/errors/NoHostError";
+import ServerError from "../types/CommonTypes/errors/ServerError";
 
 export default class ErrorFactory {
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
-  public static fromErrorDto(error: any): Error {
-    switch (error.code) {
-      case 1:
-        return new SelfSignedError(error.stack);
-      case 2:
-        return new ExpiredError(error.stack);
-      case 3:
-        return new InvalidDomainError(error.stack);
-      case 4:
-        return new UntrustedRootError(error.stack);
-      case 5:
-        return new InvalidResponseError(0, error.stack);
-      case 6:
-        return new NoHostError(error.stack);
+  public static fromErrorDto(error: unknown): CodedError {
+    const codedError = error as CodedError;
+    const { code, stack } = codedError;
+
+    switch (code) {
+      case 101:
+        return new ExpiredError(stack);
+      case 102:
+        return new InvalidDomainError(stack);
+      case 103:
+        return new SelfSignedError(stack);
+      case 104:
+        return new UntrustedRootError(stack);
+      case 200:
+        return new InvalidResponseError(0, stack);
+      case 300:
+        return new NoHostError(stack);
       default:
-        return new Error(error.message);
+        return new ServerError(codedError);
     }
   }
 }
