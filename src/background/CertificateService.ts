@@ -1,6 +1,7 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
 import Certificate from "../types/CommonTypes/certificate/Certificate";
+import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
 import TabData from "../types/TabData";
 import CertificateAnalyzer from "./CertificateAnalyzer";
@@ -32,8 +33,8 @@ export default class CertificateService {
           tabData.certificate
         );
       }
-    } catch (e) {
-      tabData.error = e;
+    } catch (error) {
+      tabData.errorMessage = ErrorMessage.fromError(error);
     }
 
     this.tabCache.set(tabId, tabData);
@@ -47,7 +48,7 @@ export default class CertificateService {
     return this.tabCache.get(tabId)?.quality;
   }
 
-  getError(tabId: number): Error | undefined {
-    return this.tabCache.get(tabId)?.error;
+  getErrorMessage(tabId: number): ErrorMessage | undefined {
+    return this.tabCache.get(tabId)?.errorMessage;
   }
 }

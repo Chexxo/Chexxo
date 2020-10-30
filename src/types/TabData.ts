@@ -1,10 +1,11 @@
 import Certificate from "./CommonTypes/certificate/Certificate";
+import ErrorMessage from "./errors/ErrorMessage";
 import { Quality } from "./Quality";
 
 export default class TabData {
   constructor(
     public certificate?: Certificate,
     public quality?: Quality,
-    public error?: Error
+    public errorMessage?: ErrorMessage
   ) {}
 }

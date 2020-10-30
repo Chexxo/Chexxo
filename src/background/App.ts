@@ -42,13 +42,9 @@ export default class App {
     _: Runtime.MessageSender,
     sendResponse: (response: unknown) => void
   ): void {
+    console.log(message);
     let params;
     switch (message.type) {
-      case "getError":
-        params = message.params as { tabId: number };
-        const error = this.certificateService.getError(params.tabId);
-        sendResponse(error);
-        break;
       case "getCertificate":
         params = message.params as { tabId: number };
         const certificate = this.certificateService.getCertificate(
@@ -60,6 +56,13 @@ export default class App {
         params = message.params as { tabId: number };
         const quality = this.certificateService.getQuality(params.tabId);
         sendResponse(quality);
+        break;
+      case "getErrorMessage":
+        params = message.params as { tabId: number };
+        const errorMessage = this.certificateService.getErrorMessage(
+          params.tabId
+        );
+        sendResponse(errorMessage);
         break;
     }
   }

@@ -1,6 +1,8 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
 import Certificate from "../types/CommonTypes/certificate/Certificate";
+import InsecureConnectionError from "../types/errors/InsecureConnectionError";
+import CertificateFactory from "./CertificateFactory";
 import CertificateProvider from "./CertificateProvider";
 
 export default class InBrowserProvider implements CertificateProvider {
@@ -20,14 +22,10 @@ export default class InBrowserProvider implements CertificateProvider {
       rawDER: false,
     });
 
-    if (securityInfo.state === "broken") {
-      throw new Error("securityInfo.state = broken");
-    }
-
     if (securityInfo.state === "insecure") {
-      throw new Error("securityInfo.state = insecure");
+      throw new InsecureConnectionError();
     }
 
-    return Certificate.fromSecurityInfo(securityInfo);
+    return CertificateFactory.fromSecurityInfo(securityInfo);
   }
 }

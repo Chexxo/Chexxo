@@ -21,7 +21,7 @@ interface State {
   certificate: Certificate | undefined;
   certificateRepresentation: string;
   qualityRepresentation: string;
-  errorRepresentation: string;
+  errorMessageRepresentation: string;
 }
 
 /**
@@ -45,7 +45,7 @@ export default class Popup extends Component<Props, State> {
       certificate: undefined,
       certificateRepresentation: "",
       qualityRepresentation: "",
-      errorRepresentation: "",
+      errorMessageRepresentation: "",
     };
   }
 
@@ -57,15 +57,15 @@ export default class Popup extends Component<Props, State> {
     this.setState({ tabId });
     const certificate = await this.getCertificate();
     const quality = await this.getQuality();
-    const error = await this.getError();
+    const errorMessage = await this.getErrorMessage();
     const certificateRepresentation = JSON.stringify(certificate, null, 2);
     const qualityRepresentation = JSON.stringify(quality, null, 2);
-    const errorRepresentation = JSON.stringify(error, null, 2);
+    const errorMessageRepresentation = JSON.stringify(errorMessage, null, 2);
     this.setState({
       certificate,
       certificateRepresentation,
       qualityRepresentation,
-      errorRepresentation,
+      errorMessageRepresentation,
     });
   }
 
@@ -73,7 +73,7 @@ export default class Popup extends Component<Props, State> {
    * Fetches the current tab's certificate
    * @returns the current tab's certificate
    */
-  async getCertificate(): Promise<Certificate> {
+  async getCertificate(): Promise<Certificate | undefined> {
     const certificate = (await this.sendMessage({
       type: "getCertificate",
       params: { tabId: this.state.tabId },
@@ -81,7 +81,7 @@ export default class Popup extends Component<Props, State> {
     return certificate;
   }
 
-  async getQuality(): Promise<Quality> {
+  async getQuality(): Promise<Quality | undefined> {
     const quality = (await this.sendMessage({
       type: "getQuality",
       params: { tabId: this.state.tabId },
@@ -89,13 +89,17 @@ export default class Popup extends Component<Props, State> {
     return quality;
   }
 
-  async getError(): Promise<Error> {
-    const error = (await this.sendMessage({
-      type: "getError",
-      params: { tabId: this.state.tabId },
-    })) as Error;
-    console.log(error);
-    return error;
+  async getErrorMessage(): Promise<string | undefined> {
+    try {
+      const error = (await this.sendMessage({
+        type: "getErrorMessage",
+        params: { tabId: this.state.tabId },
+      })) as string;
+      return error;
+    } catch (e) {
+      console.log("from Popup");
+      console.log(e);
+    }
   }
 
   /**
@@ -122,7 +126,7 @@ export default class Popup extends Component<Props, State> {
           {this.state.certificateRepresentation || "No certificate found"}
         </pre>
         <pre>{this.state.qualityRepresentation || "No quality found"}</pre>
-        <pre>{this.state.errorRepresentation || "No error found"}</pre>
+        <pre>{this.state.errorMessageRepresentation || "No error found"}</pre>
       </Container>
     );
   }
