@@ -3,7 +3,7 @@ import { browser } from "webextension-polyfill-ts";
 import App from "./App";
 import CertificateAnalyzer from "./CertificateAnalyzer";
 import CertificateService from "./CertificateService";
-import InBrowserProvider from "./InBrowserProvider";
+import InBrowserProvider from "./providers/InBrowserProvider";
 
 const {
   webRequest: { onHeadersReceived, getSecurityInfo },

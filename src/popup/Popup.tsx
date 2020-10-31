@@ -16,6 +16,9 @@ interface Props {
   ) => Promise<unknown>;
 }
 
+/**
+ * Represents the state object for the Popup component
+ */
 interface State {
   tabId: number | undefined;
   certificate: Certificate | undefined;
@@ -25,7 +28,7 @@ interface State {
 }
 
 /**
- * Represents a popup window
+ * Represents a browser action popup window
  * @noInheritDoc
  */
 export default class Popup extends Component<Props, State> {
@@ -33,7 +36,7 @@ export default class Popup extends Component<Props, State> {
   private getTabs;
 
   /**
-   * Initializes the component's default state
+   * Initializes the component's default state and registers browser API methods
    * @param props the required props for the component
    */
   constructor(props: Props) {
@@ -50,7 +53,7 @@ export default class Popup extends Component<Props, State> {
   }
 
   /**
-   * Fetches the certificate when the component is mounted
+   * Fetches the certificate, its quality and any errors when the component is mounted
    */
   async componentDidMount(): Promise<void> {
     const tabId = await this.getCurrentTabId();
@@ -71,7 +74,7 @@ export default class Popup extends Component<Props, State> {
 
   /**
    * Fetches the current tab's certificate
-   * @returns the current tab's certificate
+   * @returns the current tab's certificate or undefined
    */
   async getCertificate(): Promise<Certificate | undefined> {
     const certificate = (await this.sendMessage({
@@ -81,6 +84,10 @@ export default class Popup extends Component<Props, State> {
     return certificate;
   }
 
+  /**
+   * Fetches the current tab's certificate quality
+   * @returns the current tab's certificate quality or undefined
+   */
   async getQuality(): Promise<Quality | undefined> {
     const quality = (await this.sendMessage({
       type: "getQuality",
@@ -89,6 +96,10 @@ export default class Popup extends Component<Props, State> {
     return quality;
   }
 
+  /**
+   * Fetches the current tab's error message
+   * @returns the current tab's error message or undefined
+   */
   async getErrorMessage(): Promise<string | undefined> {
     try {
       const error = (await this.sendMessage({

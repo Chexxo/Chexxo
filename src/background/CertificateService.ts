@@ -5,7 +5,7 @@ import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
 import TabData from "../types/TabData";
 import CertificateAnalyzer from "./CertificateAnalyzer";
-import CertificateProvider from "./CertificateProvider";
+import CertificateProvider from "./providers/CertificateProvider";
 
 export default class CertificateService {
   private tabCache: Map<number, TabData>;
