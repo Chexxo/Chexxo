@@ -3,6 +3,7 @@ import InvalidDomainError from "../../types/CommonTypes/errors/certificate/Inval
 import SelfSignedError from "../../types/CommonTypes/errors/certificate/SelfSignedError";
 import UntrustedRootError from "../../types/CommonTypes/errors/certificate/UntrustedRootError";
 import CodedError from "../../types/CommonTypes/errors/CodedError";
+import ConnectionRefusedError from "../../types/CommonTypes/errors/ConnectionRefusedError";
 import InvalidResponseError from "../../types/CommonTypes/errors/InvalidResponseError";
 import NoHostError from "../../types/CommonTypes/errors/NoHostError";
 import ServerError from "../../types/CommonTypes/errors/ServerError";
@@ -25,6 +26,8 @@ export default class ErrorFactory {
         return new InvalidResponseError(0, stack);
       case 300:
         return new NoHostError(stack);
+      case 400:
+        return new ConnectionRefusedError(stack);
       default:
         return new ServerError(codedError);
     }
