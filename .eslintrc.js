@@ -44,6 +44,9 @@ module.exports = {
     sourceType: "module",
     project: "./tsconfig.json",
   },
+  rules: {
+    "jest/no-mocks-import": "off"
+  },
   settings: {
     "import/resolver": {
       node: {

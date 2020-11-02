@@ -1,36 +1,47 @@
 // import browserMock from "webextensions-api-mock";
 import { deepMock } from "mockzilla";
-import { Browser, WebRequest } from "webextension-polyfill-ts";
+import { Browser } from "webextension-polyfill-ts";
 
-const [browser, mockBrowser] = deepMock<Browser>("browser", false);
-
+import {
+  requestId,
+  onHeadersReceivedDetails,
+  getSecurityInfoOptions,
+  securityInfo,
+  certificate,
+} from "../__mocks__/Defaults";
+import InBrowserProvider from "./InBrowserProvider";
+import InsecureConnectionError from "../../types/errors/InsecureConnectionError";
 
 describe("InBrowserProvider", () => {
-  test("should pass", async () => {
-    const requestId = "1";
-    const options = { certificateChain: false, rawDER: false };
+  const [browser, mockBrowser] = deepMock<Browser>("browser", false);
 
-    const securityInfo: WebRequest.SecurityInfo = {
-      state: "secure",
-      certificates: [
-        {
-          subject: "",
-          issuer: "",
-          validity: { start: 0, end: 0 },
-          fingerprint: { sha1: "", sha256: "" },
-          serialNumber: "",
-          isBuiltInRoot: false,
-          subjectPublicKeyInfoDigest: { sha256: "" },
-        },
-      ],
-    };
-
+  test("returns the certificate when securityInfo is secure", async () => {
     mockBrowser.webRequest.getSecurityInfo
-      .expect(requestId, options)
+      .expect(requestId, getSecurityInfoOptions)
       .andResolve(securityInfo);
 
-    expect(await browser.webRequest.getSecurityInfo(requestId, options)).toBe(
-      securityInfo
+    const inBrowserProvider = new InBrowserProvider(
+      browser.webRequest.getSecurityInfo
     );
+
+    await expect(
+      inBrowserProvider.getCertificate(onHeadersReceivedDetails)
+    ).resolves.toEqual(certificate);
+  });
+
+  test("throws an InsecureConnectionError when securityInfo is insecure", async () => {
+    securityInfo.state = "insecure";
+
+    mockBrowser.webRequest.getSecurityInfo
+      .expect(requestId, getSecurityInfoOptions)
+      .andResolve(securityInfo);
+
+    const inBrowserProvider = new InBrowserProvider(
+      browser.webRequest.getSecurityInfo
+    );
+
+    await expect(
+      inBrowserProvider.getCertificate(onHeadersReceivedDetails)
+    ).rejects.toThrowError(InsecureConnectionError);
   });
 });
