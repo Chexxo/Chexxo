@@ -101,16 +101,11 @@ export default class Popup extends Component<Props, State> {
    * @returns the current tab's error message or undefined
    */
   async getErrorMessage(): Promise<string | undefined> {
-    try {
-      const error = (await this.sendMessage({
-        type: "getErrorMessage",
-        params: { tabId: this.state.tabId },
-      })) as string;
-      return error;
-    } catch (e) {
-      console.log("from Popup");
-      console.log(e);
-    }
+    const error = (await this.sendMessage({
+      type: "getErrorMessage",
+      params: { tabId: this.state.tabId },
+    })) as string;
+    return error;
   }
 
   /**

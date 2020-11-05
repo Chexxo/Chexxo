@@ -1,10 +1,9 @@
 import { Events, Runtime, WebRequest } from "webextension-polyfill-ts";
+import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
-import CertificateService from "./CertificateService";
+import CertificateStore from "./stores/CertificateStore";
 
 export default class App {
-  public test = "poop";
-
   constructor(
     private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
     private messageEmitter: Events.Event<
@@ -14,7 +13,7 @@ export default class App {
         sendResponse: (response: unknown) => void
       ) => void | Promise<unknown>
     >,
-    private certificateService: CertificateService
+    private certificateStore: CertificateStore
   ) {}
 
   init(): void {
@@ -34,7 +33,7 @@ export default class App {
   private receiveWebRequest(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
-    this.certificateService.fetchCertificate(requestDetails);
+    this.certificateStore.fetchCertificate(requestDetails);
   }
 
   private receiveMessage(
@@ -42,28 +41,27 @@ export default class App {
     _: Runtime.MessageSender,
     sendResponse: (response: unknown) => void
   ): void {
-    console.log(message);
     let params;
     switch (message.type) {
       case "getCertificate":
         params = message.params as { tabId: number };
-        const certificate = this.certificateService.getCertificate(
-          params.tabId
-        );
+        const certificate = this.certificateStore.getCertificate(params.tabId);
         sendResponse(certificate);
         break;
       case "getQuality":
         params = message.params as { tabId: number };
-        const quality = this.certificateService.getQuality(params.tabId);
+        const quality = this.certificateStore.getQuality(params.tabId);
         sendResponse(quality);
         break;
       case "getErrorMessage":
         params = message.params as { tabId: number };
-        const errorMessage = this.certificateService.getErrorMessage(
+        const errorMessage = this.certificateStore.getErrorMessage(
           params.tabId
         );
         sendResponse(errorMessage);
         break;
+      default:
+        sendResponse(new UnhandledMessageError());
     }
   }
 }

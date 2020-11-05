@@ -1,5 +1,5 @@
 module.exports = {
-  coveragePathIgnorePatterns: [".+\\.(css|styl|less|sass|scss)$"],
+  coveragePathIgnorePatterns: [".+\\.(css|styl|less|sass|scss)$", "types/"],
   preset: "ts-jest",
   roots: ["<rootDir>/src/"],
   testEnvironment: "jsdom",

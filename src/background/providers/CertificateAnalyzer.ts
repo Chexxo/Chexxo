@@ -1,5 +1,5 @@
-import Certificate from "../types/CommonTypes/certificate/Certificate";
-import { Quality } from "../types/Quality";
+import Certificate from "../../types/CommonTypes/certificate/Certificate";
+import { Quality } from "../../types/Quality";
 
 export default class CertificateAnalyzer {
   getQuality(certificate: Certificate): Quality {

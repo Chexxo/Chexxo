@@ -16,13 +16,13 @@
     "format": "npx prettier --write ./src/",
     "lint:eslint": "npx eslint ./src/ --max-warnings 0",
     "lint:webext": "npx web-ext lint --source-dir ./dist/",
-    "test": "npx jest --coverage true",
+    "test": "npx jest --verbose --coverage",
     "test:watch": "npx jest --watch",
     "build:dev": "npx webpack --config webpack.dev.js",
     "build:prod": "npx webpack --config webpack.prod.js",
     "build:watch": "npx webpack --config webpack.dev.js --watch",
     "build:documentation": "npx typedoc --options ./typedoc.config.js",
-    "run": "npx web-ext run --source-dir ./dist/ --browser-console --start-url www.google.com"
+    "start": "npx web-ext run --source-dir ./dist/ --browser-console --start-url www.google.com"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",

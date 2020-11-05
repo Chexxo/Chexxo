@@ -4,7 +4,7 @@ import DistinguishedName from "../../types/CommonTypes/certificate/Distinguished
 import Issuer from "../../types/CommonTypes/certificate/Issuer";
 import Subject from "../../types/CommonTypes/certificate/Subject";
 
-export default class CertificateFactory {
+export default abstract class CertificateFactory {
   public static fromSecurityInfo(
     securityInfo: WebRequest.SecurityInfo
   ): Certificate {
@@ -34,21 +34,24 @@ export default class CertificateFactory {
   private static DistinguishedNameFromString(
     stringRepresentation: string
   ): DistinguishedName {
-    const regex = /(CN?|OU?|L|ST)=([^,]*)/g;
+    const regex = /(^|,)\s*(?<attribute>CN?|OU?|L|ST)=(?<value>[^,]*)/g;
     let matches: RegExpExecArray | null = null;
     const params = new Map();
 
-    while ((matches = regex.exec(stringRepresentation))) {
-      params.set(matches[1], matches[2]);
+    matches = regex.exec(stringRepresentation);
+    while (matches) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      params.set(matches!.groups!.attribute, matches!.groups!.value);
+      matches = regex.exec(stringRepresentation);
     }
 
     return new DistinguishedName(
-      params.get("CN") || "",
-      params.get("O") || "",
-      params.get("OU") || "",
-      params.get("L") || "",
-      params.get("ST") || "",
-      params.get("C") || ""
+      (params.get("CN") || "").trim(),
+      (params.get("O") || "").trim(),
+      (params.get("OU") || "").trim(),
+      (params.get("L") || "").trim(),
+      (params.get("ST") || "").trim(),
+      (params.get("C") || "").trim()
     );
   }
 }
