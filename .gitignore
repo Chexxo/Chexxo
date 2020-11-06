@@ -56,5 +56,6 @@ typings/
 # Output
 dist/assets
 dist/js
+dist/styles
 docs/
 coverage/

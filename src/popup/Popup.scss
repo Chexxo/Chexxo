@@ -1,3 +1,17 @@
-.popup-container {
-  background: blue;
+body {
+  min-width: 300px;
+  min-height: 400px;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.quality-text {
+  margin-right: 0.25rem;
+  font-size: 1.2rem;
 }
