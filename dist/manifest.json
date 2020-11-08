@@ -5,7 +5,11 @@
   "version": "0.1.0",
 
   "browser_action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "19": "./assets/logo.svg",
+      "38": "./assets/logo.svg"
+    }
   },
 
   "background": {
@@ -13,9 +17,9 @@
   },
 
   "icons": {
-    "16": "icons/icon_16.png",
-    "48": "icons/icon_48.png",
-    "128": "icons/icon_128"
+    "16": "./assets/logo.svg",
+    "48": "./assets/logo.svg",
+    "128": "./assets/logo.svg"
   },
 
   "content_security_policy": "script-src 'self'; object-src 'self';",

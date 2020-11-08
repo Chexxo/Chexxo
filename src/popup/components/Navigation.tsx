@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
 import { Menu, Icon, Popup as Tooltip } from "semantic-ui-react";
 
 export default class Navigation extends Component {
@@ -9,7 +8,7 @@ export default class Navigation extends Component {
         <Tooltip
           content="Certificate"
           trigger={
-            <Menu.Item as={NavLink} to="/certificate">
+            <Menu.Item disabled>
               <Icon name="clipboard outline" />
             </Menu.Item>
           }
@@ -17,7 +16,7 @@ export default class Navigation extends Component {
         <Tooltip
           content="New Quality Entry"
           trigger={
-            <Menu.Item as={NavLink} to="/new-quality">
+            <Menu.Item disabled>
               <Icon name="pencil" />
             </Menu.Item>
           }
@@ -25,7 +24,7 @@ export default class Navigation extends Component {
         <Tooltip
           content="Managed Domains"
           trigger={
-            <Menu.Item as={NavLink} to="/domains">
+            <Menu.Item disabled>
               <Icon name="list" />
             </Menu.Item>
           }
@@ -33,7 +32,7 @@ export default class Navigation extends Component {
         <Tooltip
           content="Configuration"
           trigger={
-            <Menu.Item as={NavLink} to="/configuration">
+            <Menu.Item disabled>
               <Icon name="cog" />
             </Menu.Item>
           }

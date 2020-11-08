@@ -6,8 +6,10 @@ import CertificateStore from "./stores/CertificateStore";
 import InBrowserProvider from "./providers/InBrowserProvider";
 
 const {
-  webRequest: { onHeadersReceived, getSecurityInfo },
+  browserAction,
   runtime: { onMessage },
+  tabs: { onActivated },
+  webRequest: { onHeadersReceived, getSecurityInfo },
 } = browser;
 
 const certificateProvider = new InBrowserProvider(getSecurityInfo);
@@ -17,6 +19,12 @@ const certificateStore = new CertificateStore(
   certificateAnalyzer
 );
 
-const app = new App(onHeadersReceived, onMessage, certificateStore);
+const app = new App(
+  onHeadersReceived,
+  onMessage,
+  onActivated,
+  browserAction,
+  certificateStore
+);
 
 app.init();

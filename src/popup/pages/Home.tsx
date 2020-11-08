@@ -8,12 +8,13 @@ import {
   Popup as Tooltip,
   Rating,
   Image,
+  Placeholder,
 } from "semantic-ui-react";
 
 import "../../assets/logo.svg";
 import Certificate from "../../types/CommonTypes/certificate/Certificate";
 import ErrorMessage from "../../types/errors/ErrorMessage";
-import { Quality } from "../../types/Quality";
+import { Quality, maxQuality } from "../../types/Quality";
 import Navigation from "../components/Navigation";
 
 interface Props {
@@ -35,44 +36,43 @@ export default class Home extends Component<Props> {
 
         <Divider section />
 
-        <Container textAlign="center">
-          {this.props.certificate ? (
+        {this.props.certificate && this.props.quality ? (
+          <Container textAlign="center">
             <p>{this.props.certificate.subject.commonName}</p>
-          ) : (
-            ""
-          )}
+            <p>
+              <Tooltip
+                content="Useful information about certificate quality"
+                trigger={
+                  <div>
+                    <span className="quality-text">
+                      {this.props.quality?.text}
+                    </span>
+                    <Icon name="info circle" />
+                  </div>
+                }
+              />
+            </p>
+            <p>
+              <Rating
+                icon="star"
+                defaultRating={this.props.quality?.level}
+                maxRating={maxQuality}
+                size="massive"
+                disabled
+              />
+            </p>
+          </Container>
+        ) : (
+          !this.props.errorMessage && (
+            <Placeholder>
+              <Placeholder.Line />
+              <Placeholder.Line />
+              <Placeholder.Line />
+            </Placeholder>
+          )
+        )}
 
-          {this.props.quality ? (
-            <div>
-              <p>
-                <Tooltip
-                  content="Useful information about certificate quality"
-                  trigger={
-                    <div>
-                      <span className="quality-text">
-                        {this.props.quality?.text}
-                      </span>
-                      <Icon name="info circle" />
-                    </div>
-                  }
-                />
-              </p>
-              <p>
-                <Rating
-                  icon="star"
-                  defaultRating={this.props.quality?.level}
-                  maxRating={3}
-                  size="massive"
-                  disabled
-                />
-              </p>
-            </div>
-          ) : (
-            ""
-          )}
-        </Container>
-
-        {this.props.errorMessage ? (
+        {this.props.errorMessage && (
           <Message
             floating
             negative
@@ -81,8 +81,6 @@ export default class Home extends Component<Props> {
             size="tiny"
             content={this.props.errorMessage.message}
           />
-        ) : (
-          ""
         )}
 
         <Divider section />
