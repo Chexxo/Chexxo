@@ -11,7 +11,6 @@ import {
   Placeholder,
 } from "semantic-ui-react";
 
-import "../../assets/logo.svg";
 import Certificate from "../../types/CommonTypes/certificate/Certificate";
 import ErrorMessage from "../../types/errors/ErrorMessage";
 import { Quality, maxQuality } from "../../types/Quality";
@@ -30,8 +29,8 @@ export default class Home extends Component<Props> {
   render(): JSX.Element {
     return (
       <div className="flex-container">
-        <Header as="h2" content="Chexxo" textAlign="center">
-          <Image src="../../assets/logo.svg" size="tiny" /> Chexxo
+        <Header as="h2" textAlign="center">
+          <Image src="../assets/logo.svg" size="tiny" /> Chexxo
         </Header>
 
         <Divider section />
@@ -39,19 +38,17 @@ export default class Home extends Component<Props> {
         {this.props.certificate && this.props.quality ? (
           <Container textAlign="center">
             <p>{this.props.certificate.subject.commonName}</p>
-            <p>
-              <Tooltip
-                content="Useful information about certificate quality"
-                trigger={
-                  <div>
-                    <span className="quality-text">
-                      {this.props.quality?.text}
-                    </span>
-                    <Icon name="info circle" />
-                  </div>
-                }
-              />
-            </p>
+            <Tooltip
+              content="Useful information about certificate quality"
+              trigger={
+                <p>
+                  <span className="quality-text">
+                    {this.props.quality?.text}
+                  </span>
+                  <Icon name="info circle" />
+                </p>
+              }
+            />
             <p>
               <Rating
                 icon="star"

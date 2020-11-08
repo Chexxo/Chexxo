@@ -6,7 +6,7 @@ import CertificateStore from "./stores/CertificateStore";
 import InBrowserProvider from "./providers/InBrowserProvider";
 
 const {
-  browserAction,
+  browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },
   runtime: { onMessage },
   tabs: { onActivated },
   webRequest: { onHeadersReceived, getSecurityInfo },
@@ -23,7 +23,9 @@ const app = new App(
   onHeadersReceived,
   onMessage,
   onActivated,
-  browserAction,
+  setIcon,
+  setBadgeText,
+  setBadgeBackgroundColor,
   certificateStore
 );
 

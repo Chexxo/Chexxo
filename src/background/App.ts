@@ -8,8 +8,6 @@ import {
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
 import CertificateStore from "./stores/CertificateStore";
-import "../assets/logo.svg";
-import "../assets/logo_error.svg";
 
 export default class App {
   constructor(
@@ -24,7 +22,15 @@ export default class App {
     private tabActivatedEmitter: Events.Event<
       (activeInfo: Tabs.OnActivatedActiveInfoType) => void
     >,
-    private browserAction: BrowserAction.Static,
+    private setBrowserActionIcon: (
+      details: BrowserAction.SetIconDetailsType
+    ) => Promise<void>,
+    private setBrowserActionText: (
+      details: BrowserAction.SetBadgeTextDetailsType
+    ) => Promise<void>,
+    private setBrowserActionBackground: (
+      details: BrowserAction.SetBadgeBackgroundColorDetailsType
+    ) => Promise<void>,
     private certificateStore: CertificateStore
   ) {}
 
@@ -84,19 +90,19 @@ export default class App {
   private changeBrowserAction(tabInfo: { tabId: number }): void {
     const { tabId } = tabInfo;
     if (this.certificateStore.getErrorMessage(tabId)) {
-      this.browserAction.setIcon({ path: "../assets/logo_error.svg" });
-      this.browserAction.setBadgeBackgroundColor({ color: "#d32f2f" });
-      this.browserAction.setBadgeText({ text: "!" });
+      this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });
+      this.setBrowserActionBackground({ color: "#d32f2f" });
+      this.setBrowserActionText({ text: "!" });
     } else {
-      this.browserAction.setIcon({ path: "../assets/logo.svg" });
-      this.browserAction.setBadgeBackgroundColor({ color: "#1976d2" });
+      this.setBrowserActionIcon({ path: "../assets/logo.svg" });
+      this.setBrowserActionBackground({ color: "#1976d2" });
 
       const quality = this.certificateStore.getQuality(tabId);
       if (quality) {
         const stars = "*".repeat(quality.level);
-        this.browserAction.setBadgeText({ text: stars });
+        this.setBrowserActionText({ text: stars });
       } else {
-        this.browserAction.setBadgeText({ text: "" });
+        this.setBrowserActionText({ text: "" });
       }
     }
   }
