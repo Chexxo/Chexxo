@@ -11,23 +11,23 @@ import ServerError from "../../types/CommonTypes/errors/ServerError";
 export default class ErrorFactory {
   public static fromErrorDto(error: unknown): CodedError {
     const codedError = error as CodedError;
-    const { code, stack } = codedError;
+    const { code } = codedError;
 
     switch (code) {
       case 101:
-        return new ExpiredError(stack);
+        return new ExpiredError();
       case 102:
-        return new InvalidDomainError(stack);
+        return new InvalidDomainError();
       case 103:
-        return new SelfSignedError(stack);
+        return new SelfSignedError();
       case 104:
-        return new UntrustedRootError(stack);
+        return new UntrustedRootError();
       case 200:
-        return new InvalidResponseError(0, stack);
+        return new InvalidResponseError(0);
       case 300:
-        return new NoHostError(stack);
+        return new NoHostError();
       case 400:
-        return new ConnectionRefusedError(stack);
+        return new ConnectionRefusedError();
       default:
         return new ServerError(codedError);
     }
