@@ -54,7 +54,6 @@ typings/
 .eslintcache
 
 # Output
-dist/assets
-dist/js
+dist/
 docs/
 coverage/

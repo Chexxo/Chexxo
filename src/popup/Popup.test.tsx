@@ -21,6 +21,6 @@ describe("<Popup />", () => {
     const { getByText } = render(
       <Popup getTabs={getTabs} sendMessage={sendMessage} />
     );
-    expect(getByText("No certificate found")).toBeDefined();
+    expect(getByText("Chexxo")).toBeDefined();
   });
 });

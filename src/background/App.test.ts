@@ -42,10 +42,18 @@ beforeEach(() => {
     ["blocking"]
   );
   mockBrowser.runtime.onMessage.addListener.expect(expect.anything());
+  mockBrowser.tabs.onActivated.addListener.expect(expect.anything());
+  mockBrowser.browserAction.setIcon.expect(expect.anything());
+  mockBrowser.browserAction.setBadgeText.expect(expect.anything());
+  mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
 
   app = new App(
     browser.webRequest.onHeadersReceived,
     browser.runtime.onMessage,
+    browser.tabs.onActivated,
+    browser.browserAction.setIcon,
+    browser.browserAction.setBadgeText,
+    browser.browserAction.setBadgeBackgroundColor,
     certificateStore
   );
 });
