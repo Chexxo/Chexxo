@@ -1,13 +1,22 @@
 import { browser } from "webextension-polyfill-ts";
 
 import App from "./App";
-import CertificateService from "./CertificateService";
-import InBrowserProvider from "./InBrowserProvider";
+import CertificateAnalyzer from "./providers/CertificateAnalyzer";
+import CertificateStore from "./stores/CertificateStore";
+import InBrowserProvider from "./providers/InBrowserProvider";
 
-const app = new App(
-  browser.webRequest.onHeadersReceived,
-  browser.runtime.onMessage,
-  new CertificateService(new InBrowserProvider())
+const {
+  webRequest: { onHeadersReceived, getSecurityInfo },
+  runtime: { onMessage },
+} = browser;
+
+const certificateProvider = new InBrowserProvider(getSecurityInfo);
+const certificateAnalyzer = new CertificateAnalyzer();
+const certificateStore = new CertificateStore(
+  certificateProvider,
+  certificateAnalyzer
 );
+
+const app = new App(onHeadersReceived, onMessage, certificateStore);
 
 app.init();
