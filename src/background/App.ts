@@ -61,7 +61,7 @@ export default class App {
         sendResponse(errorMessage);
         break;
       default:
-        sendResponse(new UnhandledMessageError());
+        sendResponse(new UnhandledMessageError(JSON.stringify(message)));
     }
   }
 }
