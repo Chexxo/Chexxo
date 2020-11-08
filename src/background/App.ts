@@ -1,4 +1,10 @@
-import { Events, Runtime, WebRequest } from "webextension-polyfill-ts";
+import {
+  BrowserAction,
+  Events,
+  Runtime,
+  Tabs,
+  WebRequest,
+} from "webextension-polyfill-ts";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
 import CertificateStore from "./stores/CertificateStore";
@@ -13,6 +19,18 @@ export default class App {
         sendResponse: (response: unknown) => void
       ) => void | Promise<unknown>
     >,
+    private tabActivatedEmitter: Events.Event<
+      (activeInfo: Tabs.OnActivatedActiveInfoType) => void
+    >,
+    private setBrowserActionIcon: (
+      details: BrowserAction.SetIconDetailsType
+    ) => Promise<void>,
+    private setBrowserActionText: (
+      details: BrowserAction.SetBadgeTextDetailsType
+    ) => Promise<void>,
+    private setBrowserActionBackground: (
+      details: BrowserAction.SetBadgeBackgroundColorDetailsType
+    ) => Promise<void>,
     private certificateStore: CertificateStore
   ) {}
 
@@ -28,12 +46,16 @@ export default class App {
       extraInfoSpec
     );
     this.messageEmitter.addListener(this.receiveMessage.bind(this));
+    this.tabActivatedEmitter.addListener(this.changeBrowserAction.bind(this));
   }
 
   private receiveWebRequest(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
-    this.certificateStore.fetchCertificate(requestDetails);
+    // using await is not possible here, since making receiveWebRequest async is not allowed
+    this.certificateStore.fetchCertificate(requestDetails).then(() => {
+      this.changeBrowserAction(requestDetails);
+    });
   }
 
   private receiveMessage(
@@ -62,6 +84,26 @@ export default class App {
         break;
       default:
         sendResponse(new UnhandledMessageError(JSON.stringify(message)));
+    }
+  }
+
+  private changeBrowserAction(tabInfo: { tabId: number }): void {
+    const { tabId } = tabInfo;
+    if (this.certificateStore.getErrorMessage(tabId)) {
+      this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });
+      this.setBrowserActionBackground({ color: "#d32f2f" });
+      this.setBrowserActionText({ text: "!" });
+    } else {
+      this.setBrowserActionIcon({ path: "../assets/logo.svg" });
+      this.setBrowserActionBackground({ color: "#1976d2" });
+
+      const quality = this.certificateStore.getQuality(tabId);
+      if (quality) {
+        const stars = "*".repeat(quality.level);
+        this.setBrowserActionText({ text: stars });
+      } else {
+        this.setBrowserActionText({ text: "" });
+      }
     }
   }
 }

@@ -1,6 +1,5 @@
 /coverage/*
-/dist/assets/*
-/dist/js/*
+/dist/*
 /docs/*
 /node_modules/*
 /.eslintrc.js

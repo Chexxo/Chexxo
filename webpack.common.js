@@ -1,3 +1,5 @@
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
 module.exports = {
@@ -14,17 +16,7 @@ module.exports = {
       },
       {
         test: /\.(scss|css)$/,
-        use: [
-          {
-            loader: "style-loader",
-          },
-          {
-            loader: "css-loader",
-          },
-          {
-            loader: "sass-loader",
-          },
-        ],
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
       },
       {
         test: /\.(ttf|woff(2)?|eot|svg|png)$/,
@@ -41,9 +33,15 @@ module.exports = {
     ],
   },
   output: {
-    path: path.join(__dirname, "dist/js"),
+    path: path.join(__dirname, "dist/js/"),
     filename: "[name].js",
   },
+  plugins: [
+    new MiniCssExtractPlugin({ filename: "../styles/[name].css" }),
+    new CopyWebpackPlugin({
+      patterns: [{ from: "src/static/", to: "../" }],
+    }),
+  ],
   resolve: {
     extensions: [".js", ".ts", ".tsx"],
   },

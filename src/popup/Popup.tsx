@@ -1,9 +1,15 @@
 import React, { Component } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Tabs, Runtime } from "webextension-polyfill-ts";
-import { Container } from "semantic-ui-react";
 
 import Certificate from "../types/CommonTypes/certificate/Certificate";
+import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
+import CertificateView from "./pages/CertificateView";
+import Configuration from "./pages/Configuration";
+import Domains from "./pages/Domains";
+import Home from "./pages/Home";
+import NewQuality from "./pages/NewQuality";
 
 /**
  * Represents the required props for the Popup component
@@ -22,9 +28,8 @@ interface Props {
 interface State {
   tabId: number | undefined;
   certificate: Certificate | undefined;
-  certificateRepresentation: string;
-  qualityRepresentation: string;
-  errorMessageRepresentation: string;
+  quality: Quality | undefined;
+  errorMessage: ErrorMessage | undefined;
 }
 
 /**
@@ -46,9 +51,8 @@ export default class Popup extends Component<Props, State> {
     this.state = {
       tabId: undefined,
       certificate: undefined,
-      certificateRepresentation: "",
-      qualityRepresentation: "",
-      errorMessageRepresentation: "",
+      quality: undefined,
+      errorMessage: undefined,
     };
   }
 
@@ -58,17 +62,14 @@ export default class Popup extends Component<Props, State> {
   async componentDidMount(): Promise<void> {
     const tabId = await this.getCurrentTabId();
     this.setState({ tabId });
+
     const certificate = await this.getCertificate();
     const quality = await this.getQuality();
     const errorMessage = await this.getErrorMessage();
-    const certificateRepresentation = JSON.stringify(certificate, null, 2);
-    const qualityRepresentation = JSON.stringify(quality, null, 2);
-    const errorMessageRepresentation = JSON.stringify(errorMessage, null, 2);
     this.setState({
       certificate,
-      certificateRepresentation,
-      qualityRepresentation,
-      errorMessageRepresentation,
+      quality,
+      errorMessage,
     });
   }
 
@@ -100,12 +101,12 @@ export default class Popup extends Component<Props, State> {
    * Fetches the current tab's error message
    * @returns the current tab's error message or undefined
    */
-  async getErrorMessage(): Promise<string | undefined> {
-    const error = (await this.sendMessage({
+  async getErrorMessage(): Promise<ErrorMessage | undefined> {
+    const errorMessage = (await this.sendMessage({
       type: "getErrorMessage",
       params: { tabId: this.state.tabId },
-    })) as string;
-    return error;
+    })) as ErrorMessage;
+    return errorMessage;
   }
 
   /**
@@ -127,13 +128,29 @@ export default class Popup extends Component<Props, State> {
    */
   render(): JSX.Element {
     return (
-      <Container text>
-        <pre>
-          {this.state.certificateRepresentation || "No certificate found"}
-        </pre>
-        <pre>{this.state.qualityRepresentation || "No quality found"}</pre>
-        <pre>{this.state.errorMessageRepresentation || "No error found"}</pre>
-      </Container>
+      <Router>
+        <Switch>
+          <Route path="/certificate">
+            <CertificateView />
+          </Route>
+          <Route path="/new-quality">
+            <NewQuality />
+          </Route>
+          <Route path="/domains">
+            <Domains />
+          </Route>
+          <Route path="/configuration">
+            <Configuration />
+          </Route>
+          <Route path="/">
+            <Home
+              errorMessage={this.state.errorMessage}
+              certificate={this.state.certificate}
+              quality={this.state.quality}
+            />
+          </Route>
+        </Switch>
+      </Router>
     );
   }
 }

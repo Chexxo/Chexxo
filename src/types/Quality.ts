@@ -22,3 +22,5 @@ export const Quality = {
 };
 
 export type Quality = typeof Quality[keyof typeof Quality];
+
+export const maxQuality = 3;
