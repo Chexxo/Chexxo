@@ -8,4 +8,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2020-11-08
 ### Added
-- Add functionality to analyze Domain-, Organization-, Extended Validated Certificates in Mozilla Firefox.
+- Add functionality to analyze Domain, Organization and Extended Validated Certificates in Mozilla Firefox.
