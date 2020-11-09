@@ -4,7 +4,7 @@ import Certificate from "../../types/CommonTypes/certificate/Certificate";
 import ErrorMessage from "../../types/errors/ErrorMessage";
 import { Quality } from "../../types/Quality";
 import TabData from "../../types/TabData";
-import CertificateAnalyzer from "../providers/CertificateAnalyzer";
+import QualityAnalyzer from "../providers/QualityAnalyzer";
 import CertificateProvider from "../providers/CertificateProvider";
 
 export default class CertificateStore {
@@ -12,7 +12,7 @@ export default class CertificateStore {
 
   constructor(
     private realCertificateProvider: CertificateProvider,
-    private certificateAnalyzer: CertificateAnalyzer
+    private qualityAnalyzer: QualityAnalyzer
   ) {
     this.tabCache = new Map<number, TabData>();
   }
@@ -29,9 +29,7 @@ export default class CertificateStore {
       );
 
       if (tabData.certificate) {
-        tabData.quality = this.certificateAnalyzer.getQuality(
-          tabData.certificate
-        );
+        tabData.quality = this.qualityAnalyzer.getQuality(tabData.certificate);
       }
     } catch (error) {
       tabData.errorMessage = ErrorMessage.fromError(error);

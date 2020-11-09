@@ -1,5 +1,5 @@
 jest.mock("./providers/__mocks__/MockCertificateProvider");
-jest.mock("./providers/CertificateAnalyzer");
+jest.mock("./providers/QualityAnalyzer");
 jest.mock("./stores/CertificateStore");
 
 import { deepMock, MockzillaDeep } from "mockzilla";
@@ -12,7 +12,7 @@ import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 import { Quality } from "../types/Quality";
 
 import App from "./App";
-import CertificateAnalyzer from "./providers/CertificateAnalyzer";
+import QualityAnalyzer from "./providers/QualityAnalyzer";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./providers/__mocks__/MockCertificateProvider";
 import CertificateStore from "./stores/CertificateStore";
@@ -20,18 +20,15 @@ import CertificateStore from "./stores/CertificateStore";
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
 let certificateProvider: MockCertificateProvider;
-let certificateAnalyzer: CertificateAnalyzer;
+let qualityAnalyzer: QualityAnalyzer;
 let certificateStore: CertificateStore;
 let app: App;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   certificateProvider = new MockCertificateProvider();
-  certificateAnalyzer = new CertificateAnalyzer();
-  certificateStore = new CertificateStore(
-    certificateProvider,
-    certificateAnalyzer
-  );
+  qualityAnalyzer = new QualityAnalyzer();
+  certificateStore = new CertificateStore(certificateProvider, qualityAnalyzer);
 
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),

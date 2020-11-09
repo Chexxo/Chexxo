@@ -1,11 +1,11 @@
 jest.mock("../providers/__mocks__/MockCertificateProvider");
-jest.mock("../providers/CertificateAnalyzer");
+jest.mock("../providers/QualityAnalyzer");
 
 import { WebRequest } from "webextension-polyfill-ts";
 
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "../providers/__mocks__/MockCertificateProvider";
-import CertificateAnalyzer from "../providers/CertificateAnalyzer";
+import QualityAnalyzer from "../providers/QualityAnalyzer";
 import CertificateStore from "./CertificateStore";
 import Issuer from "../../types/CommonTypes/certificate/Issuer";
 import Subject from "../../types/CommonTypes/certificate/Subject";
@@ -14,7 +14,7 @@ import { Quality } from "../../types/Quality";
 import ErrorMessage from "../../types/errors/ErrorMessage";
 
 let certificateProvider: MockCertificateProvider;
-let certificateAnalyzer: CertificateAnalyzer;
+let qualityAnalyzer: QualityAnalyzer;
 let certificateStore: CertificateStore;
 let tabId: number;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
@@ -22,11 +22,8 @@ let certificate: Certificate;
 
 beforeEach(() => {
   certificateProvider = new MockCertificateProvider();
-  certificateAnalyzer = new CertificateAnalyzer();
-  certificateStore = new CertificateStore(
-    certificateProvider,
-    certificateAnalyzer
-  );
+  qualityAnalyzer = new QualityAnalyzer();
+  certificateStore = new CertificateStore(certificateProvider, qualityAnalyzer);
   tabId = 1;
   onHeadersReceivedDetails = {
     requestId: "1",
@@ -65,14 +62,14 @@ test("caches certificate from CertificateProvider", async () => {
   expect(certificateStore.getCertificate(tabId)).toEqual(certificate);
 });
 
-test("caches quality from CertificateAnalyzer", async () => {
+test("caches quality from QualityAnalyzer", async () => {
   certificateProvider.getCertificate = jest.fn(() => {
     return new Promise((resolve) => {
       resolve(certificate);
     });
   });
 
-  certificateAnalyzer.getQuality = jest.fn(() => {
+  qualityAnalyzer.getQuality = jest.fn(() => {
     return Quality.DomainValidated;
   });
 

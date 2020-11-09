@@ -1,7 +1,7 @@
 import Certificate from "../../types/CommonTypes/certificate/Certificate";
 import { Quality } from "../../types/Quality";
 
-export default class CertificateAnalyzer {
+export default class QualityAnalyzer {
   getQuality(certificate: Certificate): Quality {
     if (!this.isDomainValidated(certificate)) {
       return Quality.Unknown;
