@@ -1,17 +1,17 @@
-jest.mock("../providers/__mocks__/MockCertificateProvider");
-jest.mock("../providers/QualityAnalyzer");
+jest.mock("./providers/__mocks__/MockCertificateProvider");
+jest.mock("./providers/QualityAnalyzer");
 
 import { WebRequest } from "webextension-polyfill-ts";
 
 // eslint-disable-next-line jest/no-mocks-import
-import MockCertificateProvider from "../providers/__mocks__/MockCertificateProvider";
-import QualityAnalyzer from "../providers/QualityAnalyzer";
+import MockCertificateProvider from "./providers/__mocks__/MockCertificateProvider";
+import QualityAnalyzer from "./providers/QualityAnalyzer";
 import App from "./App";
-import Issuer from "../../types/CommonTypes/certificate/Issuer";
-import Subject from "../../types/CommonTypes/certificate/Subject";
-import Certificate from "../../types/CommonTypes/certificate/Certificate";
-import { Quality } from "../../types/Quality";
-import ErrorMessage from "../../types/errors/ErrorMessage";
+import Issuer from "../types/CommonTypes/certificate/Issuer";
+import Subject from "../types/CommonTypes/certificate/Subject";
+import Certificate from "../types/CommonTypes/certificate/Certificate";
+import { Quality } from "../types/Quality";
+import ErrorMessage from "../types/errors/ErrorMessage";
 
 let certificateProvider: MockCertificateProvider;
 let qualityAnalyzer: QualityAnalyzer;

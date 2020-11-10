@@ -2,7 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 
 import EventManager from "./EventManager";
 import QualityAnalyzer from "./providers/QualityAnalyzer";
-import App from "./stores/App";
+import App from "./App";
 import InBrowserProvider from "./providers/InBrowserProvider";
 
 const {

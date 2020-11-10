@@ -7,7 +7,7 @@ import {
 } from "webextension-polyfill-ts";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
-import App from "./stores/App";
+import App from "./App";
 
 export default class EventManager {
   constructor(

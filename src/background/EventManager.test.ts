@@ -1,6 +1,6 @@
 jest.mock("./providers/__mocks__/MockCertificateProvider");
 jest.mock("./providers/QualityAnalyzer");
-jest.mock("./stores/App");
+jest.mock("./App");
 
 import { deepMock, MockzillaDeep } from "mockzilla";
 import { Browser, Runtime } from "webextension-polyfill-ts";
@@ -15,7 +15,7 @@ import EventManager from "./EventManager";
 import QualityAnalyzer from "./providers/QualityAnalyzer";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./providers/__mocks__/MockCertificateProvider";
-import App from "./stores/App";
+import App from "./App";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
