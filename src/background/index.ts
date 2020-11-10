@@ -2,7 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 
 import EventManager from "./EventManager";
 import QualityAnalyzer from "./providers/QualityAnalyzer";
-import CertificateStore from "./stores/CertificateStore";
+import App from "./stores/App";
 import InBrowserProvider from "./providers/InBrowserProvider";
 
 const {
@@ -14,10 +14,7 @@ const {
 
 const certificateProvider = new InBrowserProvider(getSecurityInfo);
 const qualityAnalyzer = new QualityAnalyzer();
-const certificateStore = new CertificateStore(
-  certificateProvider,
-  qualityAnalyzer
-);
+const app = new App(certificateProvider, qualityAnalyzer);
 
 const eventManager = new EventManager(
   onHeadersReceived,
@@ -26,7 +23,7 @@ const eventManager = new EventManager(
   setIcon,
   setBadgeText,
   setBadgeBackgroundColor,
-  certificateStore
+  app
 );
 
 eventManager.init();

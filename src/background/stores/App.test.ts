@@ -6,7 +6,7 @@ import { WebRequest } from "webextension-polyfill-ts";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "../providers/__mocks__/MockCertificateProvider";
 import QualityAnalyzer from "../providers/QualityAnalyzer";
-import CertificateStore from "./CertificateStore";
+import App from "./App";
 import Issuer from "../../types/CommonTypes/certificate/Issuer";
 import Subject from "../../types/CommonTypes/certificate/Subject";
 import Certificate from "../../types/CommonTypes/certificate/Certificate";
@@ -15,7 +15,7 @@ import ErrorMessage from "../../types/errors/ErrorMessage";
 
 let certificateProvider: MockCertificateProvider;
 let qualityAnalyzer: QualityAnalyzer;
-let certificateStore: CertificateStore;
+let app: App;
 let tabId: number;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let certificate: Certificate;
@@ -23,7 +23,7 @@ let certificate: Certificate;
 beforeEach(() => {
   certificateProvider = new MockCertificateProvider();
   qualityAnalyzer = new QualityAnalyzer();
-  certificateStore = new CertificateStore(certificateProvider, qualityAnalyzer);
+  app = new App(certificateProvider, qualityAnalyzer);
   tabId = 1;
   onHeadersReceivedDetails = {
     requestId: "1",
@@ -58,8 +58,8 @@ test("caches certificate from CertificateProvider", async () => {
     });
   });
 
-  await certificateStore.fetchCertificate(onHeadersReceivedDetails);
-  expect(certificateStore.getCertificate(tabId)).toEqual(certificate);
+  await app.fetchCertificate(onHeadersReceivedDetails);
+  expect(app.getCertificate(tabId)).toEqual(certificate);
 });
 
 test("caches quality from QualityAnalyzer", async () => {
@@ -73,8 +73,8 @@ test("caches quality from QualityAnalyzer", async () => {
     return Quality.DomainValidated;
   });
 
-  await certificateStore.fetchCertificate(onHeadersReceivedDetails);
-  expect(certificateStore.getQuality(tabId)).toEqual(Quality.DomainValidated);
+  await app.fetchCertificate(onHeadersReceivedDetails);
+  expect(app.getQuality(tabId)).toEqual(Quality.DomainValidated);
 });
 
 test("catches errors from CertificateProvider", async () => {
@@ -85,10 +85,8 @@ test("catches errors from CertificateProvider", async () => {
   });
 
   await expect(
-    certificateStore.fetchCertificate(onHeadersReceivedDetails)
+    app.fetchCertificate(onHeadersReceivedDetails)
   ).resolves.not.toThrowError();
 
-  await expect(certificateStore.getErrorMessage(tabId)).toBeInstanceOf(
-    ErrorMessage
-  );
+  await expect(app.getErrorMessage(tabId)).toBeInstanceOf(ErrorMessage);
 });

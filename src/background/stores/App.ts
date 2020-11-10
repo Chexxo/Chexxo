@@ -7,7 +7,7 @@ import TabData from "../../types/TabData";
 import QualityAnalyzer from "../providers/QualityAnalyzer";
 import CertificateProvider from "../providers/CertificateProvider";
 
-export default class CertificateStore {
+export default class App {
   private tabCache: Map<number, TabData>;
 
   constructor(

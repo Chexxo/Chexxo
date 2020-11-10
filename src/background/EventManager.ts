@@ -7,7 +7,7 @@ import {
 } from "webextension-polyfill-ts";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
-import CertificateStore from "./stores/CertificateStore";
+import App from "./stores/App";
 
 export default class EventManager {
   constructor(
@@ -31,7 +31,7 @@ export default class EventManager {
     private setBrowserActionBackground: (
       details: BrowserAction.SetBadgeBackgroundColorDetailsType
     ) => Promise<void>,
-    private certificateStore: CertificateStore
+    private app: App
   ) {}
 
   init(): void {
@@ -53,7 +53,7 @@ export default class EventManager {
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
     // using await is not possible here, since making receiveWebRequest async is not allowed
-    this.certificateStore.fetchCertificate(requestDetails).then(() => {
+    this.app.fetchCertificate(requestDetails).then(() => {
       this.changeBrowserAction(requestDetails);
     });
   }
@@ -67,19 +67,17 @@ export default class EventManager {
     switch (message.type) {
       case "getCertificate":
         params = message.params as { tabId: number };
-        const certificate = this.certificateStore.getCertificate(params.tabId);
+        const certificate = this.app.getCertificate(params.tabId);
         sendResponse(certificate);
         break;
       case "getQuality":
         params = message.params as { tabId: number };
-        const quality = this.certificateStore.getQuality(params.tabId);
+        const quality = this.app.getQuality(params.tabId);
         sendResponse(quality);
         break;
       case "getErrorMessage":
         params = message.params as { tabId: number };
-        const errorMessage = this.certificateStore.getErrorMessage(
-          params.tabId
-        );
+        const errorMessage = this.app.getErrorMessage(params.tabId);
         sendResponse(errorMessage);
         break;
       default:
@@ -89,7 +87,7 @@ export default class EventManager {
 
   private changeBrowserAction(tabInfo: { tabId: number }): void {
     const { tabId } = tabInfo;
-    if (this.certificateStore.getErrorMessage(tabId)) {
+    if (this.app.getErrorMessage(tabId)) {
       this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });
       this.setBrowserActionBackground({ color: "#d32f2f" });
       this.setBrowserActionText({ text: "!" });
@@ -97,7 +95,7 @@ export default class EventManager {
       this.setBrowserActionIcon({ path: "../assets/logo.svg" });
       this.setBrowserActionBackground({ color: "#1976d2" });
 
-      const quality = this.certificateStore.getQuality(tabId);
+      const quality = this.app.getQuality(tabId);
       if (quality) {
         const stars = "*".repeat(quality.level);
         this.setBrowserActionText({ text: stars });

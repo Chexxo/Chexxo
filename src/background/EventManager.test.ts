@@ -1,6 +1,6 @@
 jest.mock("./providers/__mocks__/MockCertificateProvider");
 jest.mock("./providers/QualityAnalyzer");
-jest.mock("./stores/CertificateStore");
+jest.mock("./stores/App");
 
 import { deepMock, MockzillaDeep } from "mockzilla";
 import { Browser, Runtime } from "webextension-polyfill-ts";
@@ -15,20 +15,20 @@ import EventManager from "./EventManager";
 import QualityAnalyzer from "./providers/QualityAnalyzer";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./providers/__mocks__/MockCertificateProvider";
-import CertificateStore from "./stores/CertificateStore";
+import App from "./stores/App";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
 let certificateProvider: MockCertificateProvider;
 let qualityAnalyzer: QualityAnalyzer;
-let certificateStore: CertificateStore;
+let app: App;
 let eventManager: EventManager;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   certificateProvider = new MockCertificateProvider();
   qualityAnalyzer = new QualityAnalyzer();
-  certificateStore = new CertificateStore(certificateProvider, qualityAnalyzer);
+  app = new App(certificateProvider, qualityAnalyzer);
 
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),
@@ -51,7 +51,7 @@ beforeEach(() => {
     browser.browserAction.setIcon,
     browser.browserAction.setBadgeText,
     browser.browserAction.setBadgeBackgroundColor,
-    certificateStore
+    app
   );
 });
 
@@ -74,7 +74,7 @@ test("returns Certificate on getCertificate message", () => {
     false
   );
 
-  certificateStore.getCertificate = jest.fn((tabId: number) => {
+  app.getCertificate = jest.fn((tabId: number) => {
     expect(tabId).toEqual(message.params.tabId);
     return certificate;
   });
@@ -99,7 +99,7 @@ test("returns Certificate on getCertificate message", () => {
 test("returns Quality on getQuality message", () => {
   const message = { type: "getQuality", params: { tabId: 1 } };
 
-  certificateStore.getQuality = jest.fn((tabId: number) => {
+  app.getQuality = jest.fn((tabId: number) => {
     expect(tabId).toEqual(message.params.tabId);
     return Quality.DomainValidated;
   });
@@ -124,7 +124,7 @@ test("returns Quality on getQuality message", () => {
 test("returns ErrorMessage on getErrorMessage message", () => {
   const message = { type: "getErrorMessage", params: { tabId: 1 } };
 
-  certificateStore.getErrorMessage = jest.fn((tabId: number) => {
+  app.getErrorMessage = jest.fn((tabId: number) => {
     expect(tabId).toEqual(message.params.tabId);
     return new ErrorMessage("I am an error.");
   });
