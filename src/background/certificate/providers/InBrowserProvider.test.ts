@@ -3,10 +3,10 @@ import { deepMock } from "mockzilla";
 import { Browser, WebRequest } from "webextension-polyfill-ts";
 
 import InBrowserProvider from "./InBrowserProvider";
-import InsecureConnectionError from "../../types/errors/InsecureConnectionError";
-import Certificate from "../../types/CommonTypes/certificate/Certificate";
-import Issuer from "../../types/CommonTypes/certificate/Issuer";
-import Subject from "../../types/CommonTypes/certificate/Subject";
+import InsecureConnectionError from "../../../types/errors/InsecureConnectionError";
+import Certificate from "../../../types/CommonTypes/certificate/Certificate";
+import Issuer from "../../../types/CommonTypes/certificate/Issuer";
+import Subject from "../../../types/CommonTypes/certificate/Subject";
 
 const [browser, mockBrowser] = deepMock<Browser>("browser", false);
 

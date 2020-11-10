@@ -1,109 +1,69 @@
-import {
-  BrowserAction,
-  Events,
-  Runtime,
-  Tabs,
-  WebRequest,
-} from "webextension-polyfill-ts";
-import UnhandledMessageError from "../types/errors/UnhandledMessageError";
+import { WebNavigation, WebRequest } from "webextension-polyfill-ts";
 
-import CertificateStore from "./stores/CertificateStore";
+import Certificate from "../types/CommonTypes/certificate/Certificate";
+import ErrorMessage from "../types/errors/ErrorMessage";
+import { Quality } from "../types/Quality";
+import TabData from "../types/TabData";
+import CertificateService from "./certificate/CertificateService";
+import QualityService from "./quality/QualityService";
 
 export default class App {
+  private tabCache: Map<number, TabData>;
+
   constructor(
-    private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
-    private messageEmitter: Events.Event<
-      (
-        message: { type: string; params: unknown },
-        sender: Runtime.MessageSender,
-        sendResponse: (response: unknown) => void
-      ) => void | Promise<unknown>
-    >,
-    private tabActivatedEmitter: Events.Event<
-      (activeInfo: Tabs.OnActivatedActiveInfoType) => void
-    >,
-    private setBrowserActionIcon: (
-      details: BrowserAction.SetIconDetailsType
-    ) => Promise<void>,
-    private setBrowserActionText: (
-      details: BrowserAction.SetBadgeTextDetailsType
-    ) => Promise<void>,
-    private setBrowserActionBackground: (
-      details: BrowserAction.SetBadgeBackgroundColorDetailsType
-    ) => Promise<void>,
-    private certificateStore: CertificateStore
-  ) {}
-
-  init(): void {
-    const filter: WebRequest.RequestFilter = {
-      urls: ["<all_urls>"],
-      types: ["main_frame"],
-    };
-    const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
-    this.webRequestEmitter.addListener(
-      this.receiveWebRequest.bind(this),
-      filter,
-      extraInfoSpec
-    );
-    this.messageEmitter.addListener(this.receiveMessage.bind(this));
-    this.tabActivatedEmitter.addListener(this.changeBrowserAction.bind(this));
+    private certificateService: CertificateService,
+    private qualityService: QualityService
+  ) {
+    this.tabCache = new Map<number, TabData>();
   }
 
-  private receiveWebRequest(
+  async fetchCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): void {
-    // using await is not possible here, since making receiveWebRequest async is not allowed
-    this.certificateStore.fetchCertificate(requestDetails).then(() => {
-      this.changeBrowserAction(requestDetails);
-    });
-  }
+  ): Promise<void> {
+    const { tabId } = requestDetails;
+    const tabData: TabData = new TabData();
 
-  private receiveMessage(
-    message: { type: string; params: unknown },
-    _: Runtime.MessageSender,
-    sendResponse: (response: unknown) => void
-  ): void {
-    let params;
-    switch (message.type) {
-      case "getCertificate":
-        params = message.params as { tabId: number };
-        const certificate = this.certificateStore.getCertificate(params.tabId);
-        sendResponse(certificate);
-        break;
-      case "getQuality":
-        params = message.params as { tabId: number };
-        const quality = this.certificateStore.getQuality(params.tabId);
-        sendResponse(quality);
-        break;
-      case "getErrorMessage":
-        params = message.params as { tabId: number };
-        const errorMessage = this.certificateStore.getErrorMessage(
-          params.tabId
-        );
-        sendResponse(errorMessage);
-        break;
-      default:
-        sendResponse(new UnhandledMessageError(JSON.stringify(message)));
-    }
-  }
+    try {
+      tabData.certificate = await this.certificateService.getCertificate(
+        requestDetails
+      );
 
-  private changeBrowserAction(tabInfo: { tabId: number }): void {
-    const { tabId } = tabInfo;
-    if (this.certificateStore.getErrorMessage(tabId)) {
-      this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });
-      this.setBrowserActionBackground({ color: "#d32f2f" });
-      this.setBrowserActionText({ text: "!" });
-    } else {
-      this.setBrowserActionIcon({ path: "../assets/logo.svg" });
-      this.setBrowserActionBackground({ color: "#1976d2" });
-
-      const quality = this.certificateStore.getQuality(tabId);
-      if (quality) {
-        const stars = "*".repeat(quality.level);
-        this.setBrowserActionText({ text: stars });
-      } else {
-        this.setBrowserActionText({ text: "" });
+      if (tabData.certificate) {
+        tabData.quality = this.qualityService.getQuality(tabData.certificate);
       }
+    } catch (error) {
+      tabData.errorMessage = ErrorMessage.fromError(error);
     }
+
+    this.tabCache.set(tabId, tabData);
+  }
+
+  analyzeError(requestDetails: WebNavigation.OnErrorOccurredDetailsType): void {
+    const { tabId } = requestDetails;
+    const error = this.certificateService.analyzeError(requestDetails);
+
+    if (error !== undefined) {
+      const errorMessage = ErrorMessage.fromError(error);
+      let tabData = this.tabCache.get(tabId);
+
+      if (!tabData) {
+        tabData = new TabData();
+      }
+
+      tabData.errorMessage = errorMessage;
+      this.tabCache.set(tabId, tabData);
+    }
+  }
+
+  getCertificate(tabId: number): Certificate | undefined {
+    return this.tabCache.get(tabId)?.certificate;
+  }
+
+  getQuality(tabId: number): Quality | undefined {
+    return this.tabCache.get(tabId)?.quality;
+  }
+
+  getErrorMessage(tabId: number): ErrorMessage | undefined {
+    return this.tabCache.get(tabId)?.errorMessage;
   }
 }
