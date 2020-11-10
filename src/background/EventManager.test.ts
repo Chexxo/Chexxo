@@ -11,7 +11,7 @@ import ErrorMessage from "../types/errors/ErrorMessage";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 import { Quality } from "../types/Quality";
 
-import App from "./App";
+import EventManager from "./EventManager";
 import QualityAnalyzer from "./providers/QualityAnalyzer";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./providers/__mocks__/MockCertificateProvider";
@@ -22,7 +22,7 @@ let mockBrowser: MockzillaDeep<Browser>;
 let certificateProvider: MockCertificateProvider;
 let qualityAnalyzer: QualityAnalyzer;
 let certificateStore: CertificateStore;
-let app: App;
+let eventManager: EventManager;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
@@ -44,7 +44,7 @@ beforeEach(() => {
   mockBrowser.browserAction.setBadgeText.expect(expect.anything());
   mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
 
-  app = new App(
+  eventManager = new EventManager(
     browser.webRequest.onHeadersReceived,
     browser.runtime.onMessage,
     browser.tabs.onActivated,
@@ -57,7 +57,7 @@ beforeEach(() => {
 
 // eslint-disable-next-line jest/expect-expect
 test("initializes listeners", () => {
-  app.init();
+  eventManager.init();
 });
 
 test("returns Certificate on getCertificate message", () => {
@@ -79,7 +79,7 @@ test("returns Certificate on getCertificate message", () => {
     return certificate;
   });
 
-  app.init();
+  eventManager.init();
   const receiveMessage: (
     message: {
       type: string;
@@ -104,7 +104,7 @@ test("returns Quality on getQuality message", () => {
     return Quality.DomainValidated;
   });
 
-  app.init();
+  eventManager.init();
   const receiveMessage: (
     message: {
       type: string;
@@ -129,7 +129,7 @@ test("returns ErrorMessage on getErrorMessage message", () => {
     return new ErrorMessage("I am an error.");
   });
 
-  app.init();
+  eventManager.init();
   const receiveMessage: (
     message: {
       type: string;
@@ -149,7 +149,7 @@ test("returns ErrorMessage on getErrorMessage message", () => {
 test("returns UnhandledMessageError on unhandled message", () => {
   const message = { type: "getPotato", params: undefined };
 
-  app.init();
+  eventManager.init();
   const receiveMessage: (
     message: {
       type: string;

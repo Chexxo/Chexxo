@@ -1,6 +1,6 @@
 import { browser } from "webextension-polyfill-ts";
 
-import App from "./App";
+import EventManager from "./EventManager";
 import QualityAnalyzer from "./providers/QualityAnalyzer";
 import CertificateStore from "./stores/CertificateStore";
 import InBrowserProvider from "./providers/InBrowserProvider";
@@ -19,7 +19,7 @@ const certificateStore = new CertificateStore(
   qualityAnalyzer
 );
 
-const app = new App(
+const eventManager = new EventManager(
   onHeadersReceived,
   onMessage,
   onActivated,
@@ -29,4 +29,4 @@ const app = new App(
   certificateStore
 );
 
-app.init();
+eventManager.init();

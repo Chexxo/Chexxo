@@ -9,7 +9,7 @@ import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
 import CertificateStore from "./stores/CertificateStore";
 
-export default class App {
+export default class EventManager {
   constructor(
     private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
     private messageEmitter: Events.Event<
