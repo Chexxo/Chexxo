@@ -44,6 +44,9 @@ beforeEach(() => {
     },
     ["blocking"]
   );
+  mockBrowser.webNavigation.onErrorOccurred.addListener.expect(
+    expect.anything()
+  );
   mockBrowser.runtime.onMessage.addListener.expect(expect.anything());
   mockBrowser.tabs.onActivated.addListener.expect(expect.anything());
   mockBrowser.browserAction.setIcon.expect(expect.anything());

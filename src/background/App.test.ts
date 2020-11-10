@@ -58,8 +58,8 @@ beforeEach(() => {
   );
 });
 
-test("caches certificate from CertificateProvider", async () => {
-  certificateProvider.getCertificate = jest.fn(() => {
+test("caches certificate from CertificateService", async () => {
+  certificateService.getCertificate = jest.fn(() => {
     return new Promise((resolve) => {
       resolve(certificate);
     });
@@ -69,8 +69,8 @@ test("caches certificate from CertificateProvider", async () => {
   expect(app.getCertificate(tabId)).toEqual(certificate);
 });
 
-test("caches quality from QualityAnalyzer", async () => {
-  certificateProvider.getCertificate = jest.fn(() => {
+test("caches quality from QualityService", async () => {
+  certificateService.getCertificate = jest.fn(() => {
     return new Promise((resolve) => {
       resolve(certificate);
     });
@@ -84,8 +84,8 @@ test("caches quality from QualityAnalyzer", async () => {
   expect(app.getQuality(tabId)).toEqual(Quality.DomainValidated);
 });
 
-test("catches errors from CertificateProvider", async () => {
-  certificateProvider.getCertificate = jest.fn(() => {
+test("catches errors from CertificateService", async () => {
+  certificateService.getCertificate = jest.fn(() => {
     return new Promise((_, reject) => {
       reject(new Error());
     });
