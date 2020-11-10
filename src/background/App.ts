@@ -1,18 +1,18 @@
-import { WebRequest } from "webextension-polyfill-ts";
+import { WebNavigation, WebRequest } from "webextension-polyfill-ts";
 
 import Certificate from "../types/CommonTypes/certificate/Certificate";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
 import TabData from "../types/TabData";
-import QualityAnalyzer from "./quality/helpers/QualityAnalyzer";
-import CertificateProvider from "./certificate/providers/CertificateProvider";
+import CertificateService from "./certificate/CertificateService";
+import QualityService from "./quality/QualityService";
 
 export default class App {
   private tabCache: Map<number, TabData>;
 
   constructor(
-    private realCertificateProvider: CertificateProvider,
-    private qualityAnalyzer: QualityAnalyzer
+    private certificateService: CertificateService,
+    private qualityService: QualityService
   ) {
     this.tabCache = new Map<number, TabData>();
   }
@@ -24,18 +24,35 @@ export default class App {
     const tabData: TabData = new TabData();
 
     try {
-      tabData.certificate = await this.realCertificateProvider.getCertificate(
+      tabData.certificate = await this.certificateService.getCertificate(
         requestDetails
       );
 
       if (tabData.certificate) {
-        tabData.quality = this.qualityAnalyzer.getQuality(tabData.certificate);
+        tabData.quality = this.qualityService.getQuality(tabData.certificate);
       }
     } catch (error) {
       tabData.errorMessage = ErrorMessage.fromError(error);
     }
 
     this.tabCache.set(tabId, tabData);
+  }
+
+  analyzeError(requestDetails: WebNavigation.OnErrorOccurredDetailsType): void {
+    const { tabId } = requestDetails;
+    const error = this.certificateService.analyzeError(requestDetails);
+
+    if (error !== undefined) {
+      const errorMessage = ErrorMessage.fromError(error);
+      let tabData = this.tabCache.get(tabId);
+
+      if (!tabData) {
+        tabData = new TabData();
+      }
+
+      tabData.errorMessage = errorMessage;
+      this.tabCache.set(tabId, tabData);
+    }
   }
 
   getCertificate(tabId: number): Certificate | undefined {

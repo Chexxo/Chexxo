@@ -1,4 +1,5 @@
 jest.mock("./certificate/providers/__mocks__/MockCertificateProvider");
+jest.mock("./certificate/CertificateService.ts");
 jest.mock("./quality/helpers/QualityAnalyzer");
 jest.mock("./App");
 
@@ -10,25 +11,30 @@ import Subject from "../types/CommonTypes/certificate/Subject";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 import { Quality } from "../types/Quality";
-
 import EventManager from "./EventManager";
-import QualityAnalyzer from "./quality/helpers/QualityAnalyzer";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
 import App from "./App";
+import CertificateService from "./certificate/CertificateService";
+import QualityProvider from "./quality/providers/QualityProvider";
+import QualityService from "./quality/QualityService";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
 let certificateProvider: MockCertificateProvider;
-let qualityAnalyzer: QualityAnalyzer;
+let certificateService: CertificateService;
+let qualityProvider: QualityProvider;
+let qualityService: QualityService;
 let app: App;
 let eventManager: EventManager;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   certificateProvider = new MockCertificateProvider();
-  qualityAnalyzer = new QualityAnalyzer();
-  app = new App(certificateProvider, qualityAnalyzer);
+  certificateService = new CertificateService(certificateProvider);
+  qualityProvider = new QualityProvider();
+  qualityService = new QualityService(qualityProvider);
+  app = new App(certificateService, qualityService);
 
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),
@@ -46,6 +52,7 @@ beforeEach(() => {
 
   eventManager = new EventManager(
     browser.webRequest.onHeadersReceived,
+    browser.webNavigation.onErrorOccurred,
     browser.runtime.onMessage,
     browser.tabs.onActivated,
     browser.browserAction.setIcon,

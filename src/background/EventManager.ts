@@ -3,6 +3,7 @@ import {
   Events,
   Runtime,
   Tabs,
+  WebNavigation,
   WebRequest,
 } from "webextension-polyfill-ts";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
@@ -12,6 +13,7 @@ import App from "./App";
 export default class EventManager {
   constructor(
     private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
+    private webRequestErrorEmitter: WebNavigation.onErrorOccurredEvent,
     private messageEmitter: Events.Event<
       (
         message: { type: string; params: unknown },
@@ -45,6 +47,9 @@ export default class EventManager {
       filter,
       extraInfoSpec
     );
+    this.webRequestErrorEmitter.addListener(
+      this.receiveWebRequestError.bind(this)
+    );
     this.messageEmitter.addListener(this.receiveMessage.bind(this));
     this.tabActivatedEmitter.addListener(this.changeBrowserAction.bind(this));
   }
@@ -56,6 +61,13 @@ export default class EventManager {
     this.app.fetchCertificate(requestDetails).then(() => {
       this.changeBrowserAction(requestDetails);
     });
+  }
+
+  private receiveWebRequestError(
+    requestDetails: WebNavigation.OnErrorOccurredDetailsType
+  ): void {
+    this.app.analyzeError(requestDetails);
+    this.changeBrowserAction(requestDetails);
   }
 
   private receiveMessage(

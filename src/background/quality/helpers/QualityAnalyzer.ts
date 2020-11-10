@@ -1,8 +1,8 @@
 import Certificate from "../../../types/CommonTypes/certificate/Certificate";
 import { Quality } from "../../../types/Quality";
 
-export default class QualityAnalyzer {
-  getQuality(certificate: Certificate): Quality {
+export default abstract class QualityAnalyzer {
+  static getQuality(certificate: Certificate): Quality {
     if (!this.isDomainValidated(certificate)) {
       return Quality.Unknown;
     }
@@ -18,11 +18,11 @@ export default class QualityAnalyzer {
     return Quality.ExtendedValidated;
   }
 
-  private isDomainValidated(certificate: Certificate): boolean {
+  private static isDomainValidated(certificate: Certificate): boolean {
     return certificate.subject.commonName ? true : false;
   }
 
-  private isOrganizationValidated(certificate: Certificate): boolean {
+  private static isOrganizationValidated(certificate: Certificate): boolean {
     const {
       subject: { commonName, organization, state, location },
     } = certificate;
@@ -34,7 +34,7 @@ export default class QualityAnalyzer {
     }
   }
 
-  private isExtendedValidated(certificate: Certificate): boolean {
+  private static isExtendedValidated(certificate: Certificate): boolean {
     return certificate.hasExtendedValidation;
   }
 }

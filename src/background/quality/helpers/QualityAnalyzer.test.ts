@@ -4,8 +4,6 @@ import Subject from "../../../types/CommonTypes/certificate/Subject";
 import { Quality } from "../../../types/Quality";
 import QualityAnalyzer from "./QualityAnalyzer";
 
-const qualityAnalyzer = new QualityAnalyzer();
-
 test("detects a Domain Validated Certificate", () => {
   const issuer = new Issuer("", "", "", "", "", "");
   const subject = new Subject("example.com", "", "", "", "", "");
@@ -21,7 +19,7 @@ test("detects a Domain Validated Certificate", () => {
     false
   );
 
-  expect(qualityAnalyzer.getQuality(certificate)).toStrictEqual(
+  expect(QualityAnalyzer.getQuality(certificate)).toStrictEqual(
     Quality.DomainValidated
   );
 });
@@ -48,7 +46,7 @@ test("detects an Organization Validated Certificate", () => {
     false
   );
 
-  expect(qualityAnalyzer.getQuality(certificate)).toStrictEqual(
+  expect(QualityAnalyzer.getQuality(certificate)).toStrictEqual(
     Quality.OrganizationValidated
   );
 });
@@ -75,7 +73,7 @@ test("detects an Extended Validated Certificate", () => {
     true
   );
 
-  expect(qualityAnalyzer.getQuality(certificate)).toStrictEqual(
+  expect(QualityAnalyzer.getQuality(certificate)).toStrictEqual(
     Quality.ExtendedValidated
   );
 });
@@ -95,7 +93,7 @@ test("detects a non-conforming Certificate as Unknown", () => {
     false
   );
 
-  expect(qualityAnalyzer.getQuality(certificate)).toStrictEqual(
+  expect(QualityAnalyzer.getQuality(certificate)).toStrictEqual(
     Quality.Unknown
   );
 });

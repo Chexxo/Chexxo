@@ -1,20 +1,25 @@
 jest.mock("./certificate/providers/__mocks__/MockCertificateProvider");
+jest.mock("./certificate/CertificateService");
 jest.mock("./quality/helpers/QualityAnalyzer");
 
 import { WebRequest } from "webextension-polyfill-ts";
 
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
-import QualityAnalyzer from "./quality/helpers/QualityAnalyzer";
 import App from "./App";
 import Issuer from "../types/CommonTypes/certificate/Issuer";
 import Subject from "../types/CommonTypes/certificate/Subject";
 import Certificate from "../types/CommonTypes/certificate/Certificate";
 import { Quality } from "../types/Quality";
 import ErrorMessage from "../types/errors/ErrorMessage";
+import CertificateService from "./certificate/CertificateService";
+import QualityProvider from "./quality/providers/QualityProvider";
+import QualityService from "./quality/QualityService";
 
 let certificateProvider: MockCertificateProvider;
-let qualityAnalyzer: QualityAnalyzer;
+let certificateService: CertificateService;
+let qualityProvider: QualityProvider;
+let qualityService: QualityService;
 let app: App;
 let tabId: number;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
@@ -22,8 +27,10 @@ let certificate: Certificate;
 
 beforeEach(() => {
   certificateProvider = new MockCertificateProvider();
-  qualityAnalyzer = new QualityAnalyzer();
-  app = new App(certificateProvider, qualityAnalyzer);
+  certificateService = new CertificateService(certificateProvider);
+  qualityProvider = new QualityProvider();
+  qualityService = new QualityService(qualityProvider);
+  app = new App(certificateService, qualityService);
   tabId = 1;
   onHeadersReceivedDetails = {
     requestId: "1",
@@ -69,7 +76,7 @@ test("caches quality from QualityAnalyzer", async () => {
     });
   });
 
-  qualityAnalyzer.getQuality = jest.fn(() => {
+  qualityService.getQuality = jest.fn(() => {
     return Quality.DomainValidated;
   });
 
