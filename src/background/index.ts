@@ -7,7 +7,6 @@ import CertificateService from "./certificate/CertificateService";
 import QualityProvider from "./quality/providers/QualityProvider";
 import QualityService from "./quality/QualityService";
 
-
 const {
   browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },
   runtime: { onMessage },
