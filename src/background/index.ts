@@ -1,9 +1,9 @@
 import { browser } from "webextension-polyfill-ts";
 
 import EventManager from "./EventManager";
-import QualityAnalyzer from "./providers/QualityAnalyzer";
+import QualityAnalyzer from "./quality/helpers/QualityAnalyzer";
 import App from "./App";
-import InBrowserProvider from "./providers/InBrowserProvider";
+import InBrowserProvider from "./certificate/providers/InBrowserProvider";
 
 const {
   browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },

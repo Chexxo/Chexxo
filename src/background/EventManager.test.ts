@@ -1,5 +1,5 @@
-jest.mock("./providers/__mocks__/MockCertificateProvider");
-jest.mock("./providers/QualityAnalyzer");
+jest.mock("./certificate/providers/__mocks__/MockCertificateProvider");
+jest.mock("./quality/helpers/QualityAnalyzer");
 jest.mock("./App");
 
 import { deepMock, MockzillaDeep } from "mockzilla";
@@ -12,9 +12,9 @@ import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 import { Quality } from "../types/Quality";
 
 import EventManager from "./EventManager";
-import QualityAnalyzer from "./providers/QualityAnalyzer";
+import QualityAnalyzer from "./quality/helpers/QualityAnalyzer";
 // eslint-disable-next-line jest/no-mocks-import
-import MockCertificateProvider from "./providers/__mocks__/MockCertificateProvider";
+import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
 import App from "./App";
 
 let browser: Browser;

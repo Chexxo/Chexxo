@@ -1,7 +1,7 @@
-import Certificate from "../../types/CommonTypes/certificate/Certificate";
-import Issuer from "../../types/CommonTypes/certificate/Issuer";
-import Subject from "../../types/CommonTypes/certificate/Subject";
-import { Quality } from "../../types/Quality";
+import Certificate from "../../../types/CommonTypes/certificate/Certificate";
+import Issuer from "../../../types/CommonTypes/certificate/Issuer";
+import Subject from "../../../types/CommonTypes/certificate/Subject";
+import { Quality } from "../../../types/Quality";
 import QualityAnalyzer from "./QualityAnalyzer";
 
 const qualityAnalyzer = new QualityAnalyzer();
