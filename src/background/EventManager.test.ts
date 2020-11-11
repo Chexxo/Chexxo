@@ -5,9 +5,9 @@ jest.mock("./App");
 
 import { deepMock, MockzillaDeep } from "mockzilla";
 import { Browser, Runtime } from "webextension-polyfill-ts";
-import Certificate from "../types/CommonTypes/certificate/Certificate";
-import Issuer from "../types/CommonTypes/certificate/Issuer";
-import Subject from "../types/CommonTypes/certificate/Subject";
+import Certificate from "../types/certificate/Certificate";
+import Issuer from "../types/certificate/Issuer";
+import Subject from "../types/certificate/Subject";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 import { Quality } from "../types/Quality";

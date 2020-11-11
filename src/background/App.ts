@@ -1,6 +1,6 @@
 import { WebNavigation, WebRequest } from "webextension-polyfill-ts";
 
-import Certificate from "../types/CommonTypes/certificate/Certificate";
+import Certificate from "../types/certificate/Certificate";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
 import TabData from "../types/TabData";

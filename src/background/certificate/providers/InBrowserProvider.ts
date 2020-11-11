@@ -1,6 +1,6 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
-import Certificate from "../../../types/CommonTypes/certificate/Certificate";
+import Certificate from "../../../types/certificate/Certificate";
 import InsecureConnectionError from "../../../types/errors/InsecureConnectionError";
 import CertificateFactory from "../factories/CertificateFactory";
 import CertificateProvider from "./CertificateProvider";

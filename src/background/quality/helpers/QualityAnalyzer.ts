@@ -1,4 +1,4 @@
-import Certificate from "../../../types/CommonTypes/certificate/Certificate";
+import Certificate from "../../../types/certificate/Certificate";
 import { Quality } from "../../../types/Quality";
 
 export default abstract class QualityAnalyzer {

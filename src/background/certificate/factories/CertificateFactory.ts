@@ -1,8 +1,8 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import Certificate from "../../../types/CommonTypes/certificate/Certificate";
-import DistinguishedName from "../../../types/CommonTypes/certificate/DistinguishedName";
-import Issuer from "../../../types/CommonTypes/certificate/Issuer";
-import Subject from "../../../types/CommonTypes/certificate/Subject";
+import Certificate from "../../../types/certificate/Certificate";
+import DistinguishedName from "../../../types/certificate/DistinguishedName";
+import Issuer from "../../../types/certificate/Issuer";
+import Subject from "../../../types/certificate/Subject";
 
 export default abstract class CertificateFactory {
   public static fromSecurityInfo(

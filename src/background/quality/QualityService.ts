@@ -1,4 +1,4 @@
-import Certificate from "../../types/CommonTypes/certificate/Certificate";
+import Certificate from "../../types/certificate/Certificate";
 import { Quality } from "../../types/Quality";
 import QualityAnalyzer from "./helpers/QualityAnalyzer";
 import QualityProvider from "./providers/QualityProvider";

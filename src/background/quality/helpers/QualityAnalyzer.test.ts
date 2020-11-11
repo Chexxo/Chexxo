@@ -1,6 +1,6 @@
-import Certificate from "../../../types/CommonTypes/certificate/Certificate";
-import Issuer from "../../../types/CommonTypes/certificate/Issuer";
-import Subject from "../../../types/CommonTypes/certificate/Subject";
+import Certificate from "../../../types/certificate/Certificate";
+import Issuer from "../../../types/certificate/Issuer";
+import Subject from "../../../types/certificate/Subject";
 import { Quality } from "../../../types/Quality";
 import QualityAnalyzer from "./QualityAnalyzer";
 

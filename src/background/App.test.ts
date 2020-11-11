@@ -7,9 +7,9 @@ import { WebRequest } from "webextension-polyfill-ts";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
 import App from "./App";
-import Issuer from "../types/CommonTypes/certificate/Issuer";
-import Subject from "../types/CommonTypes/certificate/Subject";
-import Certificate from "../types/CommonTypes/certificate/Certificate";
+import Issuer from "../types/certificate/Issuer";
+import Subject from "../types/certificate/Subject";
+import Certificate from "../types/certificate/Certificate";
 import { Quality } from "../types/Quality";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import CertificateService from "./certificate/CertificateService";

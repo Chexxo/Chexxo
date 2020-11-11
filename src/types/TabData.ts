@@ -1,4 +1,4 @@
-import Certificate from "./CommonTypes/certificate/Certificate";
+import Certificate from "./certificate/Certificate";
 import ErrorMessage from "./errors/ErrorMessage";
 import { Quality } from "./Quality";
 

@@ -1,5 +1,5 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import Subject from "../../../types/CommonTypes/certificate/Subject";
+import Subject from "../../../types/certificate/Subject";
 import CertificateFactory from "./CertificateFactory";
 
 let securityInfo: WebRequest.SecurityInfo;
