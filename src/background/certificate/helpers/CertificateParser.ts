@@ -1,4 +1,4 @@
-import { X509 } from "jsrsasign";
+import { X509, KJUR } from "jsrsasign";
 import Certificate from "../../../types/certificate/Certificate";
 import DistinguishedName from "../../../types/certificate/DistinguishedName";
 import Issuer from "../../../types/certificate/Issuer";
@@ -35,7 +35,11 @@ export default abstract class CertificateParser {
       );
     }
 
-    const serialNumber = fullCert.getSerialNumberHex();
+    const serialNumber = CertificateParser.prettifyHex(
+      fullCert.getSerialNumberHex()
+    );
+    const fingerprint = CertificateParser.getFingerprint(fullCert.hex);
+    const fingerprint256 = CertificateParser.getFingerprint256(fullCert.hex);
 
     const subjectAltNames: string[] = [];
     fullCert.getExtSubjectAltName().array.forEach((element: AltNameEntry) => {
@@ -48,8 +52,8 @@ export default abstract class CertificateParser {
     );
 
     const cert = new Certificate(
-      "",
-      "",
+      fingerprint,
+      fingerprint256,
       issuer,
       serialNumber,
       subject,
@@ -128,5 +132,33 @@ export default abstract class CertificateParser {
       new Date(Date.UTC(year, month - 1, day, hour, minute, second)).getTime() /
         1000
     );
+  }
+
+  private static getFingerprint(certHex: string) {
+    const sha1MD = new KJUR.crypto.MessageDigest({
+      alg: "sha1",
+      prov: "cryptojs",
+    });
+    sha1MD.updateHex(certHex);
+    const hash: string = sha1MD.digest();
+    return CertificateParser.prettifyHex(hash);
+  }
+
+  private static getFingerprint256(certHex: string) {
+    const sha256MD = new KJUR.crypto.MessageDigest({
+      alg: "sha256",
+      prov: "cryptojs",
+    });
+    sha256MD.updateHex(certHex);
+    const hash: string = sha256MD.digest();
+    return CertificateParser.prettifyHex(hash);
+  }
+
+  private static prettifyHex(hash: string) {
+    hash = hash.toUpperCase();
+    const hashArray = hash.match(/.{1,2}/g);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    hash = hashArray!.filter(Boolean).join(":");
+    return hash;
   }
 }
