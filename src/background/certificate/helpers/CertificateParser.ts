@@ -62,7 +62,6 @@ export default abstract class CertificateParser {
       validTo,
       certificatePolicies
     );
-    console.log(cert);
     return cert;
   }
 
