@@ -76,12 +76,12 @@ test("returns Certificate on getCertificate message", () => {
     "0C:AA:F2:4A:B1:A0:C3:34:40:C0:6A:FE:99:DF:98:63:65:B0:78:1F",
     "a3:79:a6:f6:ee:af:b9:a5:5e:37:8c:11:80:34:e2:75:1e:68:2f:ab:9f:2d:30:ab:13:d2:12:55:86:ce:19:47",
     new Issuer("Example", "", "", "", "", ""),
-    0,
+    "",
     new Subject("example.com", "", "", "", "", ""),
     [],
     0,
     0,
-    false
+    []
   );
 
   app.getCertificate = jest.fn((tabId: number) => {

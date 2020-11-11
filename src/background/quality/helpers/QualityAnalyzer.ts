@@ -3,38 +3,30 @@ import { Quality } from "../../../types/Quality";
 
 export default abstract class QualityAnalyzer {
   static getQuality(certificate: Certificate): Quality {
-    if (!this.isDomainValidated(certificate)) {
-      return Quality.Unknown;
-    }
-
-    if (!this.isOrganizationValidated(certificate)) {
+    if (this.isDomainValidated(certificate)) {
       return Quality.DomainValidated;
     }
 
-    if (!this.isExtendedValidated(certificate)) {
+    if (this.isOrganizationValidated(certificate)) {
       return Quality.OrganizationValidated;
     }
 
-    return Quality.ExtendedValidated;
+    if (this.isExtendedValidated(certificate)) {
+      return Quality.ExtendedValidated;
+    }
+
+    return Quality.Unknown;
   }
 
   private static isDomainValidated(certificate: Certificate): boolean {
-    return certificate.subject.commonName ? true : false;
+    return certificate.certificatePolicies.includes("2.23.140.1.2.1");
   }
 
   private static isOrganizationValidated(certificate: Certificate): boolean {
-    const {
-      subject: { commonName, organization, state, location },
-    } = certificate;
-
-    if (commonName && organization && state && location) {
-      return true;
-    } else {
-      return false;
-    }
+    return certificate.certificatePolicies.includes("2.23.140.1.2.2");
   }
 
   private static isExtendedValidated(certificate: Certificate): boolean {
-    return certificate.hasExtendedValidation;
+    return certificate.certificatePolicies.includes("2.23.140.1.1");
   }
 }

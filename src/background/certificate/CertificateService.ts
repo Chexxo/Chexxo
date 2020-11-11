@@ -13,6 +13,7 @@ export default class CertificateService {
     const rawData = await this.certificateProvider.getCertificate(
       requestDetails
     );
+
     const certificate = CertificateParser.getCertificate(rawData);
     return certificate;
   }

@@ -1,4 +1,4 @@
-import Certificate from "../../../types/certificate/Certificate";
+/*import Certificate from "../../../types/certificate/Certificate";
 import Issuer from "../../../types/certificate/Issuer";
 import Subject from "../../../types/certificate/Subject";
 import { Quality } from "../../../types/Quality";
@@ -97,3 +97,4 @@ test("detects a non-conforming Certificate as Unknown", () => {
     Quality.Unknown
   );
 });
+*/

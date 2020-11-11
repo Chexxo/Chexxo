@@ -1,6 +1,6 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
-import Certificate from "../../../types/certificate/Certificate";
+import RawCertificate from "../../../types/CommonTypes/certificate/RawCertificate";
 import InsecureConnectionError from "../../../types/errors/InsecureConnectionError";
 import CertificateFactory from "../factories/CertificateFactory";
 import CertificateProvider from "./CertificateProvider";
@@ -15,11 +15,11 @@ export default class InBrowserProvider implements CertificateProvider {
 
   async getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<Certificate> {
+  ): Promise<RawCertificate> {
     const { requestId } = requestDetails;
     const securityInfo = await this.getSecurityInfo(requestId, {
       certificateChain: false,
-      rawDER: false,
+      rawDER: true,
     });
 
     if (securityInfo.state === "insecure") {
