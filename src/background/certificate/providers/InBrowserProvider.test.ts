@@ -4,9 +4,6 @@ import { Browser, WebRequest } from "webextension-polyfill-ts";
 
 import InBrowserProvider from "./InBrowserProvider";
 import InsecureConnectionError from "../../../types/errors/InsecureConnectionError";
-import Certificate from "../../../types/certificate/Certificate";
-import Issuer from "../../../types/certificate/Issuer";
-import Subject from "../../../types/certificate/Subject";
 
 const [browser, mockBrowser] = deepMock<Browser>("browser", false);
 
@@ -14,7 +11,6 @@ let requestId: string;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let getSecurityInfoOptions: WebRequest.GetSecurityInfoOptionsType;
 let securityInfo: WebRequest.SecurityInfo;
-let certificate: Certificate;
 
 beforeEach(() => {
   requestId = "1";
@@ -35,42 +31,30 @@ beforeEach(() => {
 
   getSecurityInfoOptions = {
     certificateChain: false,
-    rawDER: false,
+    rawDER: true,
   };
 
   securityInfo = {
     state: "secure",
     certificates: [
       {
-        subject: "CN=example.com",
-        issuer: "CN=Example",
+        subject: "",
+        issuer: "",
         validity: { start: 0, end: 0 },
         fingerprint: {
-          sha1: "0C:AA:F2:4A:B1:A0:C3:34:40:C0:6A:FE:99:DF:98:63:65:B0:78:1F",
-          sha256:
-            "a3:79:a6:f6:ee:af:b9:a5:5e:37:8c:11:80:34:e2:75:1e:68:2f:ab:9f:2d:30:ab:13:d2:12:55:86:ce:19:47",
+          sha1: "",
+          sha256: "",
         },
         serialNumber: "0",
         isBuiltInRoot: false,
         subjectPublicKeyInfoDigest: { sha256: "" },
+        rawDER: [1],
       },
     ],
   };
-
-  certificate = new Certificate(
-    "0C:AA:F2:4A:B1:A0:C3:34:40:C0:6A:FE:99:DF:98:63:65:B0:78:1F",
-    "a3:79:a6:f6:ee:af:b9:a5:5e:37:8c:11:80:34:e2:75:1e:68:2f:ab:9f:2d:30:ab:13:d2:12:55:86:ce:19:47",
-    new Issuer("Example", "", "", "", "", ""),
-    "",
-    new Subject("example.com", "", "", "", "", ""),
-    [],
-    0,
-    0,
-    []
-  );
 });
 
-test("returns the certificate when securityInfo is secure", async () => {
+test("returns the raw certificate when securityInfo is secure", async () => {
   mockBrowser.webRequest.getSecurityInfo
     .expect(requestId, getSecurityInfoOptions)
     .andResolve(securityInfo);
@@ -78,10 +62,11 @@ test("returns the certificate when securityInfo is secure", async () => {
   const inBrowserProvider = new InBrowserProvider(
     browser.webRequest.getSecurityInfo
   );
+  const certificate = await inBrowserProvider.getCertificate(
+    onHeadersReceivedDetails
+  );
 
-  await expect(
-    inBrowserProvider.getCertificate(onHeadersReceivedDetails)
-  ).resolves.toEqual(certificate);
+  expect(certificate.pem.length).toBeGreaterThan(0);
 });
 
 test("throws an InsecureConnectionError when securityInfo is insecure", async () => {

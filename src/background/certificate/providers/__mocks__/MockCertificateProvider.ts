@@ -1,8 +1,5 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
-import Certificate from "../../../../types/certificate/Certificate";
-import Issuer from "../../../../types/certificate/Issuer";
-import Subject from "../../../../types/certificate/Subject";
 import RawCertificate from "../../../../types/CommonTypes/certificate/RawCertificate";
 import CertificateProvider from "../CertificateProvider";
 

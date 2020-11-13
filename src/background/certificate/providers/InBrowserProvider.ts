@@ -2,7 +2,7 @@ import { WebRequest } from "webextension-polyfill-ts";
 
 import RawCertificate from "../../../types/CommonTypes/certificate/RawCertificate";
 import InsecureConnectionError from "../../../types/errors/InsecureConnectionError";
-import CertificateFactory from "../factories/CertificateFactory";
+import CertificateFactory from "../factories/RawCertificateFactory";
 import CertificateProvider from "./CertificateProvider";
 
 export default class InBrowserProvider implements CertificateProvider {
