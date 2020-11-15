@@ -1,4 +1,4 @@
-import { WebNavigation, WebRequest } from "webextension-polyfill-ts";
+import { WebRequest } from "webextension-polyfill-ts";
 
 import Certificate from "../types/certificate/Certificate";
 import ErrorMessage from "../types/errors/ErrorMessage";
@@ -38,7 +38,11 @@ export default class App {
     this.tabCache.set(tabId, tabData);
   }
 
-  analyzeError(requestDetails: WebNavigation.OnErrorOccurredDetailsType): void {
+  analyzeError(requestDetails: {
+    tabId: number;
+    frameId: number;
+    error: string;
+  }): void {
     const { tabId } = requestDetails;
     const error = this.certificateService.analyzeError(requestDetails);
 

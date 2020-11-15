@@ -15,6 +15,7 @@ import ErrorMessage from "../types/errors/ErrorMessage";
 import CertificateService from "./certificate/CertificateService";
 import QualityProvider from "./quality/providers/QualityProvider";
 import QualityService from "./quality/QualityService";
+import UntrustedRootError from "../types/errors/certificate/UntrustedRootError";
 
 let certificateProvider: MockCertificateProvider;
 let certificateService: CertificateService;
@@ -84,7 +85,7 @@ test("caches quality from QualityService", async () => {
   expect(app.getQuality(tabId)).toEqual(Quality.DomainValidated);
 });
 
-test("catches errors from CertificateService", async () => {
+test("catches errormessages from CertificateService", async () => {
   certificateService.getCertificate = jest.fn(() => {
     return new Promise((_, reject) => {
       reject(new Error());
@@ -96,4 +97,17 @@ test("catches errors from CertificateService", async () => {
   ).resolves.not.toThrowError();
 
   await expect(app.getErrorMessage(tabId)).toBeInstanceOf(ErrorMessage);
+});
+
+test("caches errormessages from OnErrorOccured event", () => {
+  const requestDetails = { tabId: 0, frameId: 0, error: "" };
+
+  certificateService.analyzeError = jest.fn(() => {
+    return new UntrustedRootError();
+  });
+
+  app.analyzeError(requestDetails);
+  expect(app.getErrorMessage(requestDetails.tabId)).toBeInstanceOf(
+    ErrorMessage
+  );
 });

@@ -9,20 +9,13 @@ import NoHostError from "../../../types/CommonTypes/errors/NoHostError";
 import ServerError from "../../../types/CommonTypes/errors/ServerError";
 import APIResponseError from "../../../types/CommonTypes/api/APIResponseError";
 import RevokedError from "../../../types/errors/certificate/RevokedError";
+import UnknownError from "../../../types/errors/certificate/UnknownError";
 
 export default class ErrorFactory {
   public static fromErrorDto(error: APIResponseError): CodedError {
     const code = error.code;
 
     switch (code) {
-      case 101:
-        return new ExpiredError();
-      case 102:
-        return new InvalidDomainError();
-      case 103:
-        return new SelfSignedError();
-      case 104:
-        return new UntrustedRootError();
       case 501:
         return new ConnectionRefusedError();
       case 502:
@@ -56,7 +49,7 @@ export default class ErrorFactory {
         return new RevokedError();
 
       default:
-        return new ServerError(new Error(code));
+        return new UnknownError();
     }
   }
 }
