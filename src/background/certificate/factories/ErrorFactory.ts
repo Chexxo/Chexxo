@@ -8,6 +8,7 @@ import InvalidResponseError from "../../../types/CommonTypes/errors/InvalidRespo
 import NoHostError from "../../../types/CommonTypes/errors/NoHostError";
 import ServerError from "../../../types/CommonTypes/errors/ServerError";
 import APIResponseError from "../../../types/CommonTypes/api/APIResponseError";
+import RevokedError from "../../../types/errors/certificate/RevokedError";
 
 export default class ErrorFactory {
   public static fromErrorDto(error: APIResponseError): CodedError {
@@ -30,6 +31,32 @@ export default class ErrorFactory {
         return new NoHostError();
       default:
         return new ServerError(new Error(error.publicMessage));
+    }
+  }
+
+  public static fromBrowserErrorCode(code: string): Error {
+    switch (code) {
+      case "Error code 2153390067":
+      case "net::ERR_CERT_AUTHORITY_INVALID":
+        return new UntrustedRootError();
+
+      case "Error code 2153398258":
+        return new SelfSignedError();
+
+      case "Error code 2153390069":
+      case "net::ERR_CERT_DATE_INVALID":
+        return new ExpiredError();
+
+      case "Error code 2153394164":
+      case "net::ERR_CERT_COMMON_NAME_INVALID":
+        return new InvalidDomainError();
+
+      case "Error code 2153390068":
+      case "net::ERR_CERT_REVOKED":
+        return new RevokedError();
+
+      default:
+        return new ServerError(new Error(code));
     }
   }
 }

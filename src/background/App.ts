@@ -21,7 +21,7 @@ export default class App {
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<void> {
     const { tabId } = requestDetails;
-    const tabData: TabData = new TabData();
+    const tabData = this.tabCache.get(tabId) || new TabData();
 
     try {
       tabData.certificate = await this.certificateService.getCertificate(
@@ -44,12 +44,7 @@ export default class App {
 
     if (error !== undefined) {
       const errorMessage = ErrorMessage.fromError(error);
-      let tabData = this.tabCache.get(tabId);
-
-      if (!tabData) {
-        tabData = new TabData();
-      }
-
+      const tabData = this.tabCache.get(tabId) || new TabData();
       tabData.errorMessage = errorMessage;
       this.tabCache.set(tabId, tabData);
     }
