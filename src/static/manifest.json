@@ -12,6 +12,12 @@
     }
   },
 
+  "options_ui": {
+    "page": "options.html",
+    "browser_style": true,
+    "chrome_style": true
+  },
+
   "background": {
     "scripts": ["js/background.js"]
   },
@@ -24,6 +30,7 @@
 
   "content_security_policy": "script-src 'self'; object-src 'self';",
   "permissions": [
+    "storage",
     "webNavigation",
     "webRequest",
     "webRequestBlocking",
