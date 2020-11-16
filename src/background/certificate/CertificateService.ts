@@ -1,5 +1,5 @@
 import { WebNavigation, WebRequest } from "webextension-polyfill-ts";
-import Certificate from "../../types/CommonTypes/certificate/Certificate";
+import Certificate from "../../types/certificate/Certificate";
 import CertificateErrorAnalyzer from "./helpers/CertificateErrorAnalyzer";
 import CertificateParser from "./helpers/CertificateParser";
 import CertificateProvider from "./providers/CertificateProvider";
@@ -13,6 +13,7 @@ export default class CertificateService {
     const rawData = await this.certificateProvider.getCertificate(
       requestDetails
     );
+
     const certificate = CertificateParser.getCertificate(rawData);
     return certificate;
   }

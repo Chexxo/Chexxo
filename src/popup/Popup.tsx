@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Tabs, Runtime } from "webextension-polyfill-ts";
 
-import Certificate from "../types/CommonTypes/certificate/Certificate";
+import Certificate from "../types/certificate/Certificate";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
 import CertificateView from "./pages/CertificateView";

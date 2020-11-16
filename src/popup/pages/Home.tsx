@@ -11,7 +11,7 @@ import {
   Placeholder,
 } from "semantic-ui-react";
 
-import Certificate from "../../types/CommonTypes/certificate/Certificate";
+import Certificate from "../../types/certificate/Certificate";
 import ErrorMessage from "../../types/errors/ErrorMessage";
 import { Quality, maxQuality } from "../../types/Quality";
 import Navigation from "../components/Navigation";

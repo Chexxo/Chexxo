@@ -7,9 +7,9 @@ import { WebRequest } from "webextension-polyfill-ts";
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
 import App from "./App";
-import Issuer from "../types/CommonTypes/certificate/Issuer";
-import Subject from "../types/CommonTypes/certificate/Subject";
-import Certificate from "../types/CommonTypes/certificate/Certificate";
+import Issuer from "../types/certificate/Issuer";
+import Subject from "../types/certificate/Subject";
+import Certificate from "../types/certificate/Certificate";
 import { Quality } from "../types/Quality";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import CertificateService from "./certificate/CertificateService";
@@ -49,12 +49,12 @@ beforeEach(() => {
     "0C:AA:F2:4A:B1:A0:C3:34:40:C0:6A:FE:99:DF:98:63:65:B0:78:1F",
     "a3:79:a6:f6:ee:af:b9:a5:5e:37:8c:11:80:34:e2:75:1e:68:2f:ab:9f:2d:30:ab:13:d2:12:55:86:ce:19:47",
     new Issuer("Example", "", "", "", "", ""),
-    0,
+    "",
     new Subject("example.com", "", "", "", "", ""),
     [],
     0,
     0,
-    false
+    []
   );
 });
 
