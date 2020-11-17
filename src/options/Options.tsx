@@ -1,61 +1,67 @@
 import React, { Component } from "react";
 
-import { Storage } from "webextension-polyfill-ts";
+import Configuration from "../types/Configuration";
+import Configurator from "./Configurator";
 
 interface Props {
-  storage: Storage.StorageArea;
+  configurator: Configurator;
 }
 
 interface State {
-  serverUrl: string;
+  configuration: Configuration | undefined;
+  errorMessage: string;
 }
 
 export default class Options extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      serverUrl: "",
+      configuration: undefined,
+      errorMessage: "",
     };
   }
 
   async componentDidMount(): Promise<void> {
     this.changeServerUrl = this.changeServerUrl.bind(this);
-    const storageData = (await this.readFromStorage(["serverUrl"])) as State;
-    this.setState(storageData);
-  }
 
-  async writeToStorage(keys: Record<string, unknown>): Promise<void> {
     try {
-      await this.props.storage.set(keys);
+      const storageData = await this.props.configurator.getConfiguration();
+      this.setState({ configuration: storageData });
     } catch (error) {
-      console.log(error);
+      const typedError = error as Error;
+      this.setState({ errorMessage: typedError.message });
     }
   }
 
-  async readFromStorage(keys: string[]): Promise<unknown> {
-    try {
-      return await this.props.storage.get(keys);
-    } catch (error) {
-      console.log(error);
-      return undefined;
+  componentDidUpdate(): void {
+    const configuration = this.state.configuration;
+    if (configuration) {
+      this.props.configurator.setConfiguration(configuration);
     }
   }
 
-  changeServerUrl(event: React.FormEvent<HTMLInputElement>): void {
-    const newValue = event.currentTarget.value;
-    this.setState({ serverUrl: newValue });
-    this.writeToStorage({ serverUrl: newValue });
+  async changeServerUrl(
+    event: React.FormEvent<HTMLInputElement>
+  ): Promise<void> {
+    const newUrl = event.currentTarget.value;
+    this.setState((prevState) => ({
+      configuration: {
+        ...prevState.configuration,
+        serverUrl: newUrl,
+      },
+    }));
   }
 
   render(): JSX.Element {
     return (
       <div>
+        {this.state.errorMessage && <p>this.state.errorMessage</p>}
         <label className="browser-style" htmlFor="server-url">
           <span>Server URL:</span>
           <input
             type="text"
-            value={this.state.serverUrl}
-            onBlur={this.changeServerUrl}
+            value={this.state.configuration?.serverUrl}
+            onChange={this.changeServerUrl}
           />
         </label>
       </div>
