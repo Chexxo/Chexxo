@@ -2,7 +2,7 @@ name: WebExtension CI
 on:
   push:
     branches:
-      - 'master'
+      - '**'
 
 jobs:
   build:
@@ -36,6 +36,7 @@ jobs:
           name: Coverage
           path: coverage/*
           if-no-files-found: error
+          retention-days: 14
       
       - name: Run chromium build
         run: npm run build:chromium:prod
@@ -46,6 +47,7 @@ jobs:
           name: chromium
           path: dist/chromium/*
           if-no-files-found: error
+          retention-days: 14
 
       - name: Run firefox build
         run: npm run build:firefox:prod
@@ -56,6 +58,7 @@ jobs:
           name: firefox
           path: dist/firefox/*
           if-no-files-found: error
+          retention-days: 14
       
       - name: Run documentation build
         run: npm run build:documentation
@@ -66,4 +69,5 @@ jobs:
           name: Documentation
           path: docs/*
           if-no-files-found: error
+          retention-days: 14
 
