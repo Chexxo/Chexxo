@@ -18,6 +18,7 @@ import App from "./App";
 import CertificateService from "./certificate/CertificateService";
 import QualityProvider from "./quality/providers/QualityProvider";
 import QualityService from "./quality/QualityService";
+import Configurator from "../helpers/Configurator";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -25,6 +26,7 @@ let certificateProvider: MockCertificateProvider;
 let certificateService: CertificateService;
 let qualityProvider: QualityProvider;
 let qualityService: QualityService;
+let configurator: Configurator;
 let app: App;
 let eventManager: EventManager;
 
@@ -34,7 +36,8 @@ beforeEach(() => {
   certificateService = new CertificateService(certificateProvider);
   qualityProvider = new QualityProvider();
   qualityService = new QualityService(qualityProvider);
-  app = new App(certificateService, qualityService);
+  configurator = new Configurator(browser.storage);
+  app = new App(certificateService, qualityService, configurator);
 
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),

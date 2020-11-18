@@ -2,7 +2,7 @@ jest.mock("./certificate/providers/__mocks__/MockCertificateProvider");
 jest.mock("./certificate/CertificateService");
 jest.mock("./quality/helpers/QualityAnalyzer");
 
-import { WebRequest } from "webextension-polyfill-ts";
+import { Browser, WebRequest } from "webextension-polyfill-ts";
 
 // eslint-disable-next-line jest/no-mocks-import
 import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
@@ -16,22 +16,28 @@ import CertificateService from "./certificate/CertificateService";
 import QualityProvider from "./quality/providers/QualityProvider";
 import QualityService from "./quality/QualityService";
 import UntrustedRootError from "../types/errors/certificate/UntrustedRootError";
+import Configurator from "../helpers/Configurator";
+import { deepMock } from "mockzilla";
 
+let browser: Browser;
 let certificateProvider: MockCertificateProvider;
 let certificateService: CertificateService;
 let qualityProvider: QualityProvider;
 let qualityService: QualityService;
+let configurator: Configurator;
 let app: App;
 let tabId: number;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let certificate: Certificate;
 
 beforeEach(() => {
+  [browser] = deepMock<Browser>("browser", false);
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
   qualityProvider = new QualityProvider();
   qualityService = new QualityService(qualityProvider);
-  app = new App(certificateService, qualityService);
+  configurator = new Configurator(browser.storage);
+  app = new App(certificateService, qualityService, configurator);
   tabId = 1;
   onHeadersReceivedDetails = {
     requestId: "1",

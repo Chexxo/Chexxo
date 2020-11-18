@@ -17,7 +17,7 @@ import NewQuality from "./pages/NewQuality";
 interface Props {
   getTabs: (queryInfo: Tabs.QueryQueryInfoType) => Promise<Tabs.Tab[]>;
   sendMessage: (
-    message: { type: string; params: unknown },
+    message: { type: string; params?: unknown },
     options?: Runtime.SendMessageOptionsType | undefined
   ) => Promise<unknown>;
 }

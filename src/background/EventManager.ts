@@ -6,6 +6,8 @@ import {
   WebNavigation,
   WebRequest,
 } from "webextension-polyfill-ts";
+import Configuration from "../types/Configuration";
+import StorageError from "../types/errors/StorageError";
 import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
 import App from "./App";
@@ -67,7 +69,7 @@ export default class EventManager {
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
     /*
-      has to asserted twice, because 'webextension-polyfill-ts' has declared 
+      has to be asserted twice, because 'webextension-polyfill-ts' has declared 
       OnErrorOccuredDetailsType incorrectly
     */
     const fixedDetails = (requestDetails as unknown) as {
@@ -81,7 +83,7 @@ export default class EventManager {
   }
 
   private receiveMessage(
-    message: { type: string; params: unknown },
+    message: { type: string; params?: unknown },
     _: Runtime.MessageSender,
     sendResponse: (response: unknown) => void
   ): void {
@@ -102,6 +104,21 @@ export default class EventManager {
         const errorMessage = this.app.getErrorMessage(params.tabId);
         sendResponse(errorMessage);
         break;
+      case "getConfiguration":
+        try {
+          const configuration = this.app.getConfiguration();
+          sendResponse(configuration);
+        } catch (error) {
+          sendResponse(error as StorageError);
+        }
+      case "setConfiguration":
+        params = message.params as { configuration: Configuration };
+        try {
+          this.app.setConfiguration(params.configuration);
+          sendResponse(true);
+        } catch (error) {
+          sendResponse(error as Error);
+        }
       default:
         sendResponse(new UnhandledMessageError(JSON.stringify(message)));
     }

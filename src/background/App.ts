@@ -1,6 +1,8 @@
 import { WebRequest } from "webextension-polyfill-ts";
+import Configurator from "../helpers/Configurator";
 
 import Certificate from "../types/certificate/Certificate";
+import Configuration from "../types/Configuration";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
 import TabData from "../types/TabData";
@@ -12,7 +14,8 @@ export default class App {
 
   constructor(
     private certificateService: CertificateService,
-    private qualityService: QualityService
+    private qualityService: QualityService,
+    private configurator: Configurator
   ) {
     this.tabCache = new Map<number, TabData>();
   }
@@ -64,5 +67,13 @@ export default class App {
 
   getErrorMessage(tabId: number): ErrorMessage | undefined {
     return this.tabCache.get(tabId)?.errorMessage;
+  }
+
+  async getConfiguration(): Promise<Configuration> {
+    return await this.configurator.getConfiguration();
+  }
+
+  async setConfiguration(configuration: Configuration): Promise<void> {
+    await this.configurator.setConfiguration(configuration);
   }
 }
