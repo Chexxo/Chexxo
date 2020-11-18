@@ -1,7 +1,7 @@
 const { merge } = require("webpack-merge");
-const common = require("./webpack.common");
+const chrome = require("./webpack.chrome");
 
-module.exports = merge(common, {
+module.exports = merge(chrome, {
   mode: "development",
   devtool: "inline-source-map",
 });

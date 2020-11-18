@@ -18,8 +18,8 @@
     "lint:webext": "npx web-ext lint --source-dir ./dist/",
     "test": "npx jest --verbose --coverage",
     "test:watch": "npx jest --watch",
-    "build:dev": "npx webpack --config webpack.dev.js",
-    "build:prod": "npx webpack --config webpack.prod.js",
+    "build:dev": "npx webpack --config webpack.chrome.dev.js && npx webpack --config webpack.firefox.dev.js",
+    "build:prod": "npx webpack --config webpack.chrome.prod.js && npx webpack --config webpack.firefox.prod.js",
     "build:watch": "npx webpack --config webpack.dev.js --watch",
     "build:documentation": "npx typedoc --options ./typedoc.config.js",
     "start": "npx web-ext run --source-dir ./dist/ --browser-console --start-url www.google.com"
