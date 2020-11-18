@@ -50,11 +50,9 @@ export default class ServerProvider implements CertificateProvider {
     response: APIResponseBody
   ): RawCertificate | CodedError {
     if (response.error !== null) {
-      console.log("error");
       return ErrorFactory.fromErrorDto(response.error);
     }
 
-    console.log("No error");
     return new RawCertificate(response.certificate);
   }
 }

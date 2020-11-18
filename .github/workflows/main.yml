@@ -29,31 +29,41 @@ jobs:
       
       - name: Run tests
         run: npm run test
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: Coverage
+          path: coverage/*
+          if-no-files-found: error
       
-      - name: Run code build
-        run: npm run build:prod
+      - name: Run chromium build
+        run: npm run build:chromium:prod
+      
+      - name: Upload chromium
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: chromium
+          path: dist/chromium/*
+          if-no-files-found: error
+
+      - name: Run firefox build
+        run: npm run build:firefox:prod
+      
+      - name: Upload firefox
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: firefox
+          path: dist/firefox/*
+          if-no-files-found: error
       
       - name: Run documentation build
         run: npm run build:documentation
-        
-      - name: Upload code
-        uses: actions/upload-artifact@v2.2.0
-        with:
-          name: Code
-          path: dist/*
-          if-no-files-found: error
       
       - name: Upload documentation
         uses: actions/upload-artifact@v2.2.0
         with:
           name: Documentation
           path: docs/*
-          if-no-files-found: error
-      
-      - name: Upload coverage
-        uses: actions/upload-artifact@v2.2.0
-        with:
-          name: Coverage
-          path: coverage/*
           if-no-files-found: error
 

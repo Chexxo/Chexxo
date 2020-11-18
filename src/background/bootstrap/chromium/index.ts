@@ -2,7 +2,6 @@ import { browser } from "webextension-polyfill-ts";
 
 import EventManager from "../../EventManager";
 import App from "../../App";
-import InBrowserProvider from "../../certificate/providers/InBrowserProvider";
 import CertificateService from "../../certificate/CertificateService";
 import QualityProvider from "../../quality/providers/QualityProvider";
 import QualityService from "../../quality/QualityService";

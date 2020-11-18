@@ -1,7 +1,7 @@
 const { merge } = require("webpack-merge");
-const chrome = require("./webpack.chrome");
+const chromium = require("./webpack.chromium");
 
-module.exports = merge(chrome, {
+module.exports = merge(chromium, {
   mode: "production",
   optimization: {
     minimize: false,

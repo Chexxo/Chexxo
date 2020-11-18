@@ -6,7 +6,6 @@ import InBrowserProvider from "../../certificate/providers/InBrowserProvider";
 import CertificateService from "../../certificate/CertificateService";
 import QualityProvider from "../../quality/providers/QualityProvider";
 import QualityService from "../../quality/QualityService";
-import ServerProvider from "../../certificate/providers/ServerProvider";
 
 const {
   browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },
