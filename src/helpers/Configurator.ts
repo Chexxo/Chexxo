@@ -1,4 +1,4 @@
-import { browser, Storage } from "webextension-polyfill-ts";
+import { Storage } from "webextension-polyfill-ts";
 import Configuration from "../types/Configuration";
 import StorageError from "../types/errors/StorageError";
 
@@ -17,7 +17,7 @@ export default class Configurator {
   async init(): Promise<void> {
     this.storageArea = this.storage.local;
 
-    browser.storage.onChanged.addListener(
+    this.storage.onChanged.addListener(
       async (changes: { [s: string]: Storage.StorageChange }) => {
         if (changes["configuration"]) {
           const configuration = await this.getConfiguration();
