@@ -73,6 +73,7 @@ export default class EventManager {
       OnErrorOccuredDetailsType incorrectly
     */
     const fixedDetails = (requestDetails as unknown) as {
+      url: string;
       tabId: number;
       frameId: number;
       error: string;

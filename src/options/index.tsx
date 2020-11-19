@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import "semantic-ui-css/semantic.css";
 
 import "./Options.scss";
 import Options from "./Options";

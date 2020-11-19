@@ -19,6 +19,7 @@ export default class CertificateService {
   }
 
   analyzeError(requestDetails: {
+    url: string;
     frameId: number;
     error: string;
   }): Error | undefined {

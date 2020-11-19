@@ -42,6 +42,7 @@ export default class App {
   }
 
   analyzeError(requestDetails: {
+    url: string;
     tabId: number;
     frameId: number;
     error: string;

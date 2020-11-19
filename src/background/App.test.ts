@@ -106,7 +106,7 @@ test("catches errormessages from CertificateService", async () => {
 });
 
 test("caches errormessages from OnErrorOccured event", () => {
-  const requestDetails = { tabId: 0, frameId: 0, error: "" };
+  const requestDetails = { url: "", tabId: 0, frameId: 0, error: "" };
 
   certificateService.analyzeError = jest.fn(() => {
     return new UntrustedRootError();

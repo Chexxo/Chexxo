@@ -1,5 +1,7 @@
 import React, { Component } from "react";
+import { Divider, Form, Label } from "semantic-ui-react";
 import { Runtime } from "webextension-polyfill-ts";
+import isValidUrl from "../helpers/isValidUrl";
 
 import Configuration from "../types/Configuration";
 
@@ -12,6 +14,7 @@ interface Props {
 
 interface State {
   configuration: Configuration;
+  isUrlValid: boolean;
   errorMessage: string;
 }
 
@@ -24,6 +27,7 @@ export default class Options extends Component<Props, State> {
         cacheDomainQualities: false,
         cacheDomainQualitiesIncognito: false,
       },
+      isUrlValid: true,
       errorMessage: "",
     };
   }
@@ -63,12 +67,18 @@ export default class Options extends Component<Props, State> {
 
   changeServerUrl(event: React.FormEvent<HTMLInputElement>): void {
     const newValue = event.currentTarget.value;
-    this.setState((prevState) => ({
-      configuration: {
-        ...prevState.configuration,
-        serverUrl: newValue,
-      } as Configuration,
-    }));
+
+    if (isValidUrl(newValue)) {
+      this.setState((prevState) => ({
+        configuration: {
+          ...prevState.configuration,
+          serverUrl: newValue,
+        } as Configuration,
+        isUrlValid: true,
+      }));
+    } else {
+      this.setState({ isUrlValid: false });
+    }
   }
 
   toggleCacheDomainQualities(): void {
@@ -93,39 +103,40 @@ export default class Options extends Component<Props, State> {
 
   render(): JSX.Element {
     return (
-      <div>
-        {this.state.errorMessage && <p>this.state.errorMessage</p>}
-
-        <label className="browser-style">
-          <span>Server URL:</span>
+      <Form style={{ padding: "0.5rem" }}>
+        <Divider horizontal>Server</Divider>
+        <Form.Field error={!this.state.isUrlValid}>
           <input
             type="text"
-            value={this.state.configuration.serverUrl}
-            onChange={this.changeServerUrl}
+            placeholder="http://localhost:3000"
+            defaultValue={this.state.configuration.serverUrl}
+            onBlur={this.changeServerUrl}
           />
-        </label>
-        <br />
+          {!this.state.isUrlValid && (
+            <Label basic color="red" pointing>
+              URL is not valid
+            </Label>
+          )}
+        </Form.Field>
 
-        <label className="browser-style">
-          <span>Cache managed domains:</span>
-          <input
-            type="checkbox"
-            checked={this.state.configuration.cacheDomainQualities}
-            onChange={this.toggleCacheDomainQualities}
-          />
-        </label>
-        <br />
+        <Divider horizontal>Domains</Divider>
+        <Form.Checkbox
+          toggle
+          label="Cache domain qualities and compare them on the next visit"
+          checked={this.state.configuration.cacheDomainQualities}
+          onChange={this.toggleCacheDomainQualities}
+        />
+        <Form.Checkbox
+          toggle
+          label="Cache domain qualities in Icognito Mode"
+          checked={this.state.configuration.cacheDomainQualitiesIncognito}
+          onChange={this.toggleCacheDomainQualitiesIncognito}
+        />
+        <Form.Button content="Delete cache" fluid />
 
-        <label className="browser-style">
-          <span>Cache managed domains in Incognito Mode:</span>
-          <input
-            type="checkbox"
-            checked={this.state.configuration.cacheDomainQualitiesIncognito}
-            onChange={this.toggleCacheDomainQualitiesIncognito}
-          />
-        </label>
-        <br />
-      </div>
+        <Divider horizontal>Logs</Divider>
+        <Form.Button content="Export" fluid />
+      </Form>
     );
   }
 }

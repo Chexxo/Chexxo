@@ -4,7 +4,7 @@ import StorageError from "../types/errors/StorageError";
 
 export default class Configurator {
   private defaultConfiguration: Configuration = {
-    serverUrl: "http://localhost:3000/",
+    serverUrl: "12345",
     cacheDomainQualities: true,
     cacheDomainQualitiesIncognito: false,
   };
