@@ -27,7 +27,6 @@ export default class ServerProvider implements CertificateProvider {
           const result = this.analyzeAPIResponse(apiResponse);
 
           if (result instanceof CodedError) {
-            console.log(result);
             reject(result);
           } else {
             resolve(result);
