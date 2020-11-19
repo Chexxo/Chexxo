@@ -16,10 +16,21 @@ function sendMessage(): Promise<unknown> {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+function openOptionsPage(): Promise<void> {
+  return new Promise((resolve) => {
+    resolve();
+  });
+}
+
 describe("<Popup />", () => {
   test("should render correctly", async () => {
     const { getByText } = render(
-      <Popup getTabs={getTabs} sendMessage={sendMessage} />
+      <Popup
+        getTabs={getTabs}
+        sendMessage={sendMessage}
+        openOptionsPage={openOptionsPage}
+      />
     );
     expect(getByText("Chexxo")).toBeDefined();
   });

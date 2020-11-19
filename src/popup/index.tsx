@@ -8,10 +8,14 @@ import { browser } from "webextension-polyfill-ts";
 
 const {
   tabs: { query },
-  runtime: { sendMessage },
+  runtime: { openOptionsPage, sendMessage },
 } = browser;
 
 ReactDOM.render(
-  <Popup getTabs={query} sendMessage={sendMessage} />,
+  <Popup
+    getTabs={query}
+    openOptionsPage={openOptionsPage}
+    sendMessage={sendMessage}
+  />,
   document.getElementById("popup")
 );

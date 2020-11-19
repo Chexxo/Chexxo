@@ -16,6 +16,7 @@ import NewQuality from "./pages/NewQuality";
  */
 interface Props {
   getTabs: (queryInfo: Tabs.QueryQueryInfoType) => Promise<Tabs.Tab[]>;
+  openOptionsPage: () => Promise<void>;
   sendMessage: (
     message: { type: string; params?: unknown },
     options?: Runtime.SendMessageOptionsType | undefined
@@ -147,6 +148,7 @@ export default class Popup extends Component<Props, State> {
               errorMessage={this.state.errorMessage}
               certificate={this.state.certificate}
               quality={this.state.quality}
+              openOptionsPage={this.props.openOptionsPage}
             />
           </Route>
         </Switch>
