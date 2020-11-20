@@ -6,7 +6,7 @@ export default abstract class CertificateErrorAnalyzer {
     error: string;
   }): Error | undefined {
     if (requestDetails.frameId !== 0) {
-      return;
+      return undefined;
     }
     return ErrorFactory.fromBrowserErrorCode(requestDetails.error);
   }
