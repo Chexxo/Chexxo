@@ -4,10 +4,7 @@ const { merge } = require("webpack-merge");
 
 module.exports = merge(common, {
   entry: {
-    background: path.join(
-      __dirname,
-      "src/background/bootstrap/chromium/index.ts"
-    ),
+    background: path.join(__dirname, "src/bootstrap/chromium/index.ts"),
   },
   output: {
     path: path.join(__dirname, "dist/chromium/js/"),
