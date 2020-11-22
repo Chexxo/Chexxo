@@ -37,7 +37,7 @@ export default class Configurator {
 
   async setConfiguration(configuration: Configuration): Promise<void> {
     try {
-      this.storageArea?.set({ configuration });
+      await this.storageArea?.set({ configuration });
     } catch (error) {
       throw new StorageError();
     }

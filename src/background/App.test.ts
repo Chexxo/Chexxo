@@ -17,9 +17,10 @@ import QualityProvider from "./quality/providers/QualityProvider";
 import QualityService from "./quality/QualityService";
 import UntrustedRootError from "../types/errors/certificate/UntrustedRootError";
 import Configurator from "../helpers/Configurator";
-import { deepMock } from "mockzilla";
+import { deepMock, MockzillaDeep } from "mockzilla";
 
 let browser: Browser;
+let mockBrowser: MockzillaDeep<Browser>;
 let certificateProvider: MockCertificateProvider;
 let certificateService: CertificateService;
 let qualityProvider: QualityProvider;
@@ -31,7 +32,8 @@ let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let certificate: Certificate;
 
 beforeEach(() => {
-  [browser] = deepMock<Browser>("browser", false);
+  [browser, mockBrowser] = deepMock<Browser>("browser", false);
+  mockBrowser.storage.mockAllow();
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
   qualityProvider = new QualityProvider();

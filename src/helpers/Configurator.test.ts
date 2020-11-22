@@ -54,12 +54,8 @@ test("throws error when storage set operation failed", async () => {
   const configuration = new Configuration("http://localhost:3000", false, true);
 
   mockBrowser.storage.local.set
-    .expect({ configuration })
+    .expect(expect.anything())
     .andReject(new Error());
-
-  try {
-    
-  }
 
   await expect(
     configurator.setConfiguration(configuration)

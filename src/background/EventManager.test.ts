@@ -32,6 +32,7 @@ let eventManager: EventManager;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
+  mockBrowser.storage.mockAllow();
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
   qualityProvider = new QualityProvider();
