@@ -80,6 +80,7 @@ export default class EventManager {
       case "getCertificate":
         params = message.params as { tabId: number };
         const certificate = this.app.getCertificate(params.tabId);
+        console.log(certificate);
         sendResponse(certificate);
         break;
       case "getQuality":

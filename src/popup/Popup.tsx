@@ -131,7 +131,7 @@ export default class Popup extends Component<Props, State> {
       <Router>
         <Switch>
           <Route path="/certificate">
-            <CertificateView />
+            <CertificateView certificate={this.state.certificate} />
           </Route>
           <Route path="/new-quality">
             <NewQuality />

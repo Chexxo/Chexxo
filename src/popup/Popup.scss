@@ -1,17 +1,42 @@
 body {
   min-width: 300px;
-  min-height: 400px;
+  max-width: 500px;
+  min-height: 500px;
+}
+
+.container {
+  padding: 2rem 1rem;
 }
 
 .flex-container {
+  @extend .container;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
-  padding: 2rem 1rem;
+}
+
+.floating-back-button {
+  position: fixed;
+  top: 2rem;
+  left: 1rem;
 }
 
 .quality-text {
   margin-right: 0.25rem;
   font-size: 1.2rem;
+}
+
+.data-view {
+  width: 100;
+  text-align: left;
+
+  th {
+    width: 12rem;
+  }
+
+  .word-wrap {
+    max-width: 20rem;
+    word-wrap: break-word;
+  }
 }

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import { Menu, Icon, Popup as Tooltip } from "semantic-ui-react";
 
 export default class Navigation extends Component {
@@ -8,7 +9,7 @@ export default class Navigation extends Component {
         <Tooltip
           content="Certificate"
           trigger={
-            <Menu.Item disabled>
+            <Menu.Item as={NavLink} to="/certificate">
               <Icon name="clipboard outline" />
             </Menu.Item>
           }

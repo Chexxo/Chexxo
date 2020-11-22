@@ -2,12 +2,10 @@ import React, { Component } from "react";
 import {
   Container,
   Divider,
-  Header,
   Icon,
   Message,
   Popup as Tooltip,
   Rating,
-  Image,
   Placeholder,
 } from "semantic-ui-react";
 
@@ -15,6 +13,7 @@ import Certificate from "../../types/certificate/Certificate";
 import ErrorMessage from "../../types/errors/ErrorMessage";
 import { Quality, maxQuality } from "../../types/Quality";
 import Navigation from "../components/Navigation";
+import PageHeader from "../components/PageHeader";
 
 interface Props {
   errorMessage: ErrorMessage | undefined;
@@ -29,9 +28,7 @@ export default class Home extends Component<Props> {
   render(): JSX.Element {
     return (
       <div className="flex-container">
-        <Header as="h2" textAlign="center">
-          <Image src="../assets/logo.svg" size="tiny" /> Chexxo
-        </Header>
+        <PageHeader />
 
         <Divider section />
 
