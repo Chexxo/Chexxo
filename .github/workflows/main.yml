@@ -5,9 +5,34 @@ on:
       - '**'
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
-    
+    steps:
+      - name: Fix up git URLs
+        run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: 12.x
+      
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: | 
+            node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+  test:
+    runs-on: ubuntu-latest
+    needs: setup
     steps:
       - name: Fix up git URLs
         run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
@@ -20,28 +45,77 @@ jobs:
         uses: actions/setup-node@v2.1.2
         with:
           node-version: 12.x
-      
-      - name: Install dependencies
-        run: npm i
+
+      - name: Load Cache
+        id: load-cache
+        uses: actions/cache@v2
+        with:
+          path: | 
+            node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
 
       - name: Run lint
         run: npm run lint:eslint
       
       - name: Run tests
         run: npm run test
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: Coverage
+          path: coverage/*
+          if-no-files-found: error
+          retention-days: 1
+  build-dev:
+    runs-on: ubuntu-latest
+    needs: setup
+    if: github.ref != 'refs/heads/master'
+    steps:
+      - name: Fix up git URLs
+        run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: 12.x
+
+      - name: Load Cache
+        id: load-cache
+        uses: actions/cache@v2
+        with:
+          path: | 
+            node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Run chromium build
+        run: npm run build:chromium:prod
       
-      - name: Run code build
-        run: npm run build:prod
+      - name: Upload chromium
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: chromium
+          path: dist/chromium/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Run firefox build
+        run: npm run build:firefox:prod
+      
+      - name: Upload firefox
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: firefox
+          path: dist/firefox/*
+          if-no-files-found: error
+          retention-days: 1
       
       - name: Run documentation build
         run: npm run build:documentation
-        
-      - name: Upload code
-        uses: actions/upload-artifact@v2.2.0
-        with:
-          name: Code
-          path: dist/*
-          if-no-files-found: error
       
       - name: Upload documentation
         uses: actions/upload-artifact@v2.2.0
@@ -49,11 +123,61 @@ jobs:
           name: Documentation
           path: docs/*
           if-no-files-found: error
+          retention-days: 1
+  build-prod:
+    runs-on: ubuntu-latest
+    needs: setup
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Fix up git URLs
+        run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: 12.x
+
+      - name: Load Cache
+        id: load-cache
+        uses: actions/cache@v2
+        with:
+          path: | 
+            node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Run chromium build
+        run: npm run build:chromium:prod
       
-      - name: Upload coverage
+      - name: Upload chromium
         uses: actions/upload-artifact@v2.2.0
         with:
-          name: Coverage
-          path: coverage/*
+          name: chromium
+          path: dist/chromium/*
           if-no-files-found: error
+          retention-days: 14
 
+      - name: Run firefox build
+        run: npm run build:firefox:prod
+      
+      - name: Upload firefox
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: firefox
+          path: dist/firefox/*
+          if-no-files-found: error
+          retention-days: 14
+      
+      - name: Run documentation build
+        run: npm run build:documentation
+      
+      - name: Upload documentation
+        uses: actions/upload-artifact@v2.2.0
+        with:
+          name: Documentation
+          path: docs/*
+          if-no-files-found: error
+          retention-days: 14

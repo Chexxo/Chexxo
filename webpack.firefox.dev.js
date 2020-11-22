@@ -1,7 +1,7 @@
 const { merge } = require("webpack-merge");
-const common = require("./webpack.common");
+const firefox = require("./webpack.firefox");
 
-module.exports = merge(common, {
+module.exports = merge(firefox, {
   mode: "development",
   devtool: "inline-source-map",
 });
