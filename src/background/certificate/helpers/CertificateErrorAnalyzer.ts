@@ -5,9 +5,9 @@ export default abstract class CertificateErrorAnalyzer {
     url: string;
     frameId: number;
     error: string;
-  }): Error | undefined {
+  }): Error | null {
     if (requestDetails.frameId !== 0 || requestDetails.url === "about:blank") {
-      return;
+      return null;
     }
     return ErrorFactory.fromBrowserErrorCode(requestDetails.error);
   }

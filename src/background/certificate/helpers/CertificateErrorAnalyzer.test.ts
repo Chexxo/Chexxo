@@ -18,5 +18,5 @@ test("returns undefined a non main-frame frameId is provided", () => {
     frameId: 1,
     error: "Error code 2153390067",
   };
-  expect(CertificateErrorAnalyzer.analyzeError(requestDetails)).toBeUndefined();
+  expect(CertificateErrorAnalyzer.analyzeError(requestDetails)).toBeNull();
 });

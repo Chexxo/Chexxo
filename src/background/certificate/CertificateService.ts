@@ -22,7 +22,7 @@ export default class CertificateService {
     url: string;
     frameId: number;
     error: string;
-  }): Error | undefined {
+  }): Error | null {
     return CertificateErrorAnalyzer.analyzeError(requestDetails);
   }
 }

@@ -1,12 +1,12 @@
 import { browser } from "webextension-polyfill-ts";
 
-import EventManager from "./EventManager";
-import App from "./App";
-import InBrowserProvider from "./certificate/providers/InBrowserProvider";
-import CertificateService from "./certificate/CertificateService";
-import QualityProvider from "./quality/providers/QualityProvider";
-import QualityService from "./quality/QualityService";
-import Configurator from "../helpers/Configurator";
+import Configurator from "../../helpers/Configurator";
+import EventManager from "../../background/EventManager";
+import App from "../../background/App";
+import InBrowserProvider from "../../background/certificate/providers/InBrowserProvider";
+import CertificateService from "../../background/certificate/CertificateService";
+import QualityProvider from "../../background/quality/providers/QualityProvider";
+import QualityService from "../../background/quality/QualityService";
 
 const {
   browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },
