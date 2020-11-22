@@ -46,7 +46,7 @@ export default class App {
     const { tabId } = requestDetails;
     const error = this.certificateService.analyzeError(requestDetails);
 
-    if (error !== undefined) {
+    if (error !== null) {
       const errorMessage = ErrorMessage.fromError(error);
       const tabData = this.tabCache.get(tabId) || new TabData();
       tabData.errorMessage = errorMessage;

@@ -4,9 +4,9 @@ export default abstract class CertificateErrorAnalyzer {
   static analyzeError(requestDetails: {
     frameId: number;
     error: string;
-  }): Error | undefined {
+  }): Error | null {
     if (requestDetails.frameId !== 0) {
-      return undefined;
+      return null;
     }
     return ErrorFactory.fromBrowserErrorCode(requestDetails.error);
   }

@@ -21,7 +21,7 @@ export default class CertificateService {
   analyzeError(requestDetails: {
     frameId: number;
     error: string;
-  }): Error | undefined {
+  }): Error | null {
     return CertificateErrorAnalyzer.analyzeError(requestDetails);
   }
 }
