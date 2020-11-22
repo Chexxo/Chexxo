@@ -120,6 +120,10 @@ export default class EventManager {
         } catch (error) {
           sendResponse(error as Error);
         }
+      case "deleteCache":
+        console.log("cache was deleted.");
+      case "exportLogs":
+        console.log("logs were exported.");
       default:
         sendResponse(new UnhandledMessageError(JSON.stringify(message)));
     }

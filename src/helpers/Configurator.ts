@@ -4,7 +4,7 @@ import StorageError from "../types/errors/StorageError";
 
 export default class Configurator {
   private defaultConfiguration: Configuration = {
-    serverUrl: "12345",
+    serverUrl: "",
     cacheDomainQualities: true,
     cacheDomainQualitiesIncognito: false,
   };
@@ -14,41 +14,32 @@ export default class Configurator {
 
   constructor(private storage: Storage.Static) {}
 
-  async init(): Promise<void> {
+  init(): void {
     this.storageArea = this.storage.local;
-
-    this.storage.onChanged.addListener(
-      async (changes: { [s: string]: Storage.StorageChange }) => {
-        if (changes["configuration"]) {
-          const configuration = await this.getConfiguration();
-          for (const listener of this.changeListeners) {
-            listener(configuration);
-          }
-        }
-      }
-    );
+    this.storage.onChanged.addListener(this.notifyListeners);
   }
 
   async getConfiguration(): Promise<Configuration> {
-    const storedData = await this.storageArea?.get(["configuration"]);
-
-    if (storedData === undefined) {
-      throw new StorageError("Storage operation failed.");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let storedData: { [s: string]: any } | undefined = undefined;
+    try {
+      storedData = await await this.storageArea?.get(["configuration"]);
+    } catch (error) {
+      throw new StorageError();
     }
 
-    if (Object.keys(storedData).length === 0) {
+    if (!storedData?.configuration) {
       return this.defaultConfiguration;
     }
 
     return storedData["configuration"];
   }
 
-  setConfiguration(configuration: Configuration): void {
+  async setConfiguration(configuration: Configuration): Promise<void> {
     try {
       this.storageArea?.set({ configuration });
     } catch (error) {
-      const typedError = error as Error;
-      throw new StorageError(typedError.message, typedError.stack);
+      throw new StorageError();
     }
   }
 
@@ -56,15 +47,14 @@ export default class Configurator {
     this.changeListeners.push(listener);
   }
 
-  removeListener(listener: (configuration: Configuration) => void): void {
-    const index = this.changeListeners.indexOf(listener);
-    if (index !== -1) {
-      this.changeListeners.splice(index, 1);
+  private async notifyListeners(changes: {
+    [s: string]: Storage.StorageChange;
+  }) {
+    if (changes.configuration) {
+      const configuration = await this.getConfiguration();
+      for (const listener of this.changeListeners) {
+        listener(configuration);
+      }
     }
-  }
-
-  hasListener(listener: (configuration: Configuration) => void): boolean {
-    const index = this.changeListeners.indexOf(listener);
-    return index !== -1;
   }
 }

@@ -6,7 +6,6 @@ export default abstract class CertificateErrorAnalyzer {
     frameId: number;
     error: string;
   }): Error | undefined {
-    console.log(requestDetails);
     if (requestDetails.frameId !== 0 || requestDetails.url === "about:blank") {
       return;
     }

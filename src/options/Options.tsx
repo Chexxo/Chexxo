@@ -101,6 +101,14 @@ export default class Options extends Component<Props, State> {
     }));
   }
 
+  deleteCache(): void {
+    this.props.sendMessage({ type: "deleteCache" });
+  }
+
+  exportLogs(): void {
+    this.props.sendMessage({ type: "exportLogs" });
+  }
+
   render(): JSX.Element {
     return (
       <Form style={{ padding: "0.5rem" }}>
@@ -132,10 +140,10 @@ export default class Options extends Component<Props, State> {
           checked={this.state.configuration.cacheDomainQualitiesIncognito}
           onChange={this.toggleCacheDomainQualitiesIncognito}
         />
-        <Form.Button content="Delete cache" fluid />
+        <Form.Button content="Delete cache" fluid onClick={this.deleteCache} />
 
         <Divider horizontal>Logs</Divider>
-        <Form.Button content="Export" fluid />
+        <Form.Button content="Export" fluid onClick={this.exportLogs} />
       </Form>
     );
   }
