@@ -56,7 +56,7 @@ export default class EventManager {
     this.tabActivatedEmitter.addListener(this.changeBrowserAction.bind(this));
   }
 
-  private receiveWebRequest(
+  public receiveWebRequest(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
     // using await is not possible here, since making receiveWebRequest async is not allowed
@@ -65,7 +65,7 @@ export default class EventManager {
     });
   }
 
-  private receiveWebRequestError(
+  public receiveWebRequestError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
     /*
@@ -83,7 +83,7 @@ export default class EventManager {
     this.changeBrowserAction(fixedDetails);
   }
 
-  private receiveMessage(
+  public receiveMessage(
     message: { type: string; params?: unknown },
     _: Runtime.MessageSender,
     sendResponse: (response: unknown) => void
@@ -129,7 +129,7 @@ export default class EventManager {
     }
   }
 
-  private changeBrowserAction(tabInfo: { tabId: number }): void {
+  public changeBrowserAction(tabInfo: { tabId: number }): void {
     const { tabId } = tabInfo;
     if (this.app.getErrorMessage(tabId)) {
       this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });
