@@ -1,7 +1,7 @@
 import CertificateError from "../../../types/errors/certificate/CertificateError";
 import CertificateErrorAnalyzer from "./CertificateErrorAnalyzer";
 
-test("returns CertificateError when a handled error code is provided", () => {
+test("returns CertificateError if a handled error code is provided", () => {
   const requestDetails = {
     url: "",
     frameId: 0,
@@ -12,7 +12,7 @@ test("returns CertificateError when a handled error code is provided", () => {
   );
 });
 
-test("returns undefined a non main-frame frameId is provided", () => {
+test("returns undefined if a non main-frame frameId is provided", () => {
   const requestDetails = {
     url: "",
     frameId: 1,

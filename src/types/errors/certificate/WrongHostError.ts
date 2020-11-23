@@ -7,4 +7,5 @@ export default class InvalidDomainError extends CertificateError {
   readonly name: string = "Certificate invalid host exception";
   readonly code: number = 102;
   readonly message: string = "The certificate is not valid for this domain.";
+  readonly publicMessage: string = this.message;
 }
