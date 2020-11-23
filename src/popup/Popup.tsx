@@ -133,15 +133,6 @@ export default class Popup extends Component<Props, State> {
           <Route path="/certificate">
             <CertificateView certificate={this.state.certificate} />
           </Route>
-          <Route path="/new-quality">
-            <NewQuality />
-          </Route>
-          <Route path="/domains">
-            <Domains />
-          </Route>
-          <Route path="/configuration">
-            <Configuration />
-          </Route>
           <Route path="/">
             <Home
               errorMessage={this.state.errorMessage}

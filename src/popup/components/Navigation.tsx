@@ -15,22 +15,6 @@ export default class Navigation extends Component {
           }
         />
         <Tooltip
-          content="New Quality Entry"
-          trigger={
-            <Menu.Item disabled>
-              <Icon name="pencil" />
-            </Menu.Item>
-          }
-        />
-        <Tooltip
-          content="Managed Domains"
-          trigger={
-            <Menu.Item disabled>
-              <Icon name="list" />
-            </Menu.Item>
-          }
-        />
-        <Tooltip
           content="Configuration"
           trigger={
             <Menu.Item disabled>
