@@ -1,4 +1,4 @@
-import { WebNavigation, WebRequest } from "webextension-polyfill-ts";
+import { WebRequest } from "webextension-polyfill-ts";
 import Certificate from "../../types/certificate/Certificate";
 import CertificateErrorAnalyzer from "./helpers/CertificateErrorAnalyzer";
 import CertificateParser from "./helpers/CertificateParser";
@@ -18,9 +18,10 @@ export default class CertificateService {
     return certificate;
   }
 
-  analyzeError(
-    requestDetails: WebNavigation.OnErrorOccurredDetailsType
-  ): Error | undefined {
+  analyzeError(requestDetails: {
+    frameId: number;
+    error: string;
+  }): Error | null {
     return CertificateErrorAnalyzer.analyzeError(requestDetails);
   }
 }

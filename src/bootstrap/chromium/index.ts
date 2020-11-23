@@ -1,21 +1,21 @@
 import { browser } from "webextension-polyfill-ts";
 
-import EventManager from "./EventManager";
-import App from "./App";
-import InBrowserProvider from "./certificate/providers/InBrowserProvider";
-import CertificateService from "./certificate/CertificateService";
-import QualityProvider from "./quality/providers/QualityProvider";
-import QualityService from "./quality/QualityService";
+import EventManager from "../../background/EventManager";
+import App from "../../background/App";
+import CertificateService from "../../background/certificate/CertificateService";
+import QualityProvider from "../../background/quality/providers/QualityProvider";
+import QualityService from "../../background/quality/QualityService";
+import ServerProvider from "../../background/certificate/providers/ServerProvider";
 
 const {
   browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },
   runtime: { onMessage },
   tabs: { onActivated },
   webNavigation: { onErrorOccurred },
-  webRequest: { onHeadersReceived, getSecurityInfo },
+  webRequest: { onHeadersReceived },
 } = browser;
 
-const certificateProvider = new InBrowserProvider(getSecurityInfo);
+const certificateProvider = new ServerProvider();
 const certificateService = new CertificateService(certificateProvider);
 const qualityProvider = new QualityProvider();
 const qualityService = new QualityService(qualityProvider);
