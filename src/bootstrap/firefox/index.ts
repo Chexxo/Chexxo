@@ -12,7 +12,7 @@ const {
   runtime: { onMessage },
   tabs: { onActivated },
   webNavigation: { onErrorOccurred },
-  webRequest: { onHeadersReceived, getSecurityInfo },
+  webRequest: { onBeforeRequest, onHeadersReceived, getSecurityInfo },
 } = browser;
 
 const certificateProvider = new InBrowserProvider(getSecurityInfo);
@@ -22,6 +22,7 @@ const qualityService = new QualityService(qualityProvider);
 const app = new App(certificateService, qualityService);
 
 const eventManager = new EventManager(
+  onBeforeRequest,
   onHeadersReceived,
   onErrorOccurred,
   onMessage,

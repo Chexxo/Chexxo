@@ -17,6 +17,10 @@ export default class App {
     this.tabCache = new Map<number, TabData>();
   }
 
+  resetTabData(tabId: number): void {
+    this.tabCache.delete(tabId);
+  }
+
   async fetchCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<void> {

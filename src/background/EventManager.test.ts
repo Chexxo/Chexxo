@@ -36,6 +36,14 @@ beforeEach(() => {
   qualityService = new QualityService(qualityProvider);
   app = new App(certificateService, qualityService);
 
+  mockBrowser.webRequest.onBeforeRequest.addListener.expect(
+    expect.anything(),
+    {
+      urls: ["<all_urls>"],
+      types: ["main_frame"],
+    },
+    []
+  );
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),
     {
@@ -54,6 +62,7 @@ beforeEach(() => {
   mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
 
   eventManager = new EventManager(
+    browser.webRequest.onBeforeRequest,
     browser.webRequest.onHeadersReceived,
     browser.webNavigation.onErrorOccurred,
     browser.runtime.onMessage,
