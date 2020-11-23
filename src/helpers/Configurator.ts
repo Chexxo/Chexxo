@@ -47,7 +47,7 @@ export default class Configurator {
     this.changeListeners.push(listener);
   }
 
-  public async notifyListeners(changes: {
+  async notifyListeners(changes: {
     [s: string]: Storage.StorageChange;
   }): Promise<void> {
     if (changes.configuration) {

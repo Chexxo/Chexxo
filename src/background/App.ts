@@ -18,6 +18,11 @@ export default class App {
     private configurator: Configurator
   ) {
     this.tabCache = new Map<number, TabData>();
+    configurator.addListener(this.updateConfiguration);
+  }
+
+  updateConfiguration(configuration: Configuration): void {
+    console.log(configuration);
   }
 
   async fetchCertificate(

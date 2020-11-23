@@ -13,6 +13,7 @@ interface Props {
 }
 
 interface State {
+  isInitialRender: boolean;
   configuration: Configuration;
   isUrlValid: boolean;
   errorMessage: string;
@@ -22,6 +23,7 @@ export default class Options extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      isInitialRender: true,
       configuration: {
         serverUrl: "",
         cacheDomainQualities: false,
@@ -52,7 +54,12 @@ export default class Options extends Component<Props, State> {
     }
   }
 
-  async componentDidUpdate(): Promise<void> {
+  async componentDidUpdate(prevProps: Props, prevState: State): Promise<void> {
+    if (this.state.isInitialRender) {
+      this.setState({ isInitialRender: false });
+      return;
+    }
+
     try {
       const configuration = this.state.configuration;
       await this.props.sendMessage({
