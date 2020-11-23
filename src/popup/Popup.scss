@@ -1,7 +1,5 @@
 body {
-  min-width: 300px;
   max-width: 500px;
-  min-height: 500px;
 }
 
 .container {
@@ -13,7 +11,18 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+
+  h2 {
+    flex: 1;
+    margin: 0 !important;
+    align-self: center;
+    justify-self: center;
+  }
 }
 
 .floating-back-button {
@@ -27,16 +36,38 @@ body {
   font-size: 1.2rem;
 }
 
-.data-view {
-  width: 100;
+.data-table {
+  width: 100%;
   text-align: left;
+
+  tr {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  th, td {
+    padding: 0 0.25rem;
+  }
 
   th {
     width: 12rem;
+    vertical-align: top;
   }
 
   .word-wrap {
-    max-width: 20rem;
+    max-width: 24rem;
     word-wrap: break-word;
+  }
+}
+
+.data-multi-list {
+  overflow: hidden;
+
+  .item {
+    float: left;
+    width: 50%;
+    word-wrap: break-word;
+    padding: 0.25rem 0.5rem 0.25rem 2.5rem;
+    text-indent: -2rem;
   }
 }

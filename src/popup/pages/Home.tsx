@@ -28,7 +28,7 @@ export default class Home extends Component<Props> {
   render(): JSX.Element {
     return (
       <div className="flex-container">
-        <PageHeader />
+        <PageHeader title="Chexxo" hasHomeButton={false} />
 
         <Divider section />
 

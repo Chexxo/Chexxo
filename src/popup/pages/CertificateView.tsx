@@ -11,36 +11,14 @@ export default class CertificateView extends Component<Props> {
   render(): JSX.Element {
     return (
       <div className="container">
-        <PageHeader />
+        <PageHeader title="Certificate" hasHomeButton={true} />
 
         <Divider section hidden />
 
         {this.props.certificate ? (
           <div>
-            <Divider horizontal>Fingerprints</Divider>
-            <table className="data-view">
-              <tbody>
-                <tr>
-                  <th>SHA-1</th>
-                  <td>
-                    <div className="word-wrap">
-                      {this.props.certificate.fingerprint}
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th>SHA-256</th>
-                  <td>
-                    <div className="word-wrap">
-                      {this.props.certificate.fingerprint256}
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
             <Divider horizontal>Subject</Divider>
-            <table className="data-view">
+            <table className="data-table">
               <tbody>
                 <tr>
                   <th>Common Name</th>
@@ -66,13 +44,13 @@ export default class CertificateView extends Component<Props> {
                 )}
                 {this.props.certificate.subject.state && (
                   <tr>
-                    <th>Location</th>
+                    <th>State</th>
                     <td>{this.props.certificate.subject.state}</td>
                   </tr>
                 )}
                 {this.props.certificate.subject.country && (
                   <tr>
-                    <th>Location</th>
+                    <th>Country</th>
                     <td>{this.props.certificate.subject.country}</td>
                   </tr>
                 )}
@@ -82,22 +60,20 @@ export default class CertificateView extends Component<Props> {
             {this.props.certificate.subjectAltName && (
               <div>
                 <Divider horizontal>Alternative Subjectnames</Divider>
-                <table className="data-view">
-                  <tbody>
-                    {this.props.certificate.subjectAltName.map((name) => {
-                      return (
-                        <tr key={name}>
-                          <td>{name}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="data-multi-list">
+                  {this.props.certificate.subjectAltName.map((name) => {
+                    return (
+                      <div className="item" key={name}>
+                        {name}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
             <Divider horizontal>Issuer</Divider>
-            <table className="data-view">
+            <table className="data-table">
               <tbody>
                 <tr>
                   <th>Common Name</th>
@@ -123,16 +99,38 @@ export default class CertificateView extends Component<Props> {
                 )}
                 {this.props.certificate.issuer.state && (
                   <tr>
-                    <th>Location</th>
+                    <th>State</th>
                     <td>{this.props.certificate.issuer.state}</td>
                   </tr>
                 )}
                 {this.props.certificate.issuer.country && (
                   <tr>
-                    <th>Location</th>
+                    <th>Country</th>
                     <td>{this.props.certificate.issuer.country}</td>
                   </tr>
                 )}
+              </tbody>
+            </table>
+
+            <Divider horizontal>Fingerprints</Divider>
+            <table className="data-table">
+              <tbody>
+                <tr>
+                  <th>SHA-1</th>
+                  <td>
+                    <div className="word-wrap">
+                      {this.props.certificate.fingerprint}
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th>SHA-256</th>
+                  <td>
+                    <div className="word-wrap">
+                      {this.props.certificate.fingerprint256}
+                    </div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>

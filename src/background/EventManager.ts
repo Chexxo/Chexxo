@@ -71,6 +71,7 @@ export default class EventManager {
       OnErrorOccuredDetailsType incorrectly
     */
     const fixedDetails = (requestDetails as unknown) as {
+      url: string;
       tabId: number;
       frameId: number;
       error: string;
@@ -90,7 +91,6 @@ export default class EventManager {
       case "getCertificate":
         params = message.params as { tabId: number };
         const certificate = this.app.getCertificate(params.tabId);
-        console.log(certificate);
         sendResponse(certificate);
         break;
       case "getQuality":
