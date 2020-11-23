@@ -31,8 +31,8 @@ body {
 }
 
 .data-table {
-  width: 100%;
   text-align: left;
+  width: 30rem;
 
   tr {
     display: block;
@@ -44,12 +44,16 @@ body {
   }
 
   th {
-    width: 12rem;
+    width: 10rem;
     vertical-align: top;
+  }
+  
+  td {
+    width: 20rem;
   }
 
   .word-wrap {
-    max-width: 24rem;
+    max-width: 20rem;
     word-wrap: break-word;
   }
 }
