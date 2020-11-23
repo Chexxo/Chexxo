@@ -66,8 +66,18 @@ export default class EventManager {
   private receiveWebRequestError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
-    this.app.analyzeError(requestDetails);
-    this.changeBrowserAction(requestDetails);
+    /*
+      has to asserted twice, because 'webextension-polyfill-ts' has declared 
+      OnErrorOccuredDetailsType incorrectly
+    */
+    const fixedDetails = (requestDetails as unknown) as {
+      tabId: number;
+      frameId: number;
+      error: string;
+    };
+
+    this.app.analyzeError(fixedDetails);
+    this.changeBrowserAction(fixedDetails);
   }
 
   private receiveMessage(

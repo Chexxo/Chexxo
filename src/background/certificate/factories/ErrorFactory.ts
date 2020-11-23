@@ -7,6 +7,8 @@ import ConnectionRefusedError from "../../../types/CommonTypes/errors/Connection
 import NoHostError from "../../../types/CommonTypes/errors/NoHostError";
 import ServerError from "../../../types/CommonTypes/errors/ServerError";
 import APIResponseError from "../../../types/CommonTypes/api/APIResponseError";
+import RevokedError from "../../../types/errors/certificate/RevokedError";
+import UnknownError from "../../../types/errors/certificate/UnknownError";
 import InvalidResponseErrorFactory from "../../error/factories/InvalidResponseErrorFactory";
 
 export default abstract class ErrorFactory {
@@ -14,14 +16,6 @@ export default abstract class ErrorFactory {
     const code = error.code;
 
     switch (code) {
-      case 101:
-        return new ExpiredError();
-      case 102:
-        return new InvalidDomainError();
-      case 103:
-        return new SelfSignedError();
-      case 104:
-        return new UntrustedRootError();
       case 501:
         return new ConnectionRefusedError();
       case 502:
@@ -32,6 +26,32 @@ export default abstract class ErrorFactory {
         return new NoHostError();
       default:
         return new ServerError(new Error(error.publicMessage));
+    }
+  }
+
+  public static fromBrowserErrorCode(code: string): Error {
+    switch (code) {
+      case "Error code 2153390067":
+      case "net::ERR_CERT_AUTHORITY_INVALID":
+        return new UntrustedRootError();
+
+      case "Error code 2153398258":
+        return new SelfSignedError();
+
+      case "Error code 2153390069":
+      case "net::ERR_CERT_DATE_INVALID":
+        return new ExpiredError();
+
+      case "Error code 2153394164":
+      case "net::ERR_CERT_COMMON_NAME_INVALID":
+        return new InvalidDomainError();
+
+      case "Error code 2153390068":
+      case "net::ERR_CERT_REVOKED":
+        return new RevokedError();
+
+      default:
+        return new UnknownError();
     }
   }
 }

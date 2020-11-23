@@ -1,4 +1,4 @@
-import { WebNavigation, WebRequest } from "webextension-polyfill-ts";
+import { WebRequest } from "webextension-polyfill-ts";
 
 import Certificate from "../types/certificate/Certificate";
 import ErrorMessage from "../types/errors/ErrorMessage";
@@ -21,7 +21,7 @@ export default class App {
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<void> {
     const { tabId } = requestDetails;
-    const tabData: TabData = new TabData();
+    const tabData = this.tabCache.get(tabId) || new TabData();
 
     try {
       tabData.certificate = await this.certificateService.getCertificate(
@@ -38,18 +38,17 @@ export default class App {
     this.tabCache.set(tabId, tabData);
   }
 
-  analyzeError(requestDetails: WebNavigation.OnErrorOccurredDetailsType): void {
+  analyzeError(requestDetails: {
+    tabId: number;
+    frameId: number;
+    error: string;
+  }): void {
     const { tabId } = requestDetails;
     const error = this.certificateService.analyzeError(requestDetails);
 
-    if (error !== undefined) {
+    if (error !== null) {
       const errorMessage = ErrorMessage.fromError(error);
-      let tabData = this.tabCache.get(tabId);
-
-      if (!tabData) {
-        tabData = new TabData();
-      }
-
+      const tabData = this.tabCache.get(tabId) || new TabData();
       tabData.errorMessage = errorMessage;
       this.tabCache.set(tabId, tabData);
     }
