@@ -6,10 +6,7 @@ import Certificate from "../types/certificate/Certificate";
 import ErrorMessage from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
 import CertificateView from "./pages/CertificateView";
-import Configuration from "./pages/Configuration";
-import Domains from "./pages/Domains";
 import Home from "./pages/Home";
-import NewQuality from "./pages/NewQuality";
 
 /**
  * Represents the required props for the Popup component
@@ -131,16 +128,7 @@ export default class Popup extends Component<Props, State> {
       <Router>
         <Switch>
           <Route path="/certificate">
-            <CertificateView />
-          </Route>
-          <Route path="/new-quality">
-            <NewQuality />
-          </Route>
-          <Route path="/domains">
-            <Domains />
-          </Route>
-          <Route path="/configuration">
-            <Configuration />
+            <CertificateView certificate={this.state.certificate} />
           </Route>
           <Route path="/">
             <Home
