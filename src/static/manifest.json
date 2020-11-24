@@ -1,8 +1,40 @@
 {
   "manifest_version": 2,
   "name": "Chexxo",
-  "description": "",
-  "version": "0.1.0",
+  "short_name": "Chexxo",
+  "description": "Browser extension that allows users to see the certificate quality of websites.",
+  "version": "0.3.0",
+  "version_name": "Luigi - Moon",
+  "author": "Chexxo",
+  "homepage_url": "https://github.com/Chexxo",
+  "developer": {
+    "name": "Chexxo",
+    "url": "https://github.com/Chexxo/"
+  },
+
+  "icons": {
+    "16": "./assets/logo.svg",
+    "19": "./assets/logo.svg",
+    "38": "./assets/logo.svg",
+    "48": "./assets/logo.svg",
+    "96": "./assets/logo.svg",
+    "128": "./assets/logo.svg"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "strict_min_version": "67"
+    }
+  },
+  "minimum_chrome_version": "63",
+
+  "content_security_policy": "script-src 'self'; object-src 'self';",
+  "permissions": [
+    "webNavigation",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ],
 
   "browser_action": {
     "default_popup": "popup.html",
@@ -14,19 +46,5 @@
 
   "background": {
     "scripts": ["js/background.js"]
-  },
-
-  "icons": {
-    "16": "./assets/logo.svg",
-    "48": "./assets/logo.svg",
-    "128": "./assets/logo.svg"
-  },
-
-  "content_security_policy": "script-src 'self'; object-src 'self';",
-  "permissions": [
-    "webNavigation",
-    "webRequest",
-    "webRequestBlocking",
-    "<all_urls>"
-  ]
+  }
 }
