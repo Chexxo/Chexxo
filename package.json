@@ -51,6 +51,7 @@
     "file-loader": "^6.1.1",
     "jest": "^26.5.3",
     "jest-css-modules-transform": "^4.0.1",
+    "merge-jsons-webpack-plugin": "^1.0.21",
     "mini-css-extract-plugin": "^1.2.1",
     "mockzilla": "^0.8.0",
     "node-sass": "^4.14.1",
