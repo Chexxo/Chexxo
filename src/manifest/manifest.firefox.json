@@ -6,7 +6,7 @@
   
   "browser_specific_settings": {
     "gecko": {
-      "strict_min_version": "67"
+      "strict_min_version": "67.0"
     }
   }
 }
