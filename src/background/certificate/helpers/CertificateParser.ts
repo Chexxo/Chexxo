@@ -81,7 +81,6 @@ export default abstract class CertificateParser {
     const params = new Map();
 
     matches = regex.exec(stringRepresentation);
-    console.error(matches);
     while (matches) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       params.set(matches!.groups!.attribute, matches!.groups!.value);
