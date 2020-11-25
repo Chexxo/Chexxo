@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import "semantic-ui-css/semantic.css";
 
 import "./Popup.scss";
-import Popup from "./Popup";
+import { Popup } from "./Popup";
 import { browser } from "webextension-polyfill-ts";
 
 const {

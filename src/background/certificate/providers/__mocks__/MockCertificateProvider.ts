@@ -1,9 +1,8 @@
 import { WebRequest } from "webextension-polyfill-ts";
+import { RawCertificate } from "../../../../shared/types/certificate/RawCertificate";
+import { CertificateProvider } from "../CertificateProvider";
 
-import RawCertificate from "../../../../types/CommonTypes/certificate/RawCertificate";
-import CertificateProvider from "../CertificateProvider";
-
-export default class MockCertificateProvider implements CertificateProvider {
+export class MockCertificateProvider implements CertificateProvider {
   async getCertificate(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _: WebRequest.OnHeadersReceivedDetailsType

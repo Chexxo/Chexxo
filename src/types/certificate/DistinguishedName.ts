@@ -1,4 +1,4 @@
-export default class DistinguishedName {
+export class DistinguishedName {
   constructor(
     readonly commonName: string,
     readonly organization: string,

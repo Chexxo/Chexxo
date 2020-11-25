@@ -9,18 +9,19 @@ import {
   Placeholder,
 } from "semantic-ui-react";
 
-import Certificate from "../../types/certificate/Certificate";
-import ErrorMessage from "../../types/errors/ErrorMessage";
+import { Certificate } from "../../types/certificate/Certificate";
+import { ErrorMessage } from "../../types/errors/ErrorMessage";
 import { Quality, maxQuality } from "../../types/Quality";
-import Navigation from "../components/Navigation";
-import PageHeader from "../components/PageHeader";
+import { Navigation } from "../components/Navigation";
+import { PageHeader } from "../components/PageHeader";
 
 interface Props {
   errorMessage: ErrorMessage | undefined;
   certificate: Certificate | undefined;
   quality: Quality | undefined;
 }
-export default class Home extends Component<Props> {
+
+export class Home extends Component<Props> {
   constructor(props: Props) {
     super(props);
   }

@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 
-import Popup from "./Popup";
+import { Popup } from "./Popup";
 import { Tabs } from "webextension-polyfill-ts";
 
 function getTabs(): Promise<Tabs.Tab[]> {

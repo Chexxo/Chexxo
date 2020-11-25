@@ -1,1 +1,1 @@
-export default class QualityProvider {}
+export class QualityProvider {}

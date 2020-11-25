@@ -1,4 +1,4 @@
-export default class ErrorMessage {
+export class ErrorMessage {
   constructor(readonly message: string) {}
 
   public static fromError(error: Error): ErrorMessage {

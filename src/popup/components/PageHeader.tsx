@@ -7,7 +7,7 @@ interface Props {
   hasHomeButton: boolean;
 }
 
-export default class PageHeader extends Component<Props> {
+export class PageHeader extends Component<Props> {
   render(): JSX.Element {
     return (
       <div className="header-container">

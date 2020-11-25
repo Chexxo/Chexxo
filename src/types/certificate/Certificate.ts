@@ -1,7 +1,7 @@
-import Issuer from "./Issuer";
-import Subject from "./Subject";
+import { Issuer } from "./Issuer";
+import { Subject } from "./Subject";
 
-export default class Certificate {
+export class Certificate {
   constructor(
     readonly fingerprint: string,
     readonly fingerprint256: string,

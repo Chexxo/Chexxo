@@ -1,11 +1,12 @@
-import InvalidResponseError from "../../../types/CommonTypes/errors/InvalidResponseError";
+import { APIResponseError } from "../../../shared/types/api/APIResponseError";
+import { InvalidResponseError } from "../../../shared/types/errors/InvalidResponseError";
 
-export default abstract class InvalidResponseErrorFactory {
-  static fromPublicMessage(message: string): InvalidResponseError {
-    const split = message.split("Status:");
+export abstract class InvalidResponseErrorFactory {
+  static fromAPIResponseError(error: APIResponseError): InvalidResponseError {
+    const split = error.publicMessage.split("Status:");
     if (!split[1] || isNaN(parseInt(split[1]))) {
-      return new InvalidResponseError(0);
+      return new InvalidResponseError(error.uuid, 0);
     }
-    return new InvalidResponseError(parseInt(split[1]));
+    return new InvalidResponseError(error.uuid, parseInt(split[1]));
   }
 }
