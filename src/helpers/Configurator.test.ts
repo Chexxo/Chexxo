@@ -12,7 +12,6 @@ beforeEach(() => {
   mockBrowser.storage.local.mockAllow();
   configurator = new Configurator(browser.storage);
   mockBrowser.storage.onChanged.addListener.expect(expect.anything());
-  configurator.init();
 });
 
 test("retrieves configuration when it is defined", async () => {

@@ -19,13 +19,9 @@ const {
 
 const certificateProvider = new ServerProvider();
 const certificateService = new CertificateService(certificateProvider);
-
 const qualityProvider = new QualityProvider();
 const qualityService = new QualityService(qualityProvider);
-
 const configurator = new Configurator(storage);
-configurator.init();
-
 const app = new App(certificateService, qualityService, configurator);
 
 const eventManager = new EventManager(

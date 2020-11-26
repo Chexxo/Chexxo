@@ -6,10 +6,23 @@ import { CodedError } from "../../../shared/types/errors/CodedError";
 import { ErrorFactory } from "../factories/ErrorFactory";
 import { CertificateProvider } from "./CertificateProvider";
 
-const SERVER_URL =
-  "https://snonitze65.execute-api.eu-central-1.amazonaws.com/getCertificate/";
-
 export class ServerProvider implements CertificateProvider {
+  private defaultServerUrl =
+    "https://snonitze65.execute-api.eu-central-1.amazonaws.com/getCertificate/";
+  private serverUrl: string;
+
+  constructor() {
+    this.serverUrl = this.defaultServerUrl;
+  }
+
+  public updateServerUrl(serverUrl: string): void {
+    if (serverUrl) {
+      this.serverUrl = serverUrl;
+    } else {
+      this.serverUrl = this.defaultServerUrl;
+    }
+  }
+
   public getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<RawCertificate> {
@@ -21,8 +34,7 @@ export class ServerProvider implements CertificateProvider {
     url: string
   ): Promise<RawCertificate> {
     return new Promise((resolve, reject) => {
-      console.log(url);
-      fetch(SERVER_URL + url)
+      fetch(this.serverUrl + url)
         .then((response) => response.json())
         .then((apiResponse: APIResponseBody) => {
           const result = this.analyzeAPIResponse(apiResponse);

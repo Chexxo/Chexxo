@@ -12,11 +12,9 @@ export class Configurator {
   private storageArea: Storage.StorageArea | undefined;
   private changeListeners: ((configuration: Configuration) => void)[] = [];
 
-  constructor(private storage: Storage.Static) {}
-
-  init(): void {
+  constructor(private storage: Storage.Static) {
     this.storageArea = this.storage.local;
-    this.storage.onChanged.addListener(this.notifyListeners);
+    this.storage.onChanged.addListener(this.notifyListeners.bind(this));
   }
 
   async getConfiguration(): Promise<Configuration> {

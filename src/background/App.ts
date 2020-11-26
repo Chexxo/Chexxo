@@ -18,11 +18,11 @@ export class App {
     private configurator: Configurator
   ) {
     this.tabCache = new Map<number, TabData>();
-    configurator.addListener(this.updateConfiguration);
+    configurator.addListener(this.updateConfiguration.bind(this));
   }
 
   updateConfiguration(configuration: Configuration): void {
-    console.log(configuration);
+    this.certificateService.updateConfiguration(configuration);
   }
 
   resetTabData(tabId: number): void {

@@ -123,6 +123,7 @@ export class EventManager {
         } catch (error) {
           sendResponse(error as StorageError);
         }
+        break;
       case "setConfiguration":
         params = message.params as { configuration: Configuration };
         try {
@@ -131,10 +132,13 @@ export class EventManager {
         } catch (error) {
           sendResponse(error as Error);
         }
+        break;
       case "deleteCache":
         console.log("cache was deleted.");
+        break;
       case "exportLogs":
         console.log("logs were exported.");
+        break;
       default:
         sendResponse(new UnhandledMessageError(JSON.stringify(message)));
     }
