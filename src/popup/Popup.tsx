@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Tabs, Runtime } from "webextension-polyfill-ts";
 
-import Certificate from "../types/certificate/Certificate";
-import ErrorMessage from "../types/errors/ErrorMessage";
+import { Certificate } from "../types/certificate/Certificate";
+import { ErrorMessage } from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
-import CertificateView from "./pages/CertificateView";
-import Home from "./pages/Home";
+import { CertificateView } from "./pages/CertificateView";
+import { Home } from "./pages/Home";
 
 /**
  * Represents the required props for the Popup component
@@ -33,7 +33,7 @@ interface State {
  * Represents a browser action popup window
  * @noInheritDoc
  */
-export default class Popup extends Component<Props, State> {
+export class Popup extends Component<Props, State> {
   private sendMessage;
   private getTabs;
 

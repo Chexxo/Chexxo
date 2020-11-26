@@ -1,13 +1,13 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
-import Certificate from "../types/certificate/Certificate";
-import ErrorMessage from "../types/errors/ErrorMessage";
+import { Certificate } from "../types/certificate/Certificate";
+import { ErrorMessage } from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
-import TabData from "../types/TabData";
-import CertificateService from "./certificate/CertificateService";
-import QualityService from "./quality/QualityService";
+import { TabData } from "../types/TabData";
+import { CertificateService } from "./certificate/CertificateService";
+import { QualityService } from "./quality/QualityService";
 
-export default class App {
+export class App {
   private tabCache: Map<number, TabData>;
 
   constructor(

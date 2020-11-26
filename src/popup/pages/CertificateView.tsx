@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { Divider, Message } from "semantic-ui-react";
-import Certificate from "../../types/certificate/Certificate";
-import PageHeader from "../components/PageHeader";
+import { Certificate } from "../../types/certificate/Certificate";
+import { PageHeader } from "../components/PageHeader";
 
 interface Props {
   certificate: Certificate | undefined;
 }
 
-export default class CertificateView extends Component<Props> {
+export class CertificateView extends Component<Props> {
   render(): JSX.Element {
     return (
       <div className="container">

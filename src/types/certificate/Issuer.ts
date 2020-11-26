@@ -1,3 +1,3 @@
-import DistinguishedName from "./DistinguishedName";
+import { DistinguishedName } from "./DistinguishedName";
 
-export default class Issuer extends DistinguishedName {}
+export class Issuer extends DistinguishedName {}

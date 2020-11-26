@@ -1,5 +1,5 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import CertificateFactory from "./RawCertificateFactory";
+import { CertificateFactory } from "./RawCertificateFactory";
 
 let securityInfo: WebRequest.SecurityInfo;
 

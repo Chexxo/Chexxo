@@ -1,11 +1,11 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
-import RawCertificate from "../../../types/CommonTypes/certificate/RawCertificate";
-import InsecureConnectionError from "../../../types/errors/InsecureConnectionError";
-import CertificateFactory from "../factories/RawCertificateFactory";
-import CertificateProvider from "./CertificateProvider";
+import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
+import { InsecureConnectionError } from "../../../types/errors/InsecureConnectionError";
+import { CertificateFactory } from "../factories/RawCertificateFactory";
+import { CertificateProvider } from "./CertificateProvider";
 
-export default class InBrowserProvider implements CertificateProvider {
+export class InBrowserProvider implements CertificateProvider {
   constructor(
     private getSecurityInfo: (
       requestId: string,

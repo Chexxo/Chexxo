@@ -1,14 +1,15 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import APIResponseBody from "../../../types/CommonTypes/api/APIResponseBody";
-import RawCertificate from "../../../types/CommonTypes/certificate/RawCertificate";
-import CodedError from "../../../types/CommonTypes/errors/CodedError";
-import ErrorFactory from "../factories/ErrorFactory";
-import CertificateProvider from "./CertificateProvider";
+
+import { APIResponseBody } from "../../../shared/types/api/APIResponseBody";
+import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
+import { CodedError } from "../../../shared/types/errors/CodedError";
+import { ErrorFactory } from "../factories/ErrorFactory";
+import { CertificateProvider } from "./CertificateProvider";
 
 const SERVER_URL =
   "https://snonitze65.execute-api.eu-central-1.amazonaws.com/getCertificate/";
 
-export default class ServerProvider implements CertificateProvider {
+export class ServerProvider implements CertificateProvider {
   public getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<RawCertificate> {

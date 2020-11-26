@@ -6,11 +6,11 @@ import {
   WebNavigation,
   WebRequest,
 } from "webextension-polyfill-ts";
-import UnhandledMessageError from "../types/errors/UnhandledMessageError";
+import { UnhandledMessageError } from "../types/errors/UnhandledMessageError";
 
-import App from "./App";
+import { App } from "./App";
 
-export default class EventManager {
+export class EventManager {
   constructor(
     private webRequestBeforeEmitter: WebRequest.onBeforeRequestEvent,
     private webRequestHeadersEmitter: WebRequest.onHeadersReceivedEvent,

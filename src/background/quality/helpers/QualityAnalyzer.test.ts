@@ -1,8 +1,8 @@
-import Certificate from "../../../types/certificate/Certificate";
-import Issuer from "../../../types/certificate/Issuer";
-import Subject from "../../../types/certificate/Subject";
+import { Certificate } from "../../../types/certificate/Certificate";
+import { Issuer } from "../../../types/certificate/Issuer";
+import { Subject } from "../../../types/certificate/Subject";
 import { Quality } from "../../../types/Quality";
-import QualityAnalyzer from "./QualityAnalyzer";
+import { QualityAnalyzer } from "./QualityAnalyzer";
 
 test("detects a Domain Validated Certificate", () => {
   const issuer = new Issuer("", "", "", "", "", "");

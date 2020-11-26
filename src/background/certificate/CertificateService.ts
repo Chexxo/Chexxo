@@ -1,10 +1,11 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import Certificate from "../../types/certificate/Certificate";
-import CertificateErrorAnalyzer from "./helpers/CertificateErrorAnalyzer";
-import CertificateParser from "./helpers/CertificateParser";
-import CertificateProvider from "./providers/CertificateProvider";
 
-export default class CertificateService {
+import { Certificate } from "../../types/certificate/Certificate";
+import { CertificateErrorAnalyzer } from "./helpers/CertificateErrorAnalyzer";
+import { CertificateParser } from "./helpers/CertificateParser";
+import { CertificateProvider } from "./providers/CertificateProvider";
+
+export class CertificateService {
   constructor(private certificateProvider: CertificateProvider) {}
 
   async getCertificate(

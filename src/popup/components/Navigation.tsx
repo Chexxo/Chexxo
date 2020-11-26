@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, Icon, Popup as Tooltip } from "semantic-ui-react";
 
-export default class Navigation extends Component {
+export class Navigation extends Component {
   render(): JSX.Element {
     return (
       <Menu compact icon>
