@@ -10,8 +10,8 @@ let configurator: Configurator;
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   mockBrowser.storage.local.mockAllow();
-  configurator = new Configurator(browser.storage);
   mockBrowser.storage.onChanged.addListener.expect(expect.anything());
+  configurator = new Configurator(browser.storage);
 });
 
 test("retrieves configuration when it is defined", async () => {

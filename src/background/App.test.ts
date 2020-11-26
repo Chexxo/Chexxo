@@ -37,6 +37,8 @@ let windowSpy = jest.spyOn(window, "window", "get");
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   mockBrowser.storage.mockAllow();
+  mockBrowser.storage.local.mockAllow();
+  mockBrowser.storage.onChanged.addListener.expect(expect.anything());
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
   qualityProvider = new QualityProvider();
