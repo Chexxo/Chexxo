@@ -2,11 +2,11 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "semantic-ui-css/semantic.css";
 
-import "./Options.scss";
-import Options from "./Options";
+import "../../options/Options.scss";
+import Options from "../../options/Options";
 import { browser } from "webextension-polyfill-ts";
 
 ReactDOM.render(
-  <Options sendMessage={browser.runtime.sendMessage} />,
+  <Options sendMessage={browser.runtime.sendMessage} hasServer={false} />,
   document.getElementById("options")
 );

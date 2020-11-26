@@ -9,6 +9,7 @@ interface Props {
     message: { type: string; params?: unknown },
     options?: Runtime.SendMessageOptionsType | undefined
   ) => Promise<unknown>;
+  hasServer: boolean;
 }
 
 interface State {
@@ -122,20 +123,24 @@ export default class Options extends Component<Props, State> {
   render(): JSX.Element {
     return (
       <Form style={{ padding: "0.5rem" }}>
-        <Divider horizontal>Server</Divider>
-        <Form.Field error={!this.state.isUrlValid}>
-          <input
-            type="text"
-            placeholder="http://localhost:3000"
-            defaultValue={this.state.configuration.serverUrl}
-            onBlur={this.changeServerUrl}
-          />
-          {!this.state.isUrlValid && (
-            <Label basic color="red" pointing>
-              URL is not valid
-            </Label>
-          )}
-        </Form.Field>
+        {this.props.hasServer && (
+          <div>
+            <Divider horizontal>Server</Divider>
+            <Form.Field error={!this.state.isUrlValid}>
+              <input
+                type="text"
+                placeholder="http://localhost:3000"
+                defaultValue={this.state.configuration.serverUrl}
+                onBlur={this.changeServerUrl}
+              />
+              {!this.state.isUrlValid && (
+                <Label basic color="red" pointing>
+                  URL is not valid
+                </Label>
+              )}
+            </Form.Field>
+          </div>
+        )}
 
         <Divider horizontal>Domains</Divider>
         <Form.Checkbox

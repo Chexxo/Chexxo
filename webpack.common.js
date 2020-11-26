@@ -5,7 +5,6 @@ const path = require("path");
 module.exports = {
   entry: {
     popup: path.join(__dirname, "src/popup/index.tsx"),
-    options: path.join(__dirname, "src/options/index.tsx"),
   },
   module: {
     rules: [
