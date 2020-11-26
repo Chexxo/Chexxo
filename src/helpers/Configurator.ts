@@ -1,8 +1,8 @@
 import { Storage } from "webextension-polyfill-ts";
-import Configuration from "../types/Configuration";
-import StorageError from "../types/errors/StorageError";
+import { Configuration } from "../types/Configuration";
+import { StorageError } from "../types/errors/StorageError";
 
-export default class Configurator {
+export class Configurator {
   private defaultConfiguration: Configuration = {
     serverUrl: "",
     cacheDomainQualities: true,

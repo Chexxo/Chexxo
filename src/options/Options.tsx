@@ -3,7 +3,7 @@ import { Divider, Form, Label } from "semantic-ui-react";
 import { Runtime } from "webextension-polyfill-ts";
 import isValidUrl from "../helpers/isValidUrl";
 
-import Configuration from "../types/Configuration";
+import { Configuration } from "../types/Configuration";
 
 interface Props {
   sendMessage: (
@@ -54,7 +54,7 @@ export default class Options extends Component<Props, State> {
     }
   }
 
-  async componentDidUpdate(prevProps: Props, prevState: State): Promise<void> {
+  async componentDidUpdate(): Promise<void> {
     if (this.state.isInitialRender) {
       this.setState({ isInitialRender: false });
       return;

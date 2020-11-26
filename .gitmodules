@@ -1,3 +1,3 @@
 [submodule "src/shared"]
 	path = src/shared
-	url = git@github.com:Chexxo/CommonTypes.git
+	url = https://github.com/Chexxo/CommonTypes.git

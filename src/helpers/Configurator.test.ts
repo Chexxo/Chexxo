@@ -1,7 +1,7 @@
 import { deepMock, MockzillaDeep } from "mockzilla";
 import { Browser } from "webextension-polyfill-ts";
-import Configuration from "../types/Configuration";
-import Configurator from "./Configurator";
+import { Configuration } from "../types/Configuration";
+import { Configurator } from "./Configurator";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;

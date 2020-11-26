@@ -1,4 +1,4 @@
-export default class StorageError extends Error {
+export class StorageError extends Error {
   readonly name: string = "StorageError";
   readonly message: string = "Storage operation failed.";
 }
