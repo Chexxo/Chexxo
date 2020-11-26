@@ -2,8 +2,8 @@
 import { deepMock } from "mockzilla";
 import { Browser, WebRequest } from "webextension-polyfill-ts";
 
-import InBrowserProvider from "./InBrowserProvider";
-import InsecureConnectionError from "../../../types/errors/InsecureConnectionError";
+import { InsecureConnectionError } from "../../../types/errors/InsecureConnectionError";
+import { InBrowserProvider } from "./InBrowserProvider";
 
 const [browser, mockBrowser] = deepMock<Browser>("browser", false);
 

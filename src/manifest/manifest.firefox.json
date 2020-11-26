@@ -1,0 +1,12 @@
+{
+  "developer": {
+    "name": "Chexxo",
+    "url": "https://github.com/Chexxo/"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "strict_min_version": "67.0"
+    }
+  }
+}

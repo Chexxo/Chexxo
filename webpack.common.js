@@ -6,7 +6,6 @@ module.exports = {
   entry: {
     popup: path.join(__dirname, "src/popup/index.tsx"),
     options: path.join(__dirname, "src/options/index.tsx"),
-    background: path.join(__dirname, "src/background/index.ts"),
   },
   module: {
     rules: [
@@ -34,7 +33,6 @@ module.exports = {
     ],
   },
   output: {
-    path: path.join(__dirname, "dist/js/"),
     filename: "[name].js",
   },
   plugins: [

@@ -1,9 +1,9 @@
 import { X509, KJUR } from "jsrsasign";
-import Certificate from "../../../types/certificate/Certificate";
-import DistinguishedName from "../../../types/certificate/DistinguishedName";
-import Issuer from "../../../types/certificate/Issuer";
-import Subject from "../../../types/certificate/Subject";
-import RawCertificate from "../../../types/CommonTypes/certificate/RawCertificate";
+import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
+import { Certificate } from "../../../types/certificate/Certificate";
+import { DistinguishedName } from "../../../types/certificate/DistinguishedName";
+import { Issuer } from "../../../types/certificate/Issuer";
+import { Subject } from "../../../types/certificate/Subject";
 
 class AltNameEntry {
   readonly dns: string = "";
@@ -13,7 +13,7 @@ class CertificatePolicyEntry {
   readonly policyoid: string = "";
 }
 
-export default abstract class CertificateParser {
+export abstract class CertificateParser {
   static getCertificate(rawCert: RawCertificate): Certificate {
     const fullCert = new X509();
     fullCert.readCertPEM(rawCert.pem);

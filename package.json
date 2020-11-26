@@ -1,7 +1,7 @@
 {
   "name": "chexxo",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.3.0",
+  "description": "Browser extension that allows users to see the certificate quality of websites.",
   "author": "Carlo Kirchmeier, Yannick Vogt",
   "license": "MIT",
   "repository": {
@@ -24,7 +24,7 @@
     "build:firefox:prod": "npx webpack --config webpack.firefox.prod.js",
     "build:dev": "npm run build:chromium:dev && npm run build:firefox:dev",
     "build:prod": "npm run build:chromium:prod && npm run build:firefox:prod",
-    "build:watch": "npx webpack --config webpack.dev.js --watch",
+    "build:watch": "npx webpack --config webpack.chromium.dev.js --watch && npx webpack --config webpack.firefox.dev.js -- watch",
     "build:documentation": "npx typedoc --options ./typedoc.config.js",
     "start": "npx web-ext run --source-dir ./dist/ --browser-console --start-url www.google.com"
   },
@@ -51,6 +51,7 @@
     "file-loader": "^6.1.1",
     "jest": "^26.5.3",
     "jest-css-modules-transform": "^4.0.1",
+    "merge-jsons-webpack-plugin": "^1.0.21",
     "mini-css-extract-plugin": "^1.2.1",
     "mockzilla": "^0.8.0",
     "node-sass": "^4.14.1",

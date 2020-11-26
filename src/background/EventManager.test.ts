@@ -5,20 +5,21 @@ jest.mock("./App");
 
 import { deepMock, MockzillaDeep } from "mockzilla";
 import { Browser, Runtime } from "webextension-polyfill-ts";
-import Certificate from "../types/certificate/Certificate";
-import Issuer from "../types/certificate/Issuer";
-import Subject from "../types/certificate/Subject";
-import ErrorMessage from "../types/errors/ErrorMessage";
-import UnhandledMessageError from "../types/errors/UnhandledMessageError";
+
+import { Certificate } from "../types/certificate/Certificate";
+import { Issuer } from "../types/certificate/Issuer";
+import { Subject } from "../types/certificate/Subject";
+import { ErrorMessage } from "../types/errors/ErrorMessage";
+import { UnhandledMessageError } from "../types/errors/UnhandledMessageError";
 import { Quality } from "../types/Quality";
-import EventManager from "./EventManager";
+import { App } from "./App";
+import { CertificateService } from "./certificate/CertificateService";
 // eslint-disable-next-line jest/no-mocks-import
-import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
-import App from "./App";
-import CertificateService from "./certificate/CertificateService";
-import QualityProvider from "./quality/providers/QualityProvider";
-import QualityService from "./quality/QualityService";
-import Configurator from "../helpers/Configurator";
+import { MockCertificateProvider } from "./certificate/providers/__mocks__/MockCertificateProvider";
+import { EventManager } from "./EventManager";
+import { QualityProvider } from "./quality/providers/QualityProvider";
+import { QualityService } from "./quality/QualityService";
+import { Configurator } from "../helpers/Configurator";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -40,6 +41,14 @@ beforeEach(() => {
   configurator = new Configurator(browser.storage);
   app = new App(certificateService, qualityService, configurator);
 
+  mockBrowser.webRequest.onBeforeRequest.addListener.expect(
+    expect.anything(),
+    {
+      urls: ["<all_urls>"],
+      types: ["main_frame"],
+    },
+    []
+  );
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),
     {
@@ -58,6 +67,7 @@ beforeEach(() => {
   mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
 
   eventManager = new EventManager(
+    browser.webRequest.onBeforeRequest,
     browser.webRequest.onHeadersReceived,
     browser.webNavigation.onErrorOccurred,
     browser.runtime.onMessage,

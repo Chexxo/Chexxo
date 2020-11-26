@@ -1,8 +1,8 @@
 import { WebRequest } from "webextension-polyfill-ts";
 import { bytesToBase64 } from "byte-base64";
-import RawCertificate from "../../../types/CommonTypes/certificate/RawCertificate";
+import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
 
-export default abstract class CertificateFactory {
+export abstract class CertificateFactory {
   public static fromSecurityInfo(
     securityInfo: WebRequest.SecurityInfo
   ): RawCertificate {

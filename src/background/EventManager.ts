@@ -6,15 +6,17 @@ import {
   WebNavigation,
   WebRequest,
 } from "webextension-polyfill-ts";
-import Configuration from "../types/Configuration";
-import StorageError from "../types/errors/StorageError";
-import UnhandledMessageError from "../types/errors/UnhandledMessageError";
 
-import App from "./App";
+import { Configuration } from "../types/Configuration";
+import { StorageError } from "../types/errors/StorageError";
+import { UnhandledMessageError } from "../types/errors/UnhandledMessageError";
 
-export default class EventManager {
+import { App } from "./App";
+
+export class EventManager {
   constructor(
-    private webRequestEmitter: WebRequest.onHeadersReceivedEvent,
+    private webRequestBeforeEmitter: WebRequest.onBeforeRequestEvent,
+    private webRequestHeadersEmitter: WebRequest.onHeadersReceivedEvent,
     private webRequestErrorEmitter: WebNavigation.onErrorOccurredEvent,
     private messageEmitter: Events.Event<
       (
@@ -44,7 +46,7 @@ export default class EventManager {
       types: ["main_frame"],
     };
     const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
-    this.webRequestEmitter.addListener(
+    this.webRequestHeadersEmitter.addListener(
       this.receiveWebRequest.bind(this),
       filter,
       extraInfoSpec
@@ -54,9 +56,18 @@ export default class EventManager {
     );
     this.messageEmitter.addListener(this.receiveMessage.bind(this));
     this.tabActivatedEmitter.addListener(this.changeBrowserAction.bind(this));
+    this.webRequestBeforeEmitter.addListener(
+      this.resetTabData.bind(this),
+      filter,
+      []
+    );
   }
 
-  public receiveWebRequest(
+  resetTabData(requestDetails: { tabId: number }): void {
+    this.app.resetTabData(requestDetails.tabId);
+  }
+
+  receiveWebRequest(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
     // using await is not possible here, since making receiveWebRequest async is not allowed
@@ -65,7 +76,7 @@ export default class EventManager {
     });
   }
 
-  public receiveWebRequestError(
+  receiveWebRequestError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
     /*
@@ -83,7 +94,7 @@ export default class EventManager {
     this.changeBrowserAction(fixedDetails);
   }
 
-  public receiveMessage(
+  receiveMessage(
     message: { type: string; params?: unknown },
     _: Runtime.MessageSender,
     sendResponse: (response: unknown) => void
@@ -129,7 +140,7 @@ export default class EventManager {
     }
   }
 
-  public changeBrowserAction(tabInfo: { tabId: number }): void {
+  changeBrowserAction(tabInfo: { tabId: number }): void {
     const { tabId } = tabInfo;
     if (this.app.getErrorMessage(tabId)) {
       this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });

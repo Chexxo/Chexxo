@@ -3,21 +3,22 @@ jest.mock("./certificate/CertificateService");
 jest.mock("./quality/helpers/QualityAnalyzer");
 
 import { Browser, WebRequest } from "webextension-polyfill-ts";
+import { deepMock, MockzillaDeep } from "mockzilla";
 
 // eslint-disable-next-line jest/no-mocks-import
-import MockCertificateProvider from "./certificate/providers/__mocks__/MockCertificateProvider";
-import App from "./App";
-import Issuer from "../types/certificate/Issuer";
-import Subject from "../types/certificate/Subject";
-import Certificate from "../types/certificate/Certificate";
+import { MockCertificateProvider } from "./certificate/providers/__mocks__/MockCertificateProvider";
+import { QualityProvider } from "./quality/providers/QualityProvider";
+import { QualityService } from "./quality/QualityService";
+import { Certificate } from "../types/certificate/Certificate";
+import { App } from "./App";
+import { CertificateService } from "./certificate/CertificateService";
+import { Issuer } from "../types/certificate/Issuer";
+import { Subject } from "../types/certificate/Subject";
+import { ErrorMessage } from "../types/errors/ErrorMessage";
+import { UntrustedRootError } from "../types/errors/certificate/UntrustedRootError";
+import { UUIDFactory } from "../helpers/UUIDFactory";
 import { Quality } from "../types/Quality";
-import ErrorMessage from "../types/errors/ErrorMessage";
-import CertificateService from "./certificate/CertificateService";
-import QualityProvider from "./quality/providers/QualityProvider";
-import QualityService from "./quality/QualityService";
-import UntrustedRootError from "../types/errors/certificate/UntrustedRootError";
-import Configurator from "../helpers/Configurator";
-import { deepMock, MockzillaDeep } from "mockzilla";
+import { Configurator } from "../helpers/Configurator";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -30,6 +31,8 @@ let app: App;
 let tabId: number;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let certificate: Certificate;
+
+let windowSpy = jest.spyOn(window, "window", "get");
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
@@ -65,6 +68,21 @@ beforeEach(() => {
     0,
     []
   );
+
+  windowSpy = jest.spyOn(window, "window", "get");
+  windowSpy.mockImplementation(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      <any>{
+        crypto: {
+          getRandomValues: jest.fn(),
+        },
+      }
+  );
+});
+
+afterEach(() => {
+  windowSpy.mockRestore();
 });
 
 test("caches certificate from CertificateService", async () => {
@@ -111,7 +129,7 @@ test("caches errormessages from OnErrorOccured event", () => {
   const requestDetails = { url: "", tabId: 0, frameId: 0, error: "" };
 
   certificateService.analyzeError = jest.fn(() => {
-    return new UntrustedRootError();
+    return new UntrustedRootError(UUIDFactory.uuidv4());
   });
 
   app.analyzeError(requestDetails);

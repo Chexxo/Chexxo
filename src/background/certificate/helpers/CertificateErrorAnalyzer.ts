@@ -1,6 +1,6 @@
-import ErrorFactory from "../factories/ErrorFactory";
+import { ErrorFactory } from "../factories/ErrorFactory";
 
-export default abstract class CertificateErrorAnalyzer {
+export abstract class CertificateErrorAnalyzer {
   static analyzeError(requestDetails: {
     url: string;
     frameId: number;

@@ -1,15 +1,15 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import Configurator from "../helpers/Configurator";
 
-import Certificate from "../types/certificate/Certificate";
-import Configuration from "../types/Configuration";
-import ErrorMessage from "../types/errors/ErrorMessage";
+import { Certificate } from "../types/certificate/Certificate";
+import { ErrorMessage } from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
-import TabData from "../types/TabData";
-import CertificateService from "./certificate/CertificateService";
-import QualityService from "./quality/QualityService";
+import { TabData } from "../types/TabData";
+import { CertificateService } from "./certificate/CertificateService";
+import { QualityService } from "./quality/QualityService";
+import { Configurator } from "../helpers/Configurator";
+import { Configuration } from "../types/Configuration";
 
-export default class App {
+export class App {
   private tabCache: Map<number, TabData>;
 
   constructor(
@@ -23,6 +23,10 @@ export default class App {
 
   updateConfiguration(configuration: Configuration): void {
     console.log(configuration);
+  }
+
+  resetTabData(tabId: number): void {
+    this.tabCache.delete(tabId);
   }
 
   async fetchCertificate(

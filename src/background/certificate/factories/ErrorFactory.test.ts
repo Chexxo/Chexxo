@@ -1,10 +1,28 @@
-import ExpiredError from "../../../types/errors/certificate/ExpiredError";
-import InvalidDomainError from "../../../types/errors/certificate/InvalidDomainError";
-import RevokedError from "../../../types/errors/certificate/RevokedError";
-import SelfSignedError from "../../../types/errors/certificate/SelfSignedError";
-import UnknownError from "../../../types/errors/certificate/UnknownError";
-import UntrustedRootError from "../../../types/errors/certificate/UntrustedRootError";
-import ErrorFactory from "./ErrorFactory";
+import { ExpiredError } from "../../../types/errors/certificate/ExpiredError";
+import { InvalidDomainError } from "../../../types/errors/certificate/InvalidDomainError";
+import { RevokedError } from "../../../types/errors/certificate/RevokedError";
+import { SelfSignedError } from "../../../types/errors/certificate/SelfSignedError";
+import { UnknownError } from "../../../types/errors/certificate/UnknownError";
+import { UntrustedRootError } from "../../../types/errors/certificate/UntrustedRootError";
+import { ErrorFactory } from "./ErrorFactory";
+
+let windowSpy = jest.spyOn(window, "window", "get");
+beforeEach(() => {
+  windowSpy = jest.spyOn(window, "window", "get");
+  windowSpy.mockImplementation(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      <any>{
+        crypto: {
+          getRandomValues: jest.fn(),
+        },
+      }
+  );
+});
+
+afterEach(() => {
+  windowSpy.mockRestore();
+});
 
 describe("Mozilla Firefox", () => {
   test("returns UntrustedRootError when the corresponding code is provided", () => {
