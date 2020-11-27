@@ -21,7 +21,7 @@ export class App {
     configurator.addListener(this.updateConfiguration.bind(this));
   }
 
-  async init() {
+  async init(): Promise<void> {
     const configuration = await this.configurator.getConfiguration();
     this.updateConfiguration(configuration);
   }
