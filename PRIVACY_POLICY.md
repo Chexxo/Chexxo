@@ -1,16 +1,20 @@
 # Privacy Policy for Chexxo
 At Chexxo, accessible from https://github.com/Chexxo, one of our main priorities is the privacy of our users. This Privacy Policy document contains types of information that is collected and recorded by Chexxo and how we use it.
 
-If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us through [E-Mail](mailto:chexxo@ins.hsr.che?subject=Privacy%20Policy%20Chexxo).
+If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us through [E-Mail](mailto:chexxo@ins.hsr.ch?subject=Privacy%20Policy%20Chexxo).
+
 
 ## Collected information
 ### Firefox
-Chexxo does not send any information outside in the firefox version. The only infomation collected is the local log (see chapter Log Files). Those log files can only be processed by us if you need our help and therefore provide us with them. Those log files cannot be accessed by us without you exporting them and providing them to us over a communication channel. We will treat the information provided with care and only use it to solve your problem.
+Chexxo does not send information anywhere in the Firefox version. The only infomation collected is the local log (see chapter Log Files). Those log files can only be processed by us if you need our help and therefore provide us with them. Those log files cannot be accessed by us without you exporting them and providing them to us over a communication channel. We will treat the information provided with care and only use it to solve your problem.
+
 
 ### Chromium
-Since Chromium based browsers do not provide an option to read the certificate from the webRequest-API, a server component is needed in order for Chexxo to function properly. Additionally to the local log files mentioned in the chapter about firefox above the Chromium version of the extension generates logs on the server.
+Since Chromium based browsers do not provide an option to read the certificate from the webRequest-API, a server component is needed in order for Chexxo to function properly. Additionally to the local log files mentioned in the chapter about Firefox above, the Chromium version of the extension generates logs on the server.
 
-Whilst those server logs do contain unique id's those are newly generated on every log-message and cannot be associated with a user. Chexxo will only be able to connect a log entry on the server with you if you choose to share your local log with us in order to get help regarding a problem with the extension. We will treat the information provided with care and only use it to solve your problem.
+
+Whilst those server logs do contain unique id's, those are newly generated on every log-message and cannot be associated with a user. Chexxo will only be able to connect a log entry on the server with you if you choose to share your local log with us in order to get help regarding a problem with the extension. We will treat the information provided with care and only use it to solve your problem.
+
 
 ## Log Files
 ### Local
