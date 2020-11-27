@@ -21,6 +21,11 @@ export class App {
     configurator.addListener(this.updateConfiguration.bind(this));
   }
 
+  async init() {
+    const configuration = await this.configurator.getConfiguration();
+    this.updateConfiguration(configuration);
+  }
+
   updateConfiguration(configuration: Configuration): void {
     this.certificateService.updateConfiguration(configuration);
   }

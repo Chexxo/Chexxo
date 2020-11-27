@@ -42,6 +42,7 @@ beforeEach(() => {
   qualityService = new QualityService(qualityProvider);
   configurator = new Configurator(browser.storage);
   app = new App(certificateService, qualityService, configurator);
+  app.init();
 
   mockBrowser.webRequest.onBeforeRequest.addListener.expect(
     expect.anything(),

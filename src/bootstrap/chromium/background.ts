@@ -24,6 +24,8 @@ const qualityService = new QualityService(qualityProvider);
 const configurator = new Configurator(storage);
 const app = new App(certificateService, qualityService, configurator);
 
+app.init();
+
 const eventManager = new EventManager(
   onBeforeRequest,
   onHeadersReceived,

@@ -45,6 +45,7 @@ beforeEach(() => {
   qualityService = new QualityService(qualityProvider);
   configurator = new Configurator(browser.storage);
   app = new App(certificateService, qualityService, configurator);
+  app.init();
   tabId = 1;
   onHeadersReceivedDetails = {
     requestId: "1",

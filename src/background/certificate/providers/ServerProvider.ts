@@ -3,23 +3,25 @@ import { WebRequest } from "webextension-polyfill-ts";
 import { APIResponseBody } from "../../../shared/types/api/APIResponseBody";
 import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
 import { CodedError } from "../../../shared/types/errors/CodedError";
+import { ServerUnavailableError } from "../../../types/errors/ServerUnavailableError";
 import { ErrorFactory } from "../factories/ErrorFactory";
 import { CertificateProvider } from "./CertificateProvider";
 
 export class ServerProvider implements CertificateProvider {
-  private defaultServerUrl =
-    "https://snonitze65.execute-api.eu-central-1.amazonaws.com/getCertificate/";
+  static readonly defaultServerUrl =
+    "https://snonitze65.execute-api.eu-central-1.amazonaws.com/";
+  static readonly endpoint = "getCertificate/";
   private serverUrl: string;
 
   constructor() {
-    this.serverUrl = this.defaultServerUrl;
+    this.serverUrl = ServerProvider.defaultServerUrl;
   }
 
   public updateServerUrl(serverUrl: string): void {
     if (serverUrl) {
       this.serverUrl = serverUrl;
     } else {
-      this.serverUrl = this.defaultServerUrl;
+      this.serverUrl = ServerProvider.defaultServerUrl;
     }
   }
 
@@ -34,7 +36,13 @@ export class ServerProvider implements CertificateProvider {
     url: string
   ): Promise<RawCertificate> {
     return new Promise((resolve, reject) => {
-      fetch(this.serverUrl + url)
+      let urlToFetch: string = this.serverUrl;
+      if (!this.serverUrl.endsWith("/")) {
+        urlToFetch += "/";
+      }
+      urlToFetch += ServerProvider.endpoint + url;
+
+      fetch(urlToFetch)
         .then((response) => response.json())
         .then((apiResponse: APIResponseBody) => {
           const result = this.analyzeAPIResponse(apiResponse);
@@ -45,7 +53,15 @@ export class ServerProvider implements CertificateProvider {
             resolve(result);
           }
         })
-        .catch((error) => reject(error));
+        .catch((error) => {
+          const typedError = error as Error;
+          console.log(typedError.message);
+          if (typedError.message === "Failed to fetch") {
+            reject(new ServerUnavailableError());
+          } else {
+            reject(error);
+          }
+        });
     });
   }
 
