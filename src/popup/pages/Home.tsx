@@ -19,6 +19,7 @@ interface Props {
   errorMessage: ErrorMessage | undefined;
   certificate: Certificate | undefined;
   quality: Quality | undefined;
+  openOptionsPage: () => Promise<void>;
 }
 
 export class Home extends Component<Props> {
@@ -81,7 +82,7 @@ export class Home extends Component<Props> {
         <Divider section />
 
         <Container textAlign="center">
-          <Navigation />
+          <Navigation openOptionsPage={this.props.openOptionsPage} />
         </Container>
       </div>
     );
