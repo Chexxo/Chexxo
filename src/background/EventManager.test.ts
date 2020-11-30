@@ -33,7 +33,7 @@ beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
-  qualityProvider = new QualityProvider();
+  qualityProvider = new QualityProvider(browser.storage.local);
   qualityService = new QualityService(qualityProvider);
   app = new App(certificateService, qualityService);
 

@@ -23,7 +23,7 @@ export class App {
 
   async fetchCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<void> {
+  ): Promise<boolean> {
     const { tabId } = requestDetails;
     const tabData = this.tabCache.get(tabId) || new TabData();
 
@@ -32,14 +32,32 @@ export class App {
         requestDetails
       );
 
-      if (tabData.certificate) {
-        tabData.quality = this.qualityService.getQuality(tabData.certificate);
+      if (!tabData.certificate) {
+        return false;
       }
+
+      tabData.quality = this.qualityService.getQuality(tabData.certificate);
+      const hasQualityDecreased = await this.qualityService.hasQualityDecreased(
+        requestDetails.url,
+        tabData.quality
+      );
+
+      if (hasQualityDecreased) {
+        console.log("quality has decreased");
+        tabData.errorMessage = new ErrorMessage(
+          "The websites certificate has decreased in quality since your last visit."
+        );
+        return true;
+      }
+
+      console.log("quality has NOT decreased");
+      await this.qualityService.setQuality(requestDetails.url, tabData.quality);
     } catch (error) {
       tabData.errorMessage = ErrorMessage.fromError(error);
     }
 
     this.tabCache.set(tabId, tabData);
+    return false;
   }
 
   analyzeError(requestDetails: {

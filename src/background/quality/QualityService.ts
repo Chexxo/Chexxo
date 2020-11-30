@@ -9,4 +9,12 @@ export class QualityService {
   getQuality(certificate: Certificate): Quality {
     return QualityAnalyzer.getQuality(certificate);
   }
+
+  async setQuality(url: string, quality: Quality): Promise<void> {
+    await this.qualityProvider.setQuality(url, quality);
+  }
+
+  async hasQualityDecreased(url: string, quality: Quality): Promise<boolean> {
+    return await this.qualityProvider.hasQualityDecreased(url, quality);
+  }
 }

@@ -2,7 +2,8 @@ jest.mock("./certificate/providers/__mocks__/MockCertificateProvider");
 jest.mock("./certificate/CertificateService");
 jest.mock("./quality/helpers/QualityAnalyzer");
 
-import { WebRequest } from "webextension-polyfill-ts";
+import { deepMock, MockzillaDeep } from "mockzilla";
+import { Browser, WebRequest } from "webextension-polyfill-ts";
 
 // eslint-disable-next-line jest/no-mocks-import
 import { MockCertificateProvider } from "./certificate/providers/__mocks__/MockCertificateProvider";
@@ -18,6 +19,8 @@ import { UntrustedRootError } from "../types/errors/certificate/UntrustedRootErr
 import { Quality } from "../types/Quality";
 import { UUIDFactory } from "../helpers/UUIDFactory";
 
+let browser: Browser;
+let mockBrowser: MockzillaDeep<Browser>;
 let certificateProvider: MockCertificateProvider;
 let certificateService: CertificateService;
 let qualityProvider: QualityProvider;
@@ -30,9 +33,11 @@ let certificate: Certificate;
 let windowSpy = jest.spyOn(window, "window", "get");
 
 beforeEach(() => {
+  [browser, mockBrowser] = deepMock<Browser>("browser", false);
+  mockBrowser.storage.local.mockAllow();
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
-  qualityProvider = new QualityProvider();
+  qualityProvider = new QualityProvider(browser.storage.local);
   qualityService = new QualityService(qualityProvider);
   app = new App(certificateService, qualityService);
   tabId = 1;

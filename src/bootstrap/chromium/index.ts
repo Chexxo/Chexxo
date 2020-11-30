@@ -10,6 +10,7 @@ import { QualityService } from "../../background/quality/QualityService";
 const {
   browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },
   runtime: { onMessage },
+  storage: { local },
   tabs: { onActivated },
   webNavigation: { onErrorOccurred },
   webRequest: { onBeforeRequest, onHeadersReceived },
@@ -17,7 +18,7 @@ const {
 
 const certificateProvider = new ServerProvider();
 const certificateService = new CertificateService(certificateProvider);
-const qualityProvider = new QualityProvider();
+const qualityProvider = new QualityProvider(local);
 const qualityService = new QualityService(qualityProvider);
 const app = new App(certificateService, qualityService);
 

@@ -1,4 +1,5 @@
 import {
+  browser,
   BrowserAction,
   Events,
   Runtime,
@@ -44,7 +45,7 @@ export class EventManager {
     };
     const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
     this.webRequestHeadersEmitter.addListener(
-      this.receiveWebRequest.bind(this),
+      this.receiveWebRequestHeaders.bind(this),
       filter,
       extraInfoSpec
     );
@@ -64,13 +65,19 @@ export class EventManager {
     this.app.resetTabData(requestDetails.tabId);
   }
 
-  receiveWebRequest(
+  async receiveWebRequestHeaders(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): void {
-    // using await is not possible here, since making receiveWebRequest async is not allowed
-    this.app.fetchCertificate(requestDetails).then(() => {
-      this.changeBrowserAction(requestDetails);
-    });
+  ): Promise<WebRequest.BlockingResponse> {
+    const hasQualityDecreased = await this.app.fetchCertificate(requestDetails);
+    this.changeBrowserAction(requestDetails);
+
+    if (hasQualityDecreased) {
+      const path = `blocked.html?url=${requestDetails.url}`;
+      browser.tabs.create({ url: browser.runtime.getURL(path) });
+      return { cancel: true };
+    } else {
+      return {};
+    }
   }
 
   receiveWebRequestError(
