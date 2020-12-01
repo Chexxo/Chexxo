@@ -119,6 +119,10 @@ export class EventManager {
         const errorMessage = this.app.getErrorMessage(params.tabId);
         sendResponse(errorMessage);
         break;
+      case "resetQuality":
+        params = message.params as { url: string };
+        this.app.resetQuality(params.url);
+        sendResponse(true);
       default:
         sendResponse(new UnhandledMessageError(JSON.stringify(message)));
     }

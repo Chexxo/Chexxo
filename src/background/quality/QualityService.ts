@@ -17,4 +17,8 @@ export class QualityService {
   async hasQualityDecreased(url: string, quality: Quality): Promise<boolean> {
     return await this.qualityProvider.hasQualityDecreased(url, quality);
   }
+
+  async resetQuality(url: string): Promise<void> {
+    return await this.qualityProvider.resetQuality(url);
+  }
 }

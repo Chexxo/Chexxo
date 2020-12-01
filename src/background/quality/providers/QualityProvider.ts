@@ -22,6 +22,10 @@ export class QualityProvider {
     return storedQuality.level > quality.level;
   }
 
+  async resetQuality(url: string): Promise<void> {
+    await this.setQuality(url, Quality.Unknown);
+  }
+
   private async getQuality(url: string): Promise<Quality> {
     try {
       const storageData = await this.storageArea.get(["qualities"]);

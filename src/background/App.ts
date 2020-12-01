@@ -87,4 +87,8 @@ export class App {
   getErrorMessage(tabId: number): ErrorMessage | undefined {
     return this.tabCache.get(tabId)?.errorMessage;
   }
+
+  async resetQuality(url: string): Promise<void> {
+    await this.qualityService.resetQuality(url);
+  }
 }

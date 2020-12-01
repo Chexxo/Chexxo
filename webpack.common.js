@@ -4,7 +4,8 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    popup: path.join(__dirname, "src/popup/index.tsx"),
+    popup: path.join(__dirname, "src/bootstrap/popup.tsx"),
+    blocked: path.join(__dirname, "src/bootstrap/blocked.tsx"),
   },
   module: {
     rules: [
