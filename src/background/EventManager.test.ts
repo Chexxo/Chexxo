@@ -19,6 +19,7 @@ import { MockCertificateProvider } from "./certificate/providers/__mocks__/MockC
 import { EventManager } from "./EventManager";
 import { QualityProvider } from "./quality/providers/QualityProvider";
 import { QualityService } from "./quality/QualityService";
+import { Configurator } from "../helpers/Configurator";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -26,16 +27,22 @@ let certificateProvider: MockCertificateProvider;
 let certificateService: CertificateService;
 let qualityProvider: QualityProvider;
 let qualityService: QualityService;
+let configurator: Configurator;
 let app: App;
 let eventManager: EventManager;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
+  mockBrowser.storage.mockAllow();
+  mockBrowser.storage.local.mockAllow();
+  mockBrowser.storage.onChanged.addListener.expect(expect.anything());
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
   qualityProvider = new QualityProvider();
   qualityService = new QualityService(qualityProvider);
-  app = new App(certificateService, qualityService);
+  configurator = new Configurator(browser.storage);
+  app = new App(certificateService, qualityService, configurator);
+  app.init();
 
   mockBrowser.webRequest.onBeforeRequest.addListener.expect(
     expect.anything(),

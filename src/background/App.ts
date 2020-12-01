@@ -6,15 +6,28 @@ import { Quality } from "../types/Quality";
 import { TabData } from "../types/TabData";
 import { CertificateService } from "./certificate/CertificateService";
 import { QualityService } from "./quality/QualityService";
+import { Configurator } from "../helpers/Configurator";
+import { Configuration } from "../types/Configuration";
 
 export class App {
   private tabCache: Map<number, TabData>;
 
   constructor(
     private certificateService: CertificateService,
-    private qualityService: QualityService
+    private qualityService: QualityService,
+    private configurator: Configurator
   ) {
     this.tabCache = new Map<number, TabData>();
+    configurator.addListener(this.updateConfiguration.bind(this));
+  }
+
+  async init(): Promise<void> {
+    const configuration = await this.configurator.getConfiguration();
+    this.updateConfiguration(configuration);
+  }
+
+  updateConfiguration(configuration: Configuration): void {
+    this.certificateService.updateConfiguration(configuration);
   }
 
   resetTabData(tabId: number): void {
@@ -43,6 +56,7 @@ export class App {
   }
 
   analyzeError(requestDetails: {
+    url: string;
     tabId: number;
     frameId: number;
     error: string;
@@ -68,5 +82,13 @@ export class App {
 
   getErrorMessage(tabId: number): ErrorMessage | undefined {
     return this.tabCache.get(tabId)?.errorMessage;
+  }
+
+  async getConfiguration(): Promise<Configuration> {
+    return await this.configurator.getConfiguration();
+  }
+
+  async setConfiguration(configuration: Configuration): Promise<void> {
+    await this.configurator.setConfiguration(configuration);
   }
 }
