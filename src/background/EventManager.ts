@@ -1,7 +1,5 @@
 import {
-  browser,
   BrowserAction,
-  Events,
   Runtime,
   Tabs,
   WebNavigation,
@@ -13,28 +11,11 @@ import { App } from "./App";
 
 export class EventManager {
   constructor(
-    private webRequestBeforeEmitter: WebRequest.onBeforeRequestEvent,
-    private webRequestHeadersEmitter: WebRequest.onHeadersReceivedEvent,
-    private webRequestErrorEmitter: WebNavigation.onErrorOccurredEvent,
-    private messageEmitter: Events.Event<
-      (
-        message: { type: string; params: unknown },
-        sender: Runtime.MessageSender,
-        sendResponse: (response: unknown) => void
-      ) => void | Promise<unknown>
-    >,
-    private tabActivatedEmitter: Events.Event<
-      (activeInfo: Tabs.OnActivatedActiveInfoType) => void
-    >,
-    private setBrowserActionIcon: (
-      details: BrowserAction.SetIconDetailsType
-    ) => Promise<void>,
-    private setBrowserActionText: (
-      details: BrowserAction.SetBadgeTextDetailsType
-    ) => Promise<void>,
-    private setBrowserActionBackground: (
-      details: BrowserAction.SetBadgeBackgroundColorDetailsType
-    ) => Promise<void>,
+    private webRequest: WebRequest.Static,
+    private webNavigation: WebNavigation.Static,
+    private runtime: Runtime.Static,
+    private tabs: Tabs.Static,
+    private browserAction: BrowserAction.Static,
     private app: App
   ) {}
 
@@ -44,21 +25,22 @@ export class EventManager {
       types: ["main_frame"],
     };
     const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
-    this.webRequestHeadersEmitter.addListener(
-      this.receiveWebRequestHeaders.bind(this),
-      filter,
-      extraInfoSpec
-    );
-    this.webRequestErrorEmitter.addListener(
-      this.receiveWebRequestError.bind(this)
-    );
-    this.messageEmitter.addListener(this.receiveMessage.bind(this));
-    this.tabActivatedEmitter.addListener(this.changeBrowserAction.bind(this));
-    this.webRequestBeforeEmitter.addListener(
+
+    this.webRequest.onBeforeRequest.addListener(
       this.resetTabData.bind(this),
       filter,
       []
     );
+    this.webRequest.onHeadersReceived.addListener(
+      this.receiveWebRequestHeaders.bind(this),
+      filter,
+      extraInfoSpec
+    );
+    this.webNavigation.onErrorOccurred.addListener(
+      this.receiveWebRequestError.bind(this)
+    );
+    this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
+    this.tabs.onActivated.addListener(this.changeBrowserAction.bind(this));
   }
 
   resetTabData(requestDetails: { tabId: number }): void {
@@ -73,7 +55,7 @@ export class EventManager {
 
     if (hasQualityDecreased) {
       const path = `blocked.html?url=${requestDetails.url}`;
-      browser.tabs.create({ url: browser.runtime.getURL(path) });
+      this.tabs.create({ url: this.runtime.getURL(path) });
       return { cancel: true };
     } else {
       return {};
@@ -97,53 +79,51 @@ export class EventManager {
     this.changeBrowserAction(fixedDetails);
   }
 
-  receiveMessage(
-    message: { type: string; params: unknown },
-    _: Runtime.MessageSender,
-    sendResponse: (response: unknown) => void
-  ): void {
-    let params;
-    switch (message.type) {
-      case "getCertificate":
-        params = message.params as { tabId: number };
-        const certificate = this.app.getCertificate(params.tabId);
-        sendResponse(certificate);
-        break;
-      case "getQuality":
-        params = message.params as { tabId: number };
-        const quality = this.app.getQuality(params.tabId);
-        sendResponse(quality);
-        break;
-      case "getErrorMessage":
-        params = message.params as { tabId: number };
-        const errorMessage = this.app.getErrorMessage(params.tabId);
-        sendResponse(errorMessage);
-        break;
-      case "resetQuality":
-        params = message.params as { url: string };
-        this.app.resetQuality(params.url);
-        sendResponse(true);
-      default:
-        sendResponse(new UnhandledMessageError(JSON.stringify(message)));
-    }
+  receiveMessage(message: { type: string; params: unknown }): Promise<unknown> {
+    return new Promise((resolve, reject) => {
+      let params;
+      switch (message.type) {
+        case "getCertificate":
+          params = message.params as { tabId: number };
+          const certificate = this.app.getCertificate(params.tabId);
+          resolve(certificate);
+          break;
+        case "getQuality":
+          params = message.params as { tabId: number };
+          const quality = this.app.getQuality(params.tabId);
+          resolve(quality);
+          break;
+        case "getErrorMessage":
+          params = message.params as { tabId: number };
+          const errorMessage = this.app.getErrorMessage(params.tabId);
+          resolve(errorMessage);
+          break;
+        case "resetQuality":
+          params = message.params as { url: string };
+          this.app.resetQuality(params.url);
+          resolve(true);
+        default:
+          reject(new UnhandledMessageError(JSON.stringify(message)));
+      }
+    });
   }
 
   changeBrowserAction(tabInfo: { tabId: number }): void {
     const { tabId } = tabInfo;
     if (this.app.getErrorMessage(tabId)) {
-      this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });
-      this.setBrowserActionBackground({ color: "#d32f2f" });
-      this.setBrowserActionText({ text: "!" });
+      this.browserAction.setIcon({ path: "../assets/logo_error.svg" });
+      this.browserAction.setBadgeBackgroundColor({ color: "#d32f2f" });
+      this.browserAction.setBadgeText({ text: "!" });
     } else {
-      this.setBrowserActionIcon({ path: "../assets/logo.svg" });
-      this.setBrowserActionBackground({ color: "#1976d2" });
+      this.browserAction.setIcon({ path: "../assets/logo.svg" });
+      this.browserAction.setBadgeBackgroundColor({ color: "#1976d2" });
 
       const quality = this.app.getQuality(tabId);
       if (quality) {
         const stars = "*".repeat(quality.level);
-        this.setBrowserActionText({ text: stars });
+        this.browserAction.setBadgeText({ text: stars });
       } else {
-        this.setBrowserActionText({ text: "" });
+        this.browserAction.setBadgeText({ text: "" });
       }
     }
   }

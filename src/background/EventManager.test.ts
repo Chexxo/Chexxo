@@ -31,53 +31,42 @@ let eventManager: EventManager;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
-  certificateProvider = new MockCertificateProvider();
-  certificateService = new CertificateService(certificateProvider);
-  qualityProvider = new QualityProvider(browser.storage.local);
-  qualityService = new QualityService(qualityProvider);
-  app = new App(certificateService, qualityService);
-
+  mockBrowser.storage.local.mockAllow();
+  mockBrowser.webRequest.mockAllow();
+  mockBrowser.webNavigation.mockAllow();
+  mockBrowser.runtime.mockAllow();
+  mockBrowser.tabs.mockAllow();
+  mockBrowser.browserAction.mockAllow();
   mockBrowser.webRequest.onBeforeRequest.addListener.expect(
     expect.anything(),
-    {
-      urls: ["<all_urls>"],
-      types: ["main_frame"],
-    },
-    []
+    expect.anything(),
+    expect.anything()
   );
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),
-    {
-      urls: ["<all_urls>"],
-      types: ["main_frame"],
-    },
-    ["blocking"]
+    expect.anything(),
+    expect.anything()
   );
   mockBrowser.webNavigation.onErrorOccurred.addListener.expect(
     expect.anything()
   );
   mockBrowser.runtime.onMessage.addListener.expect(expect.anything());
   mockBrowser.tabs.onActivated.addListener.expect(expect.anything());
-  mockBrowser.browserAction.setIcon.expect(expect.anything());
-  mockBrowser.browserAction.setBadgeText.expect(expect.anything());
-  mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
+
+  certificateProvider = new MockCertificateProvider();
+  certificateService = new CertificateService(certificateProvider);
+  qualityProvider = new QualityProvider(browser.storage.local);
+  qualityService = new QualityService(qualityProvider);
+  app = new App(certificateService, qualityService);
 
   eventManager = new EventManager(
-    browser.webRequest.onBeforeRequest,
-    browser.webRequest.onHeadersReceived,
-    browser.webNavigation.onErrorOccurred,
-    browser.runtime.onMessage,
-    browser.tabs.onActivated,
-    browser.browserAction.setIcon,
-    browser.browserAction.setBadgeText,
-    browser.browserAction.setBadgeBackgroundColor,
+    browser.webRequest,
+    browser.webNavigation,
+    browser.runtime,
+    browser.tabs,
+    browser.browserAction,
     app
   );
-});
-
-// eslint-disable-next-line jest/expect-expect
-test("initializes listeners", () => {
-  eventManager.init();
 });
 
 test("returns Certificate on getCertificate message", () => {

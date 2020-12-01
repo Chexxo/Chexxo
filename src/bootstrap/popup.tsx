@@ -6,12 +6,10 @@ import { browser } from "webextension-polyfill-ts";
 import "../popup/Popup.scss";
 import { Popup } from "../popup/Popup";
 
-const {
-  tabs: { query },
-  runtime: { sendMessage },
-} = browser;
-
 ReactDOM.render(
-  <Popup getTabs={query} sendMessage={sendMessage} />,
+  <Popup
+    getTabs={browser.tabs.query}
+    sendMessage={browser.runtime.sendMessage}
+  />,
   document.getElementById("popup")
 );
