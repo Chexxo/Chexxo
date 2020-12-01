@@ -79,7 +79,7 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
       );
     }
     logEntries.push(logEntry);
-    this.storageArea.set({ log: logEntries });
+    await this.storageArea.set({ log: logEntries });
   }
 
   /**
