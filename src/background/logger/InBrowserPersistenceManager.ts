@@ -1,4 +1,3 @@
-import { UUIDFactory } from "../../helpers/UUIDFactory";
 import { LogFactory } from "../../shared/logger/LogFactory";
 import { LogLevel } from "../../shared/logger/Logger";
 import { LoggerPersistenceManager } from "../../shared/logger/LoggerPersistenceManager";
@@ -23,14 +22,7 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
    *
    * @param logEntry The log entry to be persisted.
    */
-  public async save(logEntry: LogEntry): Promise<void> {
-    let uuid = undefined;
-    if (logEntry.error) {
-      uuid = logEntry.error.uuid;
-    } else if (logEntry.logLevel < LogLevel.INFO) {
-      uuid = UUIDFactory.uuidv4();
-    }
-
+  public async save(uuid: string, logEntry: LogEntry): Promise<void> {
     let logFunction = null;
     switch (logEntry.logLevel) {
       case LogLevel.WARNING:
@@ -43,11 +35,11 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
         logFunction = console.error;
     }
 
-    const logEntryReadable = LogFactory.formatLogEntry(logEntry, uuid);
+    const logEntryReadable = LogFactory.formatLogEntry(uuid, logEntry);
     logFunction(logEntryReadable);
 
     if (logEntry.logLevel < LogLevel.INFO) {
-      await this.writeLog(logEntry);
+      await this.writeLog(uuid, logEntry);
     }
   }
 
@@ -67,19 +59,43 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
    * Writes a {@link LogEntry} to the storage
    * @param logEntry The log entry to be written.
    */
-  private async writeLog(logEntry: LogEntry) {
-    const storageResponse = await this.storageArea.get(["log"]);
+  private async writeLog(uuid: string, logEntry: LogEntry): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let storageResponse: any;
+    try {
+      storageResponse = await this.storageArea.get(["log"]);
+    } catch {
+      const noLogMessage = LogFactory.formatLogEntry(
+        uuid,
+        new LogEntry(LogLevel.WARNING, Date.now(), "Log could not be read.")
+      );
+      console.warn(noLogMessage);
+      return;
+    }
+
     let logEntries: LogEntry[] = [];
     if (storageResponse.log !== undefined) {
       logEntries = <LogEntry[]>storageResponse.log;
       logEntries = this.logRotate(logEntries);
     } else {
-      await this.save(
+      const noLogMessage = LogFactory.formatLogEntry(
+        uuid,
         new LogEntry(LogLevel.INFO, Date.now(), "No log found. Creating new...")
       );
+      console.log(noLogMessage);
     }
     logEntries.push(logEntry);
-    await this.storageArea.set({ log: logEntries });
+
+    try {
+      await this.storageArea.set({ log: logEntries });
+    } catch {
+      const noLogMessage = LogFactory.formatLogEntry(
+        uuid,
+        new LogEntry(LogLevel.WARNING, Date.now(), "Log could not be written.")
+      );
+      console.warn(noLogMessage);
+      return;
+    }
   }
 
   /**

@@ -1,9 +1,10 @@
 import { WebRequest } from "webextension-polyfill-ts";
+import { UUIDFactory } from "../../../helpers/UUIDFactory";
 
-import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
 import { InsecureConnectionError } from "../../../types/errors/InsecureConnectionError";
 import { CertificateFactory } from "../factories/RawCertificateFactory";
 import { CertificateProvider } from "./CertificateProvider";
+import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 
 export class InBrowserProvider implements CertificateProvider {
   constructor(
@@ -15,17 +16,31 @@ export class InBrowserProvider implements CertificateProvider {
 
   async getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<RawCertificate> {
-    const { requestId } = requestDetails;
-    const securityInfo = await this.getSecurityInfo(requestId, {
-      certificateChain: false,
-      rawDER: true,
+  ): Promise<RawCertificateResponse> {
+    return new Promise(async (resolve, reject) => {
+      const requestUuid = UUIDFactory.uuidv4();
+      const { requestId } = requestDetails;
+      const securityInfo = await this.getSecurityInfo(requestId, {
+        certificateChain: false,
+        rawDER: true,
+      });
+
+      if (securityInfo.state === "insecure") {
+        reject(
+          new RawCertificateResponse(
+            requestUuid,
+            undefined,
+            new InsecureConnectionError()
+          )
+        );
+      }
+
+      resolve(
+        new RawCertificateResponse(
+          requestUuid,
+          CertificateFactory.fromSecurityInfo(securityInfo)
+        )
+      );
     });
-
-    if (securityInfo.state === "insecure") {
-      throw new InsecureConnectionError();
-    }
-
-    return CertificateFactory.fromSecurityInfo(securityInfo);
   }
 }

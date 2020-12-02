@@ -11,6 +11,8 @@ const date1 = Date.now();
 const date2 = Date.now() + 50;
 const date3 = Date.now() - logDays * millisecondsADay;
 
+const requestUuid = "";
+
 const logEntryInfo = new LogEntry(LogLevel.INFO, Date.now(), "Hello Info!");
 const logEntryWarning = new LogEntry(
   LogLevel.WARNING,
@@ -74,7 +76,7 @@ afterEach(() => {
 
 describe("save()", () => {
   test("Writes info to console", () => {
-    return persistence.save(logEntryInfo).then(() => {
+    return persistence.save(requestUuid, logEntryInfo).then(() => {
       expect(global.console.log).toHaveBeenLastCalledWith(
         expect.stringMatching(/Hello Info!/)
       );
@@ -82,7 +84,7 @@ describe("save()", () => {
   });
 
   test("Writes warning to console", () => {
-    return persistence.save(logEntryWarning).then(() => {
+    return persistence.save(requestUuid, logEntryWarning).then(() => {
       expect(global.console.warn).toHaveBeenLastCalledWith(
         expect.stringMatching(/Hello Warning!/)
       );
@@ -90,7 +92,7 @@ describe("save()", () => {
   });
 
   test("Writes error to console", () => {
-    return persistence.save(logEntryError).then(() => {
+    return persistence.save(requestUuid, logEntryError).then(() => {
       expect(global.console.error).toHaveBeenLastCalledWith(
         expect.stringMatching(/Hello Error!/)
       );
@@ -98,31 +100,31 @@ describe("save()", () => {
   });
 
   test("Writes error to log", () => {
-    return persistence.save(logEntryError).then(() => {
+    return persistence.save(requestUuid, logEntryError).then(() => {
       expect(log.length).toBe(3);
     });
   });
 
   test("Writes warning to log", () => {
-    return persistence.save(logEntryWarning).then(() => {
+    return persistence.save(requestUuid, logEntryWarning).then(() => {
       expect(log.length).toBe(3);
     });
   });
 
   test("Does not write info to log", () => {
-    return persistence.save(logEntryInfo).then(() => {
+    return persistence.save(requestUuid, logEntryInfo).then(() => {
       expect(log.length).toBe(2);
     });
   });
 
-  test("Takes uuid from error", () => {
+  test("Takes uuid from request", () => {
     const logEntry = new LogEntry(
       LogLevel.ERROR,
       Date.now(),
       "Hello",
-      new ConnectionRefusedError("abc123")
+      new ConnectionRefusedError()
     );
-    return persistence.save(logEntry).then(() => {
+    return persistence.save("abc123", logEntry).then(() => {
       expect(global.console.error).toHaveBeenLastCalledWith(
         expect.stringMatching(/\[abc123\]/)
       );
@@ -132,7 +134,7 @@ describe("save()", () => {
   test("Works on empty array", () => {
     log = [];
     return persistence
-      .save(new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
         expect(log.length).toBe(1);
       });
@@ -144,7 +146,7 @@ describe("save()", () => {
     });
 
     return persistence
-      .save(new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
         expect(log.length).toBe(1);
       });
@@ -155,7 +157,7 @@ describe("logrotate()", () => {
   test("Removes old logs", () => {
     log.splice(0, 0, new LogEntry(LogLevel.WARNING, date3, "Hello Old"));
     return persistence
-      .save(new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
         expect(log.length).toBe(3);
       });
@@ -166,7 +168,7 @@ describe("logrotate()", () => {
     log.splice(0, 0, new LogEntry(LogLevel.WARNING, date3 - 500, "Hi older"));
     log.splice(0, 0, new LogEntry(LogLevel.WARNING, date3, "Hi Old"));
     return persistence
-      .save(new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
         expect(log.length).toBe(3);
       });

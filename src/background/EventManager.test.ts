@@ -20,6 +20,8 @@ import { EventManager } from "./EventManager";
 import { QualityProvider } from "./quality/providers/QualityProvider";
 import { QualityService } from "./quality/QualityService";
 import { Configurator } from "../helpers/Configurator";
+import { Logger } from "../shared/logger/Logger";
+import { InBrowserPersistenceManager } from "./logger/InBrowserPersistenceManager";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -30,6 +32,7 @@ let qualityService: QualityService;
 let configurator: Configurator;
 let app: App;
 let eventManager: EventManager;
+let logger: Logger;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
@@ -41,7 +44,9 @@ beforeEach(() => {
   qualityProvider = new QualityProvider();
   qualityService = new QualityService(qualityProvider);
   configurator = new Configurator(browser.storage);
-  app = new App(certificateService, qualityService, configurator);
+  logger = new Logger(new InBrowserPersistenceManager(browser.storage.local));
+
+  app = new App(certificateService, qualityService, configurator, logger);
   app.init();
 
   mockBrowser.webRequest.onBeforeRequest.addListener.expect(

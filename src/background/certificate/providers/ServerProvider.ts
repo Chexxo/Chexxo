@@ -2,15 +2,15 @@ import { WebRequest } from "webextension-polyfill-ts";
 
 import { APIResponseBody } from "../../../shared/types/api/APIResponseBody";
 import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
-import { CodedError } from "../../../shared/types/errors/CodedError";
 import { ServerUnavailableError } from "../../../types/errors/ServerUnavailableError";
 import { ErrorFactory } from "../factories/ErrorFactory";
 import { CertificateProvider } from "./CertificateProvider";
+import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 
 export class ServerProvider implements CertificateProvider {
   static readonly defaultServerUrl =
-    "https://snonitze65.execute-api.eu-central-1.amazonaws.com/";
-  static readonly endpoint = "getCertificate/";
+    "https://cmsrvsfj03.execute-api.eu-central-1.amazonaws.com/";
+  static readonly endpoint = "certificate/";
   private serverUrl: string;
 
   constructor() {
@@ -27,14 +27,14 @@ export class ServerProvider implements CertificateProvider {
 
   public getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<RawCertificate> {
+  ): Promise<RawCertificateResponse> {
     const url = this.cleanUrl(requestDetails.url);
     return this.fetchCertificateFromServer(url);
   }
 
   private async fetchCertificateFromServer(
     url: string
-  ): Promise<RawCertificate> {
+  ): Promise<RawCertificateResponse> {
     return new Promise((resolve, reject) => {
       let urlToFetch: string = this.serverUrl;
       if (!this.serverUrl.endsWith("/")) {
@@ -47,7 +47,7 @@ export class ServerProvider implements CertificateProvider {
         .then((apiResponse: APIResponseBody) => {
           const result = this.analyzeAPIResponse(apiResponse);
 
-          if (result instanceof CodedError) {
+          if (result.error !== undefined) {
             reject(result);
           } else {
             resolve(result);
@@ -76,11 +76,18 @@ export class ServerProvider implements CertificateProvider {
 
   private analyzeAPIResponse(
     response: APIResponseBody
-  ): RawCertificate | CodedError {
+  ): RawCertificateResponse {
     if (response.error !== null) {
-      return ErrorFactory.fromErrorDto(response.error);
+      return new RawCertificateResponse(
+        response.requestUuid,
+        undefined,
+        ErrorFactory.fromErrorDto(response.error)
+      );
     }
 
-    return new RawCertificate(response.certificate);
+    return new RawCertificateResponse(
+      response.requestUuid,
+      new RawCertificate(response.certificate)
+    );
   }
 }

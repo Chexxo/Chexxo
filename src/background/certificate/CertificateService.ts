@@ -1,6 +1,6 @@
 import { WebRequest } from "webextension-polyfill-ts";
 
-import { Certificate } from "../../types/certificate/Certificate";
+import { CertificateResponse } from "../../types/certificate/CertificateResponse";
 import { Configuration } from "../../types/Configuration";
 import { CertificateErrorAnalyzer } from "./helpers/CertificateErrorAnalyzer";
 import { CertificateParser } from "./helpers/CertificateParser";
@@ -20,13 +20,26 @@ export class CertificateService {
 
   async getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<Certificate> {
-    const rawData = await this.certificateProvider.getCertificate(
+  ): Promise<CertificateResponse> {
+    const rawCertificateResponse = await this.certificateProvider.getCertificate(
       requestDetails
     );
 
-    const certificate = CertificateParser.getCertificate(rawData);
-    return certificate;
+    if (rawCertificateResponse.rawCertificate !== undefined) {
+      const certificate = CertificateParser.getCertificate(
+        rawCertificateResponse.rawCertificate
+      );
+      return new CertificateResponse(
+        rawCertificateResponse.requestUuid,
+        certificate
+      );
+    }
+
+    return new CertificateResponse(
+      rawCertificateResponse.requestUuid,
+      undefined,
+      rawCertificateResponse.error
+    );
   }
 
   analyzeError(requestDetails: {

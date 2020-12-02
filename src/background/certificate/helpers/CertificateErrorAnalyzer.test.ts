@@ -1,24 +1,6 @@
 import { CertificateError } from "../../../types/errors/certificate/CertificateError";
 import { CertificateErrorAnalyzer } from "./CertificateErrorAnalyzer";
 
-let windowSpy = jest.spyOn(window, "window", "get");
-beforeEach(() => {
-  windowSpy = jest.spyOn(window, "window", "get");
-  windowSpy.mockImplementation(
-    () =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      <any>{
-        crypto: {
-          getRandomValues: jest.fn(),
-        },
-      }
-  );
-});
-
-afterEach(() => {
-  windowSpy.mockRestore();
-});
-
 test("returns CertificateError if a handled error code is provided", () => {
   const requestDetails = {
     url: "",

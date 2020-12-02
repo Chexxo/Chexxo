@@ -8,6 +8,12 @@ import { CertificateService } from "./certificate/CertificateService";
 import { QualityService } from "./quality/QualityService";
 import { Configurator } from "../helpers/Configurator";
 import { Configuration } from "../types/Configuration";
+import { CertificateResponse } from "../types/certificate/CertificateResponse";
+import { RawCertificateResponse } from "../types/certificate/RawCertificateResponse";
+import { Logger, LogLevel } from "../shared/logger/Logger";
+import { UUIDFactory } from "../helpers/UUIDFactory";
+import { CodedError } from "../shared/types/errors/CodedError";
+import { UnknownError } from "../types/errors/UnknownError";
 
 export class App {
   private tabCache: Map<number, TabData>;
@@ -15,7 +21,8 @@ export class App {
   constructor(
     private certificateService: CertificateService,
     private qualityService: QualityService,
-    private configurator: Configurator
+    private configurator: Configurator,
+    private logger: Logger
   ) {
     this.tabCache = new Map<number, TabData>();
     configurator.addListener(this.updateConfiguration.bind(this));
@@ -41,15 +48,24 @@ export class App {
     const tabData = this.tabCache.get(tabId) || new TabData();
 
     try {
-      tabData.certificate = await this.certificateService.getCertificate(
+      const certificateResponse = await this.certificateService.getCertificate(
         requestDetails
       );
+
+      tabData.certificate = certificateResponse.certificate;
 
       if (tabData.certificate) {
         tabData.quality = this.qualityService.getQuality(tabData.certificate);
       }
-    } catch (error) {
-      tabData.errorMessage = ErrorMessage.fromError(error);
+
+      this.logger.log(
+        certificateResponse.requestUuid,
+        LogLevel.INFO,
+        `Request ${requestDetails.url} Response: 200`
+      );
+    } catch (errorResponse) {
+      this.errorLogger(errorResponse);
+      tabData.errorMessage = ErrorMessage.fromError(errorResponse);
     }
 
     this.tabCache.set(tabId, tabData);
@@ -90,5 +106,40 @@ export class App {
 
   async setConfiguration(configuration: Configuration): Promise<void> {
     await this.configurator.setConfiguration(configuration);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private errorLogger(errorResponse: any) {
+    if (
+      errorResponse instanceof CertificateResponse ||
+      errorResponse instanceof RawCertificateResponse
+    ) {
+      if (errorResponse.error instanceof CodedError) {
+        let logLevel = LogLevel.WARNING;
+        if (errorResponse.error.code === 500) {
+          logLevel = LogLevel.ERROR;
+        }
+        this.logger.log(
+          UUIDFactory.uuidv4(),
+          logLevel,
+          errorResponse.error.message,
+          errorResponse.error
+        );
+      } else {
+        this.logger.log(
+          UUIDFactory.uuidv4(),
+          LogLevel.ERROR,
+          "Unknown Error",
+          new UnknownError(errorResponse.error)
+        );
+      }
+    } else {
+      this.logger.log(
+        UUIDFactory.uuidv4(),
+        LogLevel.ERROR,
+        "Unknown Error",
+        new UnknownError(errorResponse)
+      );
+    }
   }
 }

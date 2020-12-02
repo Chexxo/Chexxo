@@ -16,9 +16,14 @@ import { Issuer } from "../types/certificate/Issuer";
 import { Subject } from "../types/certificate/Subject";
 import { ErrorMessage } from "../types/errors/ErrorMessage";
 import { UntrustedRootError } from "../types/errors/certificate/UntrustedRootError";
-import { UUIDFactory } from "../helpers/UUIDFactory";
 import { Quality } from "../types/Quality";
 import { Configurator } from "../helpers/Configurator";
+import { CertificateResponse } from "../types/certificate/CertificateResponse";
+import { Logger, LogLevel } from "../shared/logger/Logger";
+import { InBrowserPersistenceManager } from "./logger/InBrowserPersistenceManager";
+import { InsecureConnectionError } from "../types/errors/InsecureConnectionError";
+import { InvalidUrlError } from "../shared/types/errors/InvalidUrlError";
+import { ServerError } from "../shared/types/errors/ServerError";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -31,8 +36,12 @@ let app: App;
 let tabId: number;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let certificate: Certificate;
+let logger: Logger;
+
+const requestUuid = "abc123";
 
 let windowSpy = jest.spyOn(window, "window", "get");
+const consoleSave = global.console;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
@@ -44,7 +53,9 @@ beforeEach(() => {
   qualityProvider = new QualityProvider();
   qualityService = new QualityService(qualityProvider);
   configurator = new Configurator(browser.storage);
-  app = new App(certificateService, qualityService, configurator);
+  logger = new Logger(new InBrowserPersistenceManager(browser.storage.local));
+
+  app = new App(certificateService, qualityService, configurator, logger);
   app.init();
   tabId = 1;
   onHeadersReceivedDetails = {
@@ -82,16 +93,23 @@ beforeEach(() => {
         },
       }
   );
+
+  global.console = <Console>(<unknown>{
+    log: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  });
 });
 
 afterEach(() => {
   windowSpy.mockRestore();
+  global.console = consoleSave;
 });
 
 test("caches certificate from CertificateService", async () => {
   certificateService.getCertificate = jest.fn(() => {
     return new Promise((resolve) => {
-      resolve(certificate);
+      resolve(new CertificateResponse(requestUuid, certificate));
     });
   });
 
@@ -102,7 +120,7 @@ test("caches certificate from CertificateService", async () => {
 test("caches quality from QualityService", async () => {
   certificateService.getCertificate = jest.fn(() => {
     return new Promise((resolve) => {
-      resolve(certificate);
+      resolve(new CertificateResponse(requestUuid, certificate));
     });
   });
 
@@ -128,11 +146,121 @@ test("catches errormessages from CertificateService", async () => {
   await expect(app.getErrorMessage(tabId)).toBeInstanceOf(ErrorMessage);
 });
 
+test("writes  unknown error to log", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(new Error());
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.ERROR,
+    "Unknown Error",
+    expect.anything()
+  );
+});
+
+test("writes normal CodedError from InBrowser provider to log", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(
+        new CertificateResponse(
+          requestUuid,
+          undefined,
+          new InsecureConnectionError()
+        )
+      );
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.WARNING,
+    "Server responded with an insecure connection.",
+    expect.anything()
+  );
+});
+
+test("writes normal CodedError from Server provider to log", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(
+        new CertificateResponse(requestUuid, undefined, new InvalidUrlError())
+      );
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.WARNING,
+    "The url provided is not valid.",
+    expect.anything()
+  );
+});
+
+test("writes ServerError from Server provider to log", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(
+        new CertificateResponse(requestUuid, undefined, new ServerError())
+      );
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.ERROR,
+    "An internal server error occured.",
+    expect.anything()
+  );
+});
+
+test("writes unknown error from ErrorResponse to log", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(new CertificateResponse(requestUuid, undefined, new Error()));
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.ERROR,
+    "Unknown Error",
+    expect.anything()
+  );
+});
+
 test("caches errormessages from OnErrorOccured event", () => {
   const requestDetails = { url: "", tabId: 0, frameId: 0, error: "" };
 
   certificateService.analyzeError = jest.fn(() => {
-    return new UntrustedRootError(UUIDFactory.uuidv4());
+    return new UntrustedRootError();
   });
 
   app.analyzeError(requestDetails);
