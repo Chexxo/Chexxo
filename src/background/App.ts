@@ -64,7 +64,7 @@ export class App {
         `Request ${requestDetails.url} Response: 200`
       );
     } catch (errorResponse) {
-      this.errorLogger(errorResponse);
+      this.logError(errorResponse);
       tabData.errorMessage = ErrorMessage.fromError(errorResponse);
     }
 
@@ -108,8 +108,7 @@ export class App {
     await this.configurator.setConfiguration(configuration);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private errorLogger(errorResponse: any) {
+  private logError(errorResponse: unknown) {
     if (
       errorResponse instanceof CertificateResponse ||
       errorResponse instanceof RawCertificateResponse
@@ -138,7 +137,7 @@ export class App {
         UUIDFactory.uuidv4(),
         LogLevel.ERROR,
         "Unknown Error",
-        new UnknownError(errorResponse)
+        new UnknownError(<Error>errorResponse)
       );
     }
   }
