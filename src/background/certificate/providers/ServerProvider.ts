@@ -21,7 +21,6 @@ export class ServerProvider implements CertificateProvider {
     url: string
   ): Promise<RawCertificate> {
     return new Promise((resolve, reject) => {
-      console.log(url);
       fetch(SERVER_URL + url)
         .then((response) => response.json())
         .then((apiResponse: APIResponseBody) => {

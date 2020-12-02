@@ -20,7 +20,6 @@ export class Blocked extends Component<Props> {
   }
 
   async acknowledgeRisk(): Promise<void> {
-    console.log(this);
     await this.props.sendMessage({
       type: "resetQuality",
       params: { url: this.url },

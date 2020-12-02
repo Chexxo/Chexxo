@@ -43,14 +43,12 @@ export class App {
       );
 
       if (hasQualityDecreased) {
-        console.log("quality has decreased");
         tabData.errorMessage = new ErrorMessage(
           "The websites certificate has decreased in quality since your last visit."
         );
         return true;
       }
 
-      console.log("quality has NOT decreased");
       await this.qualityService.setQuality(requestDetails.url, tabData.quality);
     } catch (error) {
       tabData.errorMessage = ErrorMessage.fromError(error);
