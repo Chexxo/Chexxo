@@ -2,6 +2,7 @@
 import { deepMock } from "mockzilla";
 import { Browser, WebRequest } from "webextension-polyfill-ts";
 
+import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 import { InsecureConnectionError } from "../../../types/errors/InsecureConnectionError";
 import { InBrowserProvider } from "./InBrowserProvider";
 
@@ -11,6 +12,8 @@ let requestId: string;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let getSecurityInfoOptions: WebRequest.GetSecurityInfoOptionsType;
 let securityInfo: WebRequest.SecurityInfo;
+
+let windowSpy = jest.spyOn(window, "window", "get");
 
 beforeEach(() => {
   requestId = "1";
@@ -52,6 +55,21 @@ beforeEach(() => {
       },
     ],
   };
+
+  windowSpy = jest.spyOn(window, "window", "get");
+  windowSpy.mockImplementation(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      <any>{
+        crypto: {
+          getRandomValues: jest.fn(),
+        },
+      }
+  );
+});
+
+afterEach(() => {
+  windowSpy.mockRestore();
 });
 
 test("returns the raw certificate when securityInfo is secure", async () => {
@@ -62,14 +80,14 @@ test("returns the raw certificate when securityInfo is secure", async () => {
   const inBrowserProvider = new InBrowserProvider(
     browser.webRequest.getSecurityInfo
   );
-  const certificate = await inBrowserProvider.getCertificate(
+  const certificateResponse = await inBrowserProvider.getCertificate(
     onHeadersReceivedDetails
   );
 
-  expect(certificate.pem.length).toBeGreaterThan(0);
+  expect(certificateResponse.rawCertificate).not.toBe(undefined);
 });
 
-test("throws an InsecureConnectionError when securityInfo is insecure", async () => {
+test("returns an error when securityInfo is insecure", () => {
   securityInfo.state = "insecure";
 
   mockBrowser.webRequest.getSecurityInfo
@@ -80,7 +98,12 @@ test("throws an InsecureConnectionError when securityInfo is insecure", async ()
     browser.webRequest.getSecurityInfo
   );
 
-  await expect(
-    inBrowserProvider.getCertificate(onHeadersReceivedDetails)
-  ).rejects.toThrowError(InsecureConnectionError);
+  return inBrowserProvider
+    .getCertificate(onHeadersReceivedDetails)
+    .then(() => {
+      expect(false).toBe(true);
+    })
+    .catch((error: RawCertificateResponse) => {
+      expect(error.error).toBeInstanceOf(InsecureConnectionError);
+    });
 });

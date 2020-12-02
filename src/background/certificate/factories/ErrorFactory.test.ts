@@ -2,7 +2,7 @@ import { ExpiredError } from "../../../types/errors/certificate/ExpiredError";
 import { InvalidDomainError } from "../../../types/errors/certificate/InvalidDomainError";
 import { RevokedError } from "../../../types/errors/certificate/RevokedError";
 import { SelfSignedError } from "../../../types/errors/certificate/SelfSignedError";
-import { UnknownError } from "../../../types/errors/certificate/UnknownError";
+import { UnknownCertificateError } from "../../../types/errors/certificate/UnknownCertificateError";
 import { UntrustedRootError } from "../../../types/errors/certificate/UntrustedRootError";
 import { ErrorFactory } from "./ErrorFactory";
 
@@ -83,5 +83,7 @@ describe("Google Chrome", () => {
 });
 
 test("returns UnknownError when an unhandled code is provided", () => {
-  expect(ErrorFactory.fromBrowserErrorCode("")).toBeInstanceOf(UnknownError);
+  expect(ErrorFactory.fromBrowserErrorCode("")).toBeInstanceOf(
+    UnknownCertificateError
+  );
 });
