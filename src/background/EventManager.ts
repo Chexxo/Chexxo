@@ -137,7 +137,18 @@ export class EventManager {
         console.log("cache was deleted.");
         break;
       case "exportLogs":
-        console.log("logs were exported.");
+        try {
+          sendResponse(this.app.exportLogs());
+        } catch (error) {
+          sendResponse(error as Error);
+        }
+        break;
+      case "removeLogs":
+        try {
+          sendResponse(this.app.removeLogs());
+        } catch (error) {
+          sendResponse(error as Error);
+        }
         break;
       default:
         sendResponse(new UnhandledMessageError(JSON.stringify(message)));

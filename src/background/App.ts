@@ -10,10 +10,12 @@ import { Configurator } from "../helpers/Configurator";
 import { Configuration } from "../types/Configuration";
 import { CertificateResponse } from "../types/certificate/CertificateResponse";
 import { RawCertificateResponse } from "../types/certificate/RawCertificateResponse";
-import { Logger, LogLevel } from "../shared/logger/Logger";
+import { LogLevel } from "../shared/logger/Logger";
 import { UUIDFactory } from "../helpers/UUIDFactory";
 import { CodedError } from "../shared/types/errors/CodedError";
 import { UnknownError } from "../types/errors/UnknownError";
+import { InBrowserLogger } from "./logger/InBrowserLogger";
+import { LogEntry } from "../shared/types/logger/LogEntry";
 
 export class App {
   private tabCache: Map<number, TabData>;
@@ -22,7 +24,7 @@ export class App {
     private certificateService: CertificateService,
     private qualityService: QualityService,
     private configurator: Configurator,
-    private logger: Logger
+    private logger: InBrowserLogger
   ) {
     this.tabCache = new Map<number, TabData>();
     configurator.addListener(this.updateConfiguration.bind(this));
@@ -81,6 +83,9 @@ export class App {
     const error = this.certificateService.analyzeError(requestDetails);
 
     if (error !== null) {
+      this.logError(
+        new CertificateResponse(UUIDFactory.uuidv4(), undefined, error)
+      );
       const errorMessage = ErrorMessage.fromError(error);
       const tabData = this.tabCache.get(tabId) || new TabData();
       tabData.errorMessage = errorMessage;
@@ -106,6 +111,14 @@ export class App {
 
   async setConfiguration(configuration: Configuration): Promise<void> {
     await this.configurator.setConfiguration(configuration);
+  }
+
+  public async exportLogs(): Promise<LogEntry[] | null> {
+    return this.logger.getAll();
+  }
+
+  public async removeLogs(): Promise<void> {
+    return this.logger.removeAll();
   }
 
   private logError(errorResponse: unknown) {

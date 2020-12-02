@@ -22,6 +22,7 @@ import { QualityService } from "./quality/QualityService";
 import { Configurator } from "../helpers/Configurator";
 import { Logger } from "../shared/logger/Logger";
 import { InBrowserPersistenceManager } from "./logger/InBrowserPersistenceManager";
+import { InBrowserLogger } from "./logger/InBrowserLogger";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -32,7 +33,7 @@ let qualityService: QualityService;
 let configurator: Configurator;
 let app: App;
 let eventManager: EventManager;
-let logger: Logger;
+let logger: InBrowserLogger;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
@@ -44,7 +45,9 @@ beforeEach(() => {
   qualityProvider = new QualityProvider();
   qualityService = new QualityService(qualityProvider);
   configurator = new Configurator(browser.storage);
-  logger = new Logger(new InBrowserPersistenceManager(browser.storage.local));
+  logger = new InBrowserLogger(
+    new InBrowserPersistenceManager(browser.storage.local)
+  );
 
   app = new App(certificateService, qualityService, configurator, logger);
   app.init();

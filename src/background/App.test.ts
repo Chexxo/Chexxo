@@ -19,11 +19,12 @@ import { UntrustedRootError } from "../types/errors/certificate/UntrustedRootErr
 import { Quality } from "../types/Quality";
 import { Configurator } from "../helpers/Configurator";
 import { CertificateResponse } from "../types/certificate/CertificateResponse";
-import { Logger, LogLevel } from "../shared/logger/Logger";
+import { LogLevel } from "../shared/logger/Logger";
 import { InBrowserPersistenceManager } from "./logger/InBrowserPersistenceManager";
 import { InsecureConnectionError } from "../types/errors/InsecureConnectionError";
 import { InvalidUrlError } from "../shared/types/errors/InvalidUrlError";
 import { ServerError } from "../shared/types/errors/ServerError";
+import { InBrowserLogger } from "./logger/InBrowserLogger";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -36,7 +37,7 @@ let app: App;
 let tabId: number;
 let onHeadersReceivedDetails: WebRequest.OnHeadersReceivedDetailsType;
 let certificate: Certificate;
-let logger: Logger;
+let logger: InBrowserLogger;
 
 const requestUuid = "abc123";
 
@@ -53,7 +54,9 @@ beforeEach(() => {
   qualityProvider = new QualityProvider();
   qualityService = new QualityService(qualityProvider);
   configurator = new Configurator(browser.storage);
-  logger = new Logger(new InBrowserPersistenceManager(browser.storage.local));
+  logger = new InBrowserLogger(
+    new InBrowserPersistenceManager(browser.storage.local)
+  );
 
   app = new App(certificateService, qualityService, configurator, logger);
   app.init();

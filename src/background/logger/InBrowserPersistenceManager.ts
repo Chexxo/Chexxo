@@ -22,7 +22,7 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
    *
    * @param logEntry The log entry to be persisted.
    */
-  public async save(uuid: string, logEntry: LogEntry): Promise<void> {
+  public async save(logEntry: LogEntry): Promise<void> {
     let logFunction = null;
     switch (logEntry.logLevel) {
       case LogLevel.WARNING:
@@ -35,11 +35,11 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
         logFunction = console.error;
     }
 
-    const logEntryReadable = LogFactory.formatLogEntry(uuid, logEntry);
+    const logEntryReadable = LogFactory.formatLogEntry(logEntry);
     logFunction(logEntryReadable);
 
     if (logEntry.logLevel < LogLevel.INFO) {
-      await this.writeLog(uuid, logEntry);
+      await this.writeLog(logEntry);
     }
   }
 
@@ -50,24 +50,35 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   public async getAll(): Promise<LogEntry[] | null> {
     const storageResponse = await this.storageArea.get(["log"]);
     if (storageResponse.log) {
-      return storageResponse.log;
+      return JSON.parse(storageResponse.log);
     }
     return null;
+  }
+
+  /**
+   * Removes all log entries.
+   */
+  public async removeAll(): Promise<void> {
+    await this.storageArea.remove("log");
   }
 
   /**
    * Writes a {@link LogEntry} to the storage
    * @param logEntry The log entry to be written.
    */
-  private async writeLog(uuid: string, logEntry: LogEntry): Promise<void> {
+  private async writeLog(logEntry: LogEntry): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let storageResponse: any;
     try {
       storageResponse = await this.storageArea.get(["log"]);
     } catch {
       const noLogMessage = LogFactory.formatLogEntry(
-        uuid,
-        new LogEntry(LogLevel.WARNING, Date.now(), "Log could not be read.")
+        new LogEntry(
+          logEntry.requestUuid,
+          LogLevel.WARNING,
+          Date.now(),
+          "Log could not be read."
+        )
       );
       console.warn(noLogMessage);
       return;
@@ -75,23 +86,32 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
 
     let logEntries: LogEntry[] = [];
     if (storageResponse.log !== undefined) {
-      logEntries = <LogEntry[]>storageResponse.log;
+      logEntries = <LogEntry[]>JSON.parse(storageResponse.log);
       logEntries = this.logRotate(logEntries);
     } else {
       const noLogMessage = LogFactory.formatLogEntry(
-        uuid,
-        new LogEntry(LogLevel.INFO, Date.now(), "No log found. Creating new...")
+        new LogEntry(
+          logEntry.requestUuid,
+          LogLevel.INFO,
+          Date.now(),
+          "No log found. Creating new..."
+        )
       );
       console.log(noLogMessage);
     }
     logEntries.push(logEntry);
-
+    console.log(logEntries);
     try {
-      await this.storageArea.set({ log: logEntries });
-    } catch {
+      await this.storageArea.set({ log: JSON.stringify(logEntries) });
+    } catch (e) {
+      console.log(e);
       const noLogMessage = LogFactory.formatLogEntry(
-        uuid,
-        new LogEntry(LogLevel.WARNING, Date.now(), "Log could not be written.")
+        new LogEntry(
+          logEntry.requestUuid,
+          LogLevel.WARNING,
+          Date.now(),
+          "Log could not be written."
+        )
       );
       console.warn(noLogMessage);
       return;

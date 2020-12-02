@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Divider, Form, Label } from "semantic-ui-react";
 import { Runtime } from "webextension-polyfill-ts";
+import { LogFactory } from "../shared/logger/LogFactory";
+import { LogEntry } from "../shared/types/logger/LogEntry";
 
 import { Configuration } from "../types/Configuration";
 
@@ -40,6 +42,8 @@ export default class Options extends Component<Props, State> {
     this.toggleCacheDomainQualitiesIncognito = this.toggleCacheDomainQualitiesIncognito.bind(
       this
     );
+    this.exportLogs = this.exportLogs.bind(this);
+    this.deleteLogs = this.deleteLogs.bind(this);
 
     try {
       const configuration = (await this.props.sendMessage({
@@ -105,8 +109,30 @@ export default class Options extends Component<Props, State> {
     this.props.sendMessage({ type: "deleteCache" });
   }
 
-  exportLogs(): void {
-    this.props.sendMessage({ type: "exportLogs" });
+  public async exportLogs(): Promise<void> {
+    const logEntries = (await this.props.sendMessage({
+      type: "exportLogs",
+    })) as LogEntry[];
+    const element = document.createElement("a");
+
+    let file;
+    if (logEntries === null) {
+      file = new Blob([], { type: "text/plain;charset=utf-8" });
+    } else {
+      let fileExport = "";
+      for (let i = 0; i < logEntries.length; i++) {
+        fileExport += LogFactory.formatLogEntry(logEntries[i]) + "\n";
+        file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
+      }
+    }
+    element.href = URL.createObjectURL(file);
+    element.download = "ChexxoLog.txt";
+    document.body.appendChild(element);
+    element.click();
+  }
+
+  public async removeLogs(): Promise<void> {
+    await this.props.sendMessage({ type: "removeLogs" });
   }
 
   private isValidUrl(url: string): boolean {
@@ -159,6 +185,7 @@ export default class Options extends Component<Props, State> {
 
         <Divider horizontal>Logs</Divider>
         <Form.Button content="Export" fluid onClick={this.exportLogs} />
+        <Form.Button content="Remove" fluid onClick={this.removeLogs} />
       </Form>
     );
   }
