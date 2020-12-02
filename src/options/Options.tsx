@@ -43,7 +43,7 @@ export default class Options extends Component<Props, State> {
       this
     );
     this.exportLogs = this.exportLogs.bind(this);
-    this.deleteLogs = this.deleteLogs.bind(this);
+    this.removeLogs = this.removeLogs.bind(this);
 
     try {
       const configuration = (await this.props.sendMessage({
@@ -126,7 +126,7 @@ export default class Options extends Component<Props, State> {
       }
     }
     element.href = URL.createObjectURL(file);
-    element.download = "ChexxoLog.txt";
+    element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
     document.body.appendChild(element);
     element.click();
   }

@@ -55,7 +55,6 @@ export class ServerProvider implements CertificateProvider {
         })
         .catch((error) => {
           const typedError = error as Error;
-          console.log(typedError.message);
           if (typedError.message === "Failed to fetch") {
             reject(new ServerUnavailableError());
           } else {

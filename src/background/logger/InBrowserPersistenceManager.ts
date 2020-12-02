@@ -100,11 +100,9 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
       console.log(noLogMessage);
     }
     logEntries.push(logEntry);
-    console.log(logEntries);
     try {
       await this.storageArea.set({ log: JSON.stringify(logEntries) });
-    } catch (e) {
-      console.log(e);
+    } catch {
       const noLogMessage = LogFactory.formatLogEntry(
         new LogEntry(
           logEntry.requestUuid,
