@@ -14,33 +14,27 @@ export class InBrowserProvider implements CertificateProvider {
     ) => Promise<WebRequest.SecurityInfo>
   ) {}
 
-  async getCertificate(
+  public async getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<RawCertificateResponse> {
-    return new Promise(async (resolve, reject) => {
-      const requestUuid = UUIDFactory.uuidv4();
-      const { requestId } = requestDetails;
-      const securityInfo = await this.getSecurityInfo(requestId, {
-        certificateChain: false,
-        rawDER: true,
-      });
-
-      if (securityInfo.state === "insecure") {
-        reject(
-          new RawCertificateResponse(
-            requestUuid,
-            undefined,
-            new InsecureConnectionError()
-          )
-        );
-      }
-
-      resolve(
-        new RawCertificateResponse(
-          requestUuid,
-          CertificateFactory.fromSecurityInfo(securityInfo)
-        )
-      );
+    const requestUuid = UUIDFactory.uuidv4();
+    const { requestId } = requestDetails;
+    const securityInfo = await this.getSecurityInfo(requestId, {
+      certificateChain: false,
+      rawDER: true,
     });
+
+    if (securityInfo.state === "insecure") {
+      throw new RawCertificateResponse(
+        requestUuid,
+        undefined,
+        new InsecureConnectionError()
+      );
+    }
+
+    return new RawCertificateResponse(
+      requestUuid,
+      CertificateFactory.fromSecurityInfo(securityInfo)
+    );
   }
 }
