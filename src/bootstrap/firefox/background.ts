@@ -9,7 +9,6 @@ import { InBrowserPersistenceManager } from "../../background/logger/InBrowserPe
 import { QualityProvider } from "../../background/quality/providers/QualityProvider";
 import { QualityService } from "../../background/quality/QualityService";
 import { Configurator } from "../../helpers/Configurator";
-import { Logger } from "../../shared/logger/Logger";
 
 const {
   browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },

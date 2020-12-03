@@ -70,7 +70,7 @@ beforeEach(() => {
     set: jest.fn((object: any) => {
       log = object.log;
     }),
-    remove: jest.fn((object: any) => {
+    remove: jest.fn(() => {
       log = "";
     }),
   });
@@ -169,6 +169,32 @@ describe("save()", () => {
       .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
         expect(JSON.parse(log).length).toBe(1);
+      });
+  });
+
+  test("Writes warning if log cannot be read", () => {
+    storageArea.get = jest.fn(() => {
+      throw new Error();
+    });
+    return persistence
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
+      .then(() => {
+        expect(console.warn).toHaveBeenLastCalledWith(
+          expect.stringMatching(/Log could not be read./)
+        );
+      });
+  });
+
+  test("Writes warning if log cannot be written", () => {
+    storageArea.set = jest.fn(() => {
+      throw new Error();
+    });
+    return persistence
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
+      .then(() => {
+        expect(console.warn).toHaveBeenLastCalledWith(
+          expect.stringMatching(/Log could not be written./)
+        );
       });
   });
 });
