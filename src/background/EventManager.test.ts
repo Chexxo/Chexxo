@@ -37,9 +37,7 @@ beforeEach(() => {
   mockBrowser.runtime.mockAllow();
   mockBrowser.tabs.mockAllow();
   mockBrowser.browserAction.mockAllow();
-  mockBrowser.webRequest.onBeforeRequest.addListener.expect(
-    expect.anything(),
-    expect.anything(),
+  mockBrowser.webNavigation.onBeforeNavigate.addListener.expect(
     expect.anything()
   );
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
@@ -50,8 +48,8 @@ beforeEach(() => {
   mockBrowser.webNavigation.onErrorOccurred.addListener.expect(
     expect.anything()
   );
+  mockBrowser.webNavigation.onCompleted.addListener.expect(expect.anything());
   mockBrowser.runtime.onMessage.addListener.expect(expect.anything());
-  mockBrowser.tabs.onActivated.addListener.expect(expect.anything());
 
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
