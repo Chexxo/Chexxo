@@ -26,11 +26,7 @@ export class EventManager {
     };
     const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
 
-    this.webRequest.onBeforeRequest.addListener(
-      this.resetTabData.bind(this),
-      filter,
-      []
-    );
+    this.webNavigation.onBeforeNavigate.addListener(this.resetTab.bind(this));
     this.webRequest.onHeadersReceived.addListener(
       this.receiveWebRequestHeaders.bind(this),
       filter,
@@ -39,20 +35,44 @@ export class EventManager {
     this.webNavigation.onErrorOccurred.addListener(
       this.receiveWebRequestError.bind(this)
     );
+    this.webNavigation.onCompleted.addListener(
+      this.changeBrowserAction.bind(this)
+    );
     this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
-    this.tabs.onActivated.addListener(this.changeBrowserAction.bind(this));
   }
 
-  resetTabData(requestDetails: { tabId: number }): void {
-    this.app.resetTabData(requestDetails.tabId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isHttps(requestDetails: { url: string; tabId: number }): boolean {
+    const url = new URL(requestDetails.url);
+    return url.protocol === "https:";
+  }
+
+  resetTab(requestDetails: {
+    url: string;
+    tabId: number;
+    parentFrameId: number;
+  }): void {
+    if (requestDetails.parentFrameId !== -1) {
+      return;
+    }
+
+    if (this.isHttps(requestDetails)) {
+      this.browserAction.enable(requestDetails.tabId);
+    } else {
+      this.browserAction.disable(requestDetails.tabId);
+      this.app.resetTabData(requestDetails.tabId);
+    }
   }
 
   async receiveWebRequestHeaders(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<WebRequest.BlockingResponse> {
-    const hasQualityDecreased = await this.app.fetchCertificate(requestDetails);
-    this.changeBrowserAction(requestDetails);
+    if (!this.isHttps(requestDetails)) {
+      return {};
+    }
+    this.app.resetTabData(requestDetails.tabId);
 
+    const hasQualityDecreased = await this.app.fetchCertificate(requestDetails);
     if (hasQualityDecreased) {
       const path = `blocked.html?url=${requestDetails.url}`;
       this.tabs.create({ url: this.runtime.getURL(path) });
@@ -65,6 +85,10 @@ export class EventManager {
   receiveWebRequestError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
+    if (!this.isHttps(requestDetails)) {
+      return;
+    }
+
     /*
       has to asserted twice, because 'webextension-polyfill-ts' has declared 
       OnErrorOccuredDetailsType incorrectly
@@ -74,9 +98,7 @@ export class EventManager {
       frameId: number;
       error: string;
     };
-
     this.app.analyzeError(fixedDetails);
-    this.changeBrowserAction(fixedDetails);
   }
 
   receiveMessage(message: { type: string; params: unknown }): Promise<unknown> {
@@ -108,22 +130,23 @@ export class EventManager {
     });
   }
 
-  changeBrowserAction(tabInfo: { tabId: number }): void {
-    const { tabId } = tabInfo;
-    if (this.app.getErrorMessage(tabId)) {
-      this.browserAction.setIcon({ path: "../assets/logo_error.svg" });
-      this.browserAction.setBadgeBackgroundColor({ color: "#d32f2f" });
-      this.browserAction.setBadgeText({ text: "!" });
+  changeBrowserAction(requestDetails: { tabId: number }): void {
+    const { tabId } = requestDetails;
+    const errorMessage = this.app.getErrorMessage(tabId);
+    if (errorMessage) {
+      this.browserAction.setIcon({ tabId, path: "../assets/logo_error.svg" });
+      this.browserAction.setBadgeBackgroundColor({ tabId, color: "#d32f2f" });
+      this.browserAction.setBadgeText({ tabId, text: "!" });
     } else {
-      this.browserAction.setIcon({ path: "../assets/logo.svg" });
-      this.browserAction.setBadgeBackgroundColor({ color: "#1976d2" });
+      this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
+      this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
 
       const quality = this.app.getQuality(tabId);
       if (quality) {
         const stars = "*".repeat(quality.level);
-        this.browserAction.setBadgeText({ text: stars });
+        this.browserAction.setBadgeText({ tabId, text: stars });
       } else {
-        this.browserAction.setBadgeText({ text: "" });
+        this.browserAction.setBadgeText({ tabId, text: "" });
       }
     }
   }

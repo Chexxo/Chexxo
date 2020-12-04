@@ -8,14 +8,12 @@ import { CertificateService } from "./certificate/CertificateService";
 import { QualityService } from "./quality/QualityService";
 
 export class App {
-  private tabCache: Map<number, TabData>;
+  private tabCache = new Map<number, TabData>();
 
   constructor(
     private certificateService: CertificateService,
     private qualityService: QualityService
-  ) {
-    this.tabCache = new Map<number, TabData>();
-  }
+  ) {}
 
   resetTabData(tabId: number): void {
     this.tabCache.delete(tabId);
