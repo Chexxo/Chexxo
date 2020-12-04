@@ -48,9 +48,9 @@ export class EventManager {
     this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
   }
 
-  isHttps(requestDetails: { url: string; tabId: number }): boolean {
-    const url = new URL(requestDetails.url);
-    return url.protocol === "https:";
+  isHttps(url: string): boolean {
+    const realUrl = new URL(url);
+    return realUrl.protocol === "https:";
   }
 
   resetTab(requestDetails: {
@@ -62,10 +62,7 @@ export class EventManager {
       return;
     }
 
-    if (this.isHttps(requestDetails)) {
-      this.browserAction.enable(requestDetails.tabId);
-    } else {
-      this.browserAction.disable(requestDetails.tabId);
+    if (!this.isHttps(requestDetails.url)) {
       this.app.resetTabData(requestDetails.tabId);
     }
   }
@@ -87,7 +84,7 @@ export class EventManager {
     if (fixedDetails.parentFrameId !== -1) {
       return {};
     }
-    if (!this.isHttps(fixedDetails)) {
+    if (!this.isHttps(fixedDetails.url)) {
       return {};
     }
 
@@ -119,11 +116,12 @@ export class EventManager {
     if (requestDetails.frameId !== 0) {
       return;
     }
-    if (!this.isHttps(requestDetails)) {
+    if (!this.isHttps(requestDetails.url)) {
       return;
     }
 
     this.app.analyzeError(fixedDetails);
+    this.changeBrowserAction(requestDetails);
   }
 
   receiveMessage(message: { type: string; params: unknown }): Promise<unknown> {
@@ -155,12 +153,35 @@ export class EventManager {
     });
   }
 
-  changeBrowserAction(requestDetails: { tabId: number }): void {
-    const { tabId } = requestDetails;
+  changeBrowserAction(requestDetails: { url: string; tabId: number }): void {
+    const { url, tabId } = requestDetails;
+    const { parentFrameId } = (requestDetails as unknown) as {
+      parentFrameId: number;
+    };
+
+    if (parentFrameId !== -1) {
+      return;
+    }
+
+    if (!this.isHttps(url)) {
+      this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
+      this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
+      this.browserAction.disable(tabId);
+      return;
+    } else {
+      this.browserAction.enable(tabId);
+    }
+
     const errorMessage = this.app.getErrorMessage(tabId);
     if (errorMessage) {
-      this.browserAction.setIcon({ tabId, path: "../assets/logo_error.svg" });
-      this.browserAction.setBadgeBackgroundColor({ tabId, color: "#d32f2f" });
+      this.browserAction.setIcon({
+        tabId,
+        path: "../assets/logo_error.svg",
+      });
+      this.browserAction.setBadgeBackgroundColor({
+        tabId,
+        color: "#d32f2f",
+      });
       this.browserAction.setBadgeText({ tabId, text: "!" });
     } else {
       this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
