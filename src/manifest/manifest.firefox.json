@@ -8,5 +8,10 @@
     "gecko": {
       "strict_min_version": "67.0"
     }
-  }
+  },
+
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking"
+  ]
 }

@@ -11,27 +11,34 @@ import { App } from "./App";
 
 export class EventManager {
   constructor(
-    private webRequest: WebRequest.Static,
     private webNavigation: WebNavigation.Static,
     private runtime: Runtime.Static,
     private tabs: Tabs.Static,
     private browserAction: BrowserAction.Static,
-    private app: App
+    private app: App,
+    private webRequest?: WebRequest.Static
   ) {}
 
   init(): void {
-    const filter: WebRequest.RequestFilter = {
-      urls: ["<all_urls>"],
-      types: ["main_frame"],
-    };
-    const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
-
     this.webNavigation.onBeforeNavigate.addListener(this.resetTab.bind(this));
-    this.webRequest.onHeadersReceived.addListener(
-      this.receiveWebRequestHeaders.bind(this),
-      filter,
-      extraInfoSpec
-    );
+
+    if (this.webRequest) {
+      const filter: WebRequest.RequestFilter = {
+        urls: ["<all_urls>"],
+        types: ["main_frame"],
+      };
+      const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
+      this.webRequest.onHeadersReceived.addListener(
+        this.receiveWebRequestHeaders.bind(this),
+        filter,
+        extraInfoSpec
+      );
+    } else {
+      this.webNavigation.onCommitted.addListener(
+        this.receiveWebRequestHeaders.bind(this)
+      );
+    }
+
     this.webNavigation.onErrorOccurred.addListener(
       this.receiveWebRequestError.bind(this)
     );
@@ -41,7 +48,6 @@ export class EventManager {
     this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isHttps(requestDetails: { url: string; tabId: number }): boolean {
     const url = new URL(requestDetails.url);
     return url.protocol === "https:";
@@ -64,17 +70,32 @@ export class EventManager {
     }
   }
 
-  async receiveWebRequestHeaders(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<WebRequest.BlockingResponse> {
-    if (!this.isHttps(requestDetails)) {
+  async receiveWebRequestHeaders(requestDetails: {
+    url: string;
+    tabId: number;
+  }): Promise<WebRequest.BlockingResponse> {
+    /*
+      has to be asserted twice, because 'webextension-polyfill-ts' has declared 
+      OnCommittedDetailsType incorrectly
+    */
+    const fixedDetails = (requestDetails as unknown) as {
+      url: string;
+      tabId: number;
+      parentFrameId: number;
+    };
+
+    if (fixedDetails.parentFrameId !== -1) {
       return {};
     }
-    this.app.resetTabData(requestDetails.tabId);
+    if (!this.isHttps(fixedDetails)) {
+      return {};
+    }
 
-    const hasQualityDecreased = await this.app.fetchCertificate(requestDetails);
+    this.app.resetTabData(fixedDetails.tabId);
+
+    const hasQualityDecreased = await this.app.fetchCertificate(fixedDetails);
     if (hasQualityDecreased) {
-      const path = `blocked.html?url=${requestDetails.url}`;
+      const path = `blocked.html?url=${fixedDetails.url}`;
       this.tabs.create({ url: this.runtime.getURL(path) });
       return { cancel: true };
     } else {
@@ -85,12 +106,8 @@ export class EventManager {
   receiveWebRequestError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
-    if (!this.isHttps(requestDetails)) {
-      return;
-    }
-
     /*
-      has to asserted twice, because 'webextension-polyfill-ts' has declared 
+      has to be asserted twice, because 'webextension-polyfill-ts' has declared 
       OnErrorOccuredDetailsType incorrectly
     */
     const fixedDetails = (requestDetails as unknown) as {
@@ -98,6 +115,14 @@ export class EventManager {
       frameId: number;
       error: string;
     };
+
+    if (requestDetails.frameId !== 0) {
+      return;
+    }
+    if (!this.isHttps(requestDetails)) {
+      return;
+    }
+
     this.app.analyzeError(fixedDetails);
   }
 

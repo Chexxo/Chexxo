@@ -1,5 +1,3 @@
-import { WebRequest } from "webextension-polyfill-ts";
-
 import { Certificate } from "../types/certificate/Certificate";
 import { ErrorMessage } from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
@@ -19,9 +17,11 @@ export class App {
     this.tabCache.delete(tabId);
   }
 
-  async fetchCertificate(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<boolean> {
+  async fetchCertificate(requestDetails: {
+    url: string;
+    tabId: number;
+    requestId?: string;
+  }): Promise<boolean> {
     const { tabId } = requestDetails;
     const tabData = this.tabCache.get(tabId) || new TabData();
 

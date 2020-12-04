@@ -1,5 +1,3 @@
-import { WebRequest } from "webextension-polyfill-ts";
-
 import { APIResponseBody } from "../../../shared/types/api/APIResponseBody";
 import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
 import { CodedError } from "../../../shared/types/errors/CodedError";
@@ -10,9 +8,9 @@ const SERVER_URL =
   "https://snonitze65.execute-api.eu-central-1.amazonaws.com/getCertificate/";
 
 export class ServerProvider implements CertificateProvider {
-  public getCertificate(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<RawCertificate> {
+  public getCertificate(requestDetails: {
+    url: string;
+  }): Promise<RawCertificate> {
     const url = this.cleanUrl(requestDetails.url);
     return this.fetchCertificateFromServer(url);
   }
