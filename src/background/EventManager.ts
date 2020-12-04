@@ -40,7 +40,7 @@ export class EventManager {
     private app: App
   ) {}
 
-  init(): void {
+  public init(): void {
     const filter: WebRequest.RequestFilter = {
       urls: ["<all_urls>"],
       types: ["main_frame"],
@@ -63,11 +63,11 @@ export class EventManager {
     );
   }
 
-  resetTabData(requestDetails: { tabId: number }): void {
+  public resetTabData(requestDetails: { tabId: number }): void {
     this.app.resetTabData(requestDetails.tabId);
   }
 
-  receiveWebRequest(
+  public receiveWebRequest(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): void {
     // using await is not possible here, since making receiveWebRequest async is not allowed
@@ -76,7 +76,7 @@ export class EventManager {
     });
   }
 
-  receiveWebRequestError(
+  public receiveWebRequestError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
     /*
@@ -94,7 +94,7 @@ export class EventManager {
     this.changeBrowserAction(fixedDetails);
   }
 
-  receiveMessage(
+  public receiveMessage(
     message: { type: string; params?: unknown },
     _: Runtime.MessageSender,
     sendResponse: (response: unknown) => void
@@ -133,18 +133,29 @@ export class EventManager {
           sendResponse(error as Error);
         }
         break;
-      case "deleteCache":
-        console.log("cache was deleted.");
+      case "removeCache":
+        sendResponse(this.app.removeCache());
         break;
       case "exportLogs":
-        console.log("logs were exported.");
+        try {
+          sendResponse(this.app.exportLogs());
+        } catch (error) {
+          sendResponse(error as Error);
+        }
+        break;
+      case "removeLogs":
+        try {
+          sendResponse(this.app.removeLogs());
+        } catch (error) {
+          sendResponse(error as Error);
+        }
         break;
       default:
         sendResponse(new UnhandledMessageError(JSON.stringify(message)));
     }
   }
 
-  changeBrowserAction(tabInfo: { tabId: number }): void {
+  public changeBrowserAction(tabInfo: { tabId: number }): void {
     const { tabId } = tabInfo;
     if (this.app.getErrorMessage(tabId)) {
       this.setBrowserActionIcon({ path: "../assets/logo_error.svg" });

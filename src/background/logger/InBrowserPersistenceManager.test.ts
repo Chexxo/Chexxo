@@ -11,17 +11,28 @@ const date1 = Date.now();
 const date2 = Date.now() + 50;
 const date3 = Date.now() - logDays * millisecondsADay;
 
-const requestUuid = "";
+const requestUuid = "abc123";
 
-const logEntryInfo = new LogEntry(LogLevel.INFO, Date.now(), "Hello Info!");
+const logEntryInfo = new LogEntry(
+  requestUuid,
+  LogLevel.INFO,
+  Date.now(),
+  "Hello Info!"
+);
 const logEntryWarning = new LogEntry(
+  requestUuid,
   LogLevel.WARNING,
   Date.now(),
   "Hello Warning!"
 );
-const logEntryError = new LogEntry(LogLevel.ERROR, Date.now(), "Hello Error!");
+const logEntryError = new LogEntry(
+  requestUuid,
+  LogLevel.ERROR,
+  Date.now(),
+  "Hello Error!"
+);
 
-let log: LogEntry[] = [];
+let log = "";
 
 let storageArea: Storage.StorageArea;
 const consoleSave = global.console;
@@ -40,9 +51,14 @@ let persistence: InBrowserPersistenceManager;
 let windowSpy = jest.spyOn(window, "window", "get");
 beforeEach(() => {
   jest.resetAllMocks();
-  log = [];
-  log.push(new LogEntry(LogLevel.WARNING, date1, "Hello World"));
-  log.push(new LogEntry(LogLevel.WARNING, date2, "Hello World"));
+  const logArray = [];
+  logArray.push(
+    new LogEntry(requestUuid, LogLevel.WARNING, date1, "Hello World")
+  );
+  logArray.push(
+    new LogEntry(requestUuid, LogLevel.WARNING, date2, "Hello World")
+  );
+  log = JSON.stringify(logArray);
 
   storageArea = <Storage.StorageArea>(<unknown>{
     get: jest.fn().mockImplementation(() => {
@@ -53,6 +69,9 @@ beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     set: jest.fn((object: any) => {
       log = object.log;
+    }),
+    remove: jest.fn(() => {
+      log = "";
     }),
   });
 
@@ -76,7 +95,7 @@ afterEach(() => {
 
 describe("save()", () => {
   test("Writes info to console", () => {
-    return persistence.save(requestUuid, logEntryInfo).then(() => {
+    return persistence.save(logEntryInfo).then(() => {
       expect(global.console.log).toHaveBeenLastCalledWith(
         expect.stringMatching(/Hello Info!/)
       );
@@ -84,7 +103,7 @@ describe("save()", () => {
   });
 
   test("Writes warning to console", () => {
-    return persistence.save(requestUuid, logEntryWarning).then(() => {
+    return persistence.save(logEntryWarning).then(() => {
       expect(global.console.warn).toHaveBeenLastCalledWith(
         expect.stringMatching(/Hello Warning!/)
       );
@@ -92,7 +111,7 @@ describe("save()", () => {
   });
 
   test("Writes error to console", () => {
-    return persistence.save(requestUuid, logEntryError).then(() => {
+    return persistence.save(logEntryError).then(() => {
       expect(global.console.error).toHaveBeenLastCalledWith(
         expect.stringMatching(/Hello Error!/)
       );
@@ -100,31 +119,32 @@ describe("save()", () => {
   });
 
   test("Writes error to log", () => {
-    return persistence.save(requestUuid, logEntryError).then(() => {
-      expect(log.length).toBe(3);
+    return persistence.save(logEntryError).then(() => {
+      expect(JSON.parse(log).length).toBe(3);
     });
   });
 
   test("Writes warning to log", () => {
-    return persistence.save(requestUuid, logEntryWarning).then(() => {
-      expect(log.length).toBe(3);
+    return persistence.save(logEntryWarning).then(() => {
+      expect(JSON.parse(log).length).toBe(3);
     });
   });
 
   test("Does not write info to log", () => {
-    return persistence.save(requestUuid, logEntryInfo).then(() => {
-      expect(log.length).toBe(2);
+    return persistence.save(logEntryInfo).then(() => {
+      expect(JSON.parse(log).length).toBe(2);
     });
   });
 
   test("Takes uuid from request", () => {
     const logEntry = new LogEntry(
+      "abc123",
       LogLevel.ERROR,
       Date.now(),
       "Hello",
       new ConnectionRefusedError()
     );
-    return persistence.save("abc123", logEntry).then(() => {
+    return persistence.save(logEntry).then(() => {
       expect(global.console.error).toHaveBeenLastCalledWith(
         expect.stringMatching(/\[abc123\]/)
       );
@@ -132,11 +152,11 @@ describe("save()", () => {
   });
 
   test("Works on empty array", () => {
-    log = [];
+    log = JSON.stringify([]);
     return persistence
-      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
-        expect(log.length).toBe(1);
+        expect(JSON.parse(log).length).toBe(1);
       });
   });
 
@@ -146,31 +166,79 @@ describe("save()", () => {
     });
 
     return persistence
-      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
-        expect(log.length).toBe(1);
+        expect(JSON.parse(log).length).toBe(1);
+      });
+  });
+
+  test("Writes warning if log cannot be read", () => {
+    storageArea.get = jest.fn(() => {
+      throw new Error();
+    });
+    return persistence
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
+      .then(() => {
+        expect(console.warn).toHaveBeenLastCalledWith(
+          expect.stringMatching(/Log could not be read./)
+        );
+      });
+  });
+
+  test("Writes warning if log cannot be written", () => {
+    storageArea.set = jest.fn(() => {
+      throw new Error();
+    });
+    return persistence
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
+      .then(() => {
+        expect(console.warn).toHaveBeenLastCalledWith(
+          expect.stringMatching(/Log could not be written./)
+        );
       });
   });
 });
 
 describe("logrotate()", () => {
   test("Removes old logs", () => {
-    log.splice(0, 0, new LogEntry(LogLevel.WARNING, date3, "Hello Old"));
+    const logArray = JSON.parse(log);
+    logArray.splice(
+      0,
+      0,
+      new LogEntry(requestUuid, LogLevel.WARNING, date3, "Hello Old")
+    );
+    log = JSON.stringify(logArray);
+
     return persistence
-      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
-        expect(log.length).toBe(3);
+        expect(JSON.parse(log).length).toBe(3);
       });
   });
 
   test("Removes multiple old logs", () => {
-    log.splice(0, 0, new LogEntry(LogLevel.WARNING, date3 - 1000, "Hi oldest"));
-    log.splice(0, 0, new LogEntry(LogLevel.WARNING, date3 - 500, "Hi older"));
-    log.splice(0, 0, new LogEntry(LogLevel.WARNING, date3, "Hi Old"));
+    const logArray = JSON.parse(log);
+    logArray.splice(
+      0,
+      0,
+      new LogEntry(requestUuid, LogLevel.WARNING, date3 - 1000, "Hi oldest")
+    );
+    logArray.splice(
+      0,
+      0,
+      new LogEntry(requestUuid, LogLevel.WARNING, date3 - 500, "Hi older")
+    );
+    logArray.splice(
+      0,
+      0,
+      new LogEntry(requestUuid, LogLevel.WARNING, date3, "Hi Old")
+    );
+    log = JSON.stringify(logArray);
+
     return persistence
-      .save(requestUuid, new LogEntry(LogLevel.ERROR, Date.now(), "Hello"))
+      .save(new LogEntry(requestUuid, LogLevel.ERROR, Date.now(), "Hello"))
       .then(() => {
-        expect(log.length).toBe(3);
+        expect(JSON.parse(log).length).toBe(3);
       });
   });
 });
@@ -178,7 +246,7 @@ describe("logrotate()", () => {
 describe("getAll()", () => {
   test("Returns all logs", () => {
     return persistence.getAll().then((data) => {
-      expect(data).toEqual(log);
+      expect(data).toEqual(JSON.parse(log));
     });
   });
 
@@ -193,9 +261,17 @@ describe("getAll()", () => {
   });
 
   test("Returns empty array if log is empty array", () => {
-    log = [];
+    log = JSON.stringify([]);
     return persistence.getAll().then((data) => {
       expect(data).toStrictEqual([]);
+    });
+  });
+});
+
+describe("deleteAll()", () => {
+  test("removes all logs", () => {
+    return persistence.removeAll().then(() => {
+      expect(storageArea.remove).toHaveBeenCalledTimes(1);
     });
   });
 });

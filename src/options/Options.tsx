@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Divider, Form, Label } from "semantic-ui-react";
 import { Runtime } from "webextension-polyfill-ts";
+import { LogFactory } from "../shared/logger/LogFactory";
+import { LogEntry } from "../shared/types/logger/LogEntry";
 
 import { Configuration } from "../types/Configuration";
 
@@ -40,6 +42,9 @@ export default class Options extends Component<Props, State> {
     this.toggleCacheDomainQualitiesIncognito = this.toggleCacheDomainQualitiesIncognito.bind(
       this
     );
+    this.removeCache = this.removeCache.bind(this);
+    this.exportLogs = this.exportLogs.bind(this);
+    this.removeLogs = this.removeLogs.bind(this);
 
     try {
       const configuration = (await this.props.sendMessage({
@@ -101,12 +106,34 @@ export default class Options extends Component<Props, State> {
     }));
   }
 
-  deleteCache(): void {
-    this.props.sendMessage({ type: "deleteCache" });
+  removeCache(): void {
+    this.props.sendMessage({ type: "removeCache" });
   }
 
-  exportLogs(): void {
-    this.props.sendMessage({ type: "exportLogs" });
+  public async exportLogs(): Promise<void> {
+    const logEntries = (await this.props.sendMessage({
+      type: "exportLogs",
+    })) as LogEntry[];
+    const element = document.createElement("a");
+
+    let file;
+    if (logEntries === null) {
+      file = new Blob([], { type: "text/plain;charset=utf-8" });
+    } else {
+      let fileExport = "";
+      for (let i = 0; i < logEntries.length; i++) {
+        fileExport += LogFactory.formatLogEntry(logEntries[i]) + "\n";
+        file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
+      }
+    }
+    element.href = URL.createObjectURL(file);
+    element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
+    document.body.appendChild(element);
+    element.click();
+  }
+
+  public async removeLogs(): Promise<void> {
+    await this.props.sendMessage({ type: "removeLogs" });
   }
 
   private isValidUrl(url: string): boolean {
@@ -155,10 +182,11 @@ export default class Options extends Component<Props, State> {
           checked={this.state.configuration.cacheDomainQualitiesIncognito}
           onChange={this.toggleCacheDomainQualitiesIncognito}
         />
-        <Form.Button content="Delete cache" fluid onClick={this.deleteCache} />
+        <Form.Button content="Delete cache" fluid onClick={this.removeCache} />
 
         <Divider horizontal>Logs</Divider>
         <Form.Button content="Export" fluid onClick={this.exportLogs} />
+        <Form.Button content="Remove" fluid onClick={this.removeLogs} />
       </Form>
     );
   }

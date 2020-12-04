@@ -10,10 +10,12 @@ import { Configurator } from "../helpers/Configurator";
 import { Configuration } from "../types/Configuration";
 import { CertificateResponse } from "../types/certificate/CertificateResponse";
 import { RawCertificateResponse } from "../types/certificate/RawCertificateResponse";
-import { Logger, LogLevel } from "../shared/logger/Logger";
+import { LogLevel } from "../shared/logger/Logger";
 import { UUIDFactory } from "../helpers/UUIDFactory";
 import { CodedError } from "../shared/types/errors/CodedError";
 import { UnknownError } from "../types/errors/UnknownError";
+import { InBrowserLogger } from "./logger/InBrowserLogger";
+import { LogEntry } from "../shared/types/logger/LogEntry";
 
 export class App {
   private tabCache: Map<number, TabData>;
@@ -22,7 +24,7 @@ export class App {
     private certificateService: CertificateService,
     private qualityService: QualityService,
     private configurator: Configurator,
-    private logger: Logger
+    private logger: InBrowserLogger
   ) {
     this.tabCache = new Map<number, TabData>();
     configurator.addListener(this.updateConfiguration.bind(this));
@@ -64,7 +66,7 @@ export class App {
         `Request ${requestDetails.url} Response: 200`
       );
     } catch (errorResponse) {
-      this.logError(errorResponse);
+      this.logError(requestDetails.url, errorResponse);
       tabData.errorMessage = ErrorMessage.fromError(errorResponse);
     }
 
@@ -81,6 +83,10 @@ export class App {
     const error = this.certificateService.analyzeError(requestDetails);
 
     if (error !== null) {
+      this.logError(
+        requestDetails.url,
+        new CertificateResponse(UUIDFactory.uuidv4(), undefined, error)
+      );
       const errorMessage = ErrorMessage.fromError(error);
       const tabData = this.tabCache.get(tabId) || new TabData();
       tabData.errorMessage = errorMessage;
@@ -108,7 +114,21 @@ export class App {
     await this.configurator.setConfiguration(configuration);
   }
 
-  private logError(errorResponse: unknown) {
+  public async removeCache(): Promise<void> {
+    this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Cache was removed.`);
+  }
+
+  public async exportLogs(): Promise<LogEntry[] | null> {
+    this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Logs were exported.`);
+    return this.logger.getAll();
+  }
+
+  public async removeLogs(): Promise<void> {
+    this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Logs were removed.`);
+    return this.logger.removeAll();
+  }
+
+  private logError(url: string, errorResponse: unknown) {
     if (
       errorResponse instanceof CertificateResponse ||
       errorResponse instanceof RawCertificateResponse
@@ -121,14 +141,14 @@ export class App {
         this.logger.log(
           UUIDFactory.uuidv4(),
           logLevel,
-          errorResponse.error.message,
+          `Request: ${url} Response: ${errorResponse.error.message}`,
           errorResponse.error
         );
       } else {
         this.logger.log(
           UUIDFactory.uuidv4(),
           LogLevel.ERROR,
-          "Unknown Error",
+          `Request: ${url} Response: Unknown Error`,
           new UnknownError(errorResponse.error)
         );
       }
@@ -136,7 +156,7 @@ export class App {
       this.logger.log(
         UUIDFactory.uuidv4(),
         LogLevel.ERROR,
-        "Unknown Error",
+        `Request: ${url} Response: Unknown Error`,
         new UnknownError(<Error>errorResponse)
       );
     }
