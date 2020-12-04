@@ -5,7 +5,7 @@ import { Storage } from "webextension-polyfill-ts";
 import { ConnectionRefusedError } from "../../shared/types/errors/ConnectionRefusedError";
 
 const millisecondsADay = 86_400_000;
-const logDays = 14;
+const logDays = InBrowserPersistenceManager["logDays"];
 
 const date1 = Date.now();
 const date2 = Date.now() + 50;
