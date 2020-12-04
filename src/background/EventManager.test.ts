@@ -32,7 +32,6 @@ let eventManager: EventManager;
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   mockBrowser.storage.local.mockAllow();
-  mockBrowser.webRequest.mockAllow();
   mockBrowser.webNavigation.mockAllow();
   mockBrowser.runtime.mockAllow();
   mockBrowser.tabs.mockAllow();
@@ -40,11 +39,7 @@ beforeEach(() => {
   mockBrowser.webNavigation.onBeforeNavigate.addListener.expect(
     expect.anything()
   );
-  mockBrowser.webRequest.onHeadersReceived.addListener.expect(
-    expect.anything(),
-    expect.anything(),
-    expect.anything()
-  );
+  mockBrowser.webNavigation.onCommitted.addListener.expect(expect.anything());
   mockBrowser.webNavigation.onErrorOccurred.addListener.expect(
     expect.anything()
   );
@@ -58,7 +53,6 @@ beforeEach(() => {
   app = new App(certificateService, qualityService);
 
   eventManager = new EventManager(
-    browser.webRequest,
     browser.webNavigation,
     browser.runtime,
     browser.tabs,
