@@ -6,7 +6,7 @@ import { Storage } from "webextension-polyfill-ts";
 
 export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   private static millisecondsADay = 86_400_000;
-  private static logDays = 14;
+  private static logDays = 2;
 
   /**
    * Constructs the persistence manager with the storage given.

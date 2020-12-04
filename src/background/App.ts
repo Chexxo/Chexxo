@@ -66,7 +66,7 @@ export class App {
         `Request ${requestDetails.url} Response: 200`
       );
     } catch (errorResponse) {
-      this.logError(errorResponse);
+      this.logError(requestDetails.url, errorResponse);
       tabData.errorMessage = ErrorMessage.fromError(errorResponse);
     }
 
@@ -84,6 +84,7 @@ export class App {
 
     if (error !== null) {
       this.logError(
+        requestDetails.url,
         new CertificateResponse(UUIDFactory.uuidv4(), undefined, error)
       );
       const errorMessage = ErrorMessage.fromError(error);
@@ -113,15 +114,21 @@ export class App {
     await this.configurator.setConfiguration(configuration);
   }
 
+  public async removeCache(): Promise<void> {
+    this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Cache was removed.`);
+  }
+
   public async exportLogs(): Promise<LogEntry[] | null> {
+    this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Logs were exported.`);
     return this.logger.getAll();
   }
 
   public async removeLogs(): Promise<void> {
+    this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Logs were removed.`);
     return this.logger.removeAll();
   }
 
-  private logError(errorResponse: unknown) {
+  private logError(url: string, errorResponse: unknown) {
     if (
       errorResponse instanceof CertificateResponse ||
       errorResponse instanceof RawCertificateResponse
@@ -134,14 +141,14 @@ export class App {
         this.logger.log(
           UUIDFactory.uuidv4(),
           logLevel,
-          errorResponse.error.message,
+          `Request: ${url} Response: ${errorResponse.error.message}`,
           errorResponse.error
         );
       } else {
         this.logger.log(
           UUIDFactory.uuidv4(),
           LogLevel.ERROR,
-          "Unknown Error",
+          `Request: ${url} Response: Unknown Error`,
           new UnknownError(errorResponse.error)
         );
       }
@@ -149,7 +156,7 @@ export class App {
       this.logger.log(
         UUIDFactory.uuidv4(),
         LogLevel.ERROR,
-        "Unknown Error",
+        `Request: ${url} Response: Unknown Error`,
         new UnknownError(<Error>errorResponse)
       );
     }

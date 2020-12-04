@@ -133,8 +133,8 @@ export class EventManager {
           sendResponse(error as Error);
         }
         break;
-      case "deleteCache":
-        console.log("cache was deleted.");
+      case "removeCache":
+        sendResponse(this.app.removeCache());
         break;
       case "exportLogs":
         try {

@@ -42,6 +42,7 @@ export default class Options extends Component<Props, State> {
     this.toggleCacheDomainQualitiesIncognito = this.toggleCacheDomainQualitiesIncognito.bind(
       this
     );
+    this.removeCache = this.removeCache.bind(this);
     this.exportLogs = this.exportLogs.bind(this);
     this.removeLogs = this.removeLogs.bind(this);
 
@@ -105,8 +106,8 @@ export default class Options extends Component<Props, State> {
     }));
   }
 
-  deleteCache(): void {
-    this.props.sendMessage({ type: "deleteCache" });
+  removeCache(): void {
+    this.props.sendMessage({ type: "removeCache" });
   }
 
   public async exportLogs(): Promise<void> {
@@ -181,7 +182,7 @@ export default class Options extends Component<Props, State> {
           checked={this.state.configuration.cacheDomainQualitiesIncognito}
           onChange={this.toggleCacheDomainQualitiesIncognito}
         />
-        <Form.Button content="Delete cache" fluid onClick={this.deleteCache} />
+        <Form.Button content="Delete cache" fluid onClick={this.removeCache} />
 
         <Divider horizontal>Logs</Divider>
         <Form.Button content="Export" fluid onClick={this.exportLogs} />

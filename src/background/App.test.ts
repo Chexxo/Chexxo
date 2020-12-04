@@ -149,7 +149,7 @@ test("catches errormessages from CertificateService", async () => {
   await expect(app.getErrorMessage(tabId)).toBeInstanceOf(ErrorMessage);
 });
 
-test("writes  unknown error to log", async () => {
+test("writes unknown error to log", async () => {
   logger.log = jest.fn();
   certificateService.getCertificate = jest.fn(() => {
     return new Promise((_, reject) => {
@@ -164,7 +164,27 @@ test("writes  unknown error to log", async () => {
   expect(logger.log).toHaveBeenLastCalledWith(
     expect.anything(),
     LogLevel.ERROR,
-    "Unknown Error",
+    expect.stringMatching(/Unknown Error/),
+    expect.anything()
+  );
+});
+
+test("includes url in unknown error log", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(new Error());
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.ERROR,
+    expect.stringMatching(/https:\/\/example.com\//),
     expect.anything()
   );
 });
@@ -190,7 +210,7 @@ test("writes normal CodedError from InBrowser provider to log", async () => {
   expect(logger.log).toHaveBeenLastCalledWith(
     expect.anything(),
     LogLevel.WARNING,
-    "Server responded with an insecure connection.",
+    expect.stringMatching(/Server responded with an insecure connection./),
     expect.anything()
   );
 });
@@ -212,7 +232,29 @@ test("writes normal CodedError from Server provider to log", async () => {
   expect(logger.log).toHaveBeenLastCalledWith(
     expect.anything(),
     LogLevel.WARNING,
-    "The url provided is not valid.",
+    expect.stringMatching(/The url provided is not valid./),
+    expect.anything()
+  );
+});
+
+test("includes url in log of CodedError", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(
+        new CertificateResponse(requestUuid, undefined, new InvalidUrlError())
+      );
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.WARNING,
+    expect.stringMatching(/https:\/\/example.com\//),
     expect.anything()
   );
 });
@@ -234,7 +276,7 @@ test("writes ServerError from Server provider to log", async () => {
   expect(logger.log).toHaveBeenLastCalledWith(
     expect.anything(),
     LogLevel.ERROR,
-    "An internal server error occured.",
+    expect.stringMatching(/An internal server error occured./),
     expect.anything()
   );
 });
@@ -254,7 +296,27 @@ test("writes unknown error from ErrorResponse to log", async () => {
   expect(logger.log).toHaveBeenLastCalledWith(
     expect.anything(),
     LogLevel.ERROR,
-    "Unknown Error",
+    expect.stringMatching(/Unknown Error/),
+    expect.anything()
+  );
+});
+
+test("includes url in error from ErrorResponse log", async () => {
+  logger.log = jest.fn();
+  certificateService.getCertificate = jest.fn(() => {
+    return new Promise((_, reject) => {
+      reject(new CertificateResponse(requestUuid, undefined, new Error()));
+    });
+  });
+
+  await expect(
+    app.fetchCertificate(onHeadersReceivedDetails)
+  ).resolves.not.toThrowError();
+
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.ERROR,
+    expect.stringMatching(/https:\/\/example.com\//),
     expect.anything()
   );
 });
@@ -269,5 +331,37 @@ test("caches errormessages from OnErrorOccured event", () => {
   app.analyzeError(requestDetails);
   expect(app.getErrorMessage(requestDetails.tabId)).toBeInstanceOf(
     ErrorMessage
+  );
+});
+
+test("writes info on cache removed", () => {
+  logger.log = jest.fn();
+  app.removeCache();
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.INFO,
+    expect.stringMatching(/Cache was removed./)
+  );
+});
+
+test("writes info on logs removed", () => {
+  logger.log = jest.fn();
+  logger.removeAll = jest.fn();
+  app.removeLogs();
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.INFO,
+    expect.stringMatching(/Logs were removed./)
+  );
+});
+
+test("writes info on logs exported", () => {
+  logger.log = jest.fn();
+  logger.getAll = jest.fn();
+  app.exportLogs();
+  expect(logger.log).toHaveBeenLastCalledWith(
+    expect.anything(),
+    LogLevel.INFO,
+    expect.stringMatching(/Logs were exported./)
   );
 });
