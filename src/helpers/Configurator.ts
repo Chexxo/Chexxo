@@ -6,7 +6,6 @@ export class Configurator {
   private defaultConfiguration: Configuration = {
     serverUrl: "",
     cacheDomainQualities: true,
-    cacheDomainQualitiesIncognito: false,
   };
 
   private storageArea: Storage.StorageArea | undefined;

@@ -37,6 +37,7 @@ export class App {
 
   updateConfiguration(configuration: Configuration): void {
     this.certificateService.updateConfiguration(configuration);
+    this.qualityService.updateConfiguration(configuration);
   }
 
   resetTabData(tabId: number): void {
@@ -136,6 +137,7 @@ export class App {
 
   public async removeCache(): Promise<void> {
     this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Cache was removed.`);
+    return this.qualityService.removeQualities();
   }
 
   public async exportLogs(): Promise<LogEntry[] | null> {

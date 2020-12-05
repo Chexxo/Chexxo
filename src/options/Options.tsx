@@ -36,7 +36,6 @@ export default class Options extends Component<Props, State> {
       configuration: {
         serverUrl: "",
         cacheDomainQualities: false,
-        cacheDomainQualitiesIncognito: false,
       },
       isUrlValid: true,
       messageStatus: MessageStatus.NONE,
@@ -49,9 +48,6 @@ export default class Options extends Component<Props, State> {
   async componentDidMount(): Promise<void> {
     this.changeServerUrl = this.changeServerUrl.bind(this);
     this.toggleCacheDomainQualities = this.toggleCacheDomainQualities.bind(
-      this
-    );
-    this.toggleCacheDomainQualitiesIncognito = this.toggleCacheDomainQualitiesIncognito.bind(
       this
     );
     this.removeCache = this.removeCache.bind(this);
@@ -113,16 +109,6 @@ export default class Options extends Component<Props, State> {
       configuration: {
         ...prevState.configuration,
         cacheDomainQualities: newValue,
-      } as Configuration,
-    }));
-  }
-
-  toggleCacheDomainQualitiesIncognito(): void {
-    const newValue = !this.state.configuration.cacheDomainQualitiesIncognito;
-    this.setState((prevState) => ({
-      configuration: {
-        ...prevState.configuration,
-        cacheDomainQualitiesIncognito: newValue,
       } as Configuration,
     }));
   }
@@ -231,21 +217,15 @@ export default class Options extends Component<Props, State> {
           </div>
         )}
 
-        {/*<Divider horizontal>Domains</Divider>
+        <Divider horizontal>Domains</Divider>
         <Form.Checkbox
           toggle
           label="Cache domain qualities and compare them on the next visit"
           checked={this.state.configuration.cacheDomainQualities}
           onChange={this.toggleCacheDomainQualities}
         />
-        <Form.Checkbox
-          toggle
-          label="Cache domain qualities in Icognito Mode"
-          checked={this.state.configuration.cacheDomainQualitiesIncognito}
-          onChange={this.toggleCacheDomainQualitiesIncognito}
-        />
         <Form.Button content="Remove cache" fluid onClick={this.removeCache} />
-        */}
+
         <Divider horizontal>Logs</Divider>
         <Form.Button content="Export" fluid onClick={this.exportLogs} />
         <Form.Button content="Remove" fluid onClick={this.removeLogs} />
