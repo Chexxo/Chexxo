@@ -49,6 +49,8 @@ beforeAll(() => {
 let persistence: InBrowserPersistenceManager;
 
 let windowSpy = jest.spyOn(window, "window", "get");
+
+// eslint-disable-next-line max-lines-per-function
 beforeEach(() => {
   jest.resetAllMocks();
   const logArray = [];
@@ -93,6 +95,7 @@ afterEach(() => {
   windowSpy.mockRestore();
 });
 
+// eslint-disable-next-line max-lines-per-function
 describe("save()", () => {
   test("Writes info to console", () => {
     return persistence.save(logEntryInfo).then(() => {
@@ -199,6 +202,7 @@ describe("save()", () => {
   });
 });
 
+// eslint-disable-next-line max-lines-per-function
 describe("logrotate()", () => {
   test("Removes old logs", () => {
     const logArray = JSON.parse(log);
