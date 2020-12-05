@@ -1,8 +1,8 @@
 import { WebRequest } from "webextension-polyfill-ts";
-import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
+import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 
 export interface CertificateProvider {
   getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<RawCertificate>;
+  ): Promise<RawCertificateResponse>;
 }

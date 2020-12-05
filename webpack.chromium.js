@@ -6,6 +6,7 @@ const MergeJsonWebpackPlugin = require("merge-jsons-webpack-plugin");
 module.exports = merge(common, {
   entry: {
     background: path.join(__dirname, "src/bootstrap/chromium/background.ts"),
+    options: path.join(__dirname, "src/bootstrap/chromium/options.tsx"),
   },
   output: {
     path: path.join(__dirname, "dist/chromium/js/"),

@@ -19,6 +19,9 @@ import { MockCertificateProvider } from "./certificate/providers/__mocks__/MockC
 import { EventManager } from "./EventManager";
 import { QualityProvider } from "./quality/providers/QualityProvider";
 import { QualityService } from "./quality/QualityService";
+import { Configurator } from "../helpers/Configurator";
+import { InBrowserPersistenceManager } from "./logger/InBrowserPersistenceManager";
+import { InBrowserLogger } from "./logger/InBrowserLogger";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -26,12 +29,16 @@ let certificateProvider: MockCertificateProvider;
 let certificateService: CertificateService;
 let qualityProvider: QualityProvider;
 let qualityService: QualityService;
+let configurator: Configurator;
 let app: App;
 let eventManager: EventManager;
+let logger: InBrowserLogger;
 
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
+  mockBrowser.storage.mockAllow();
   mockBrowser.storage.local.mockAllow();
+  mockBrowser.storage.onChanged.addListener.expect(expect.anything());
   mockBrowser.webRequest.mockAllow();
   mockBrowser.webNavigation.mockAllow();
   mockBrowser.runtime.mockAllow();
@@ -57,7 +64,12 @@ beforeEach(() => {
   certificateService = new CertificateService(certificateProvider);
   qualityProvider = new QualityProvider(browser.storage.local);
   qualityService = new QualityService(qualityProvider);
-  app = new App(certificateService, qualityService);
+  configurator = new Configurator(browser.storage);
+  logger = new InBrowserLogger(
+    new InBrowserPersistenceManager(browser.storage.local)
+  );
+  app = new App(certificateService, qualityService, configurator, logger);
+  app.init();
 
   eventManager = new EventManager(
     browser.webRequest,
@@ -173,4 +185,81 @@ test("returns UnhandledMessageError on unhandled message", () => {
   receiveMessage(message, {}, (response: unknown) => {
     expect(response).toBeInstanceOf(UnhandledMessageError);
   });
+});
+
+test("calls fetch on receiveWebRequest", () => {
+  app.fetchCertificate = jest.fn(() => {
+    return new Promise((resolve) => {
+      resolve();
+    });
+  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  eventManager.receiveWebRequestHeaders(<any>{});
+  expect(app.fetchCertificate).toHaveBeenCalledTimes(1);
+});
+
+test("calls changeBrowserAction on receiveWebRequestError", () => {
+  app.analyzeError = jest.fn();
+  eventManager.changeBrowserAction = jest.fn();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  eventManager.receiveWebRequestError(<any>{});
+  expect(eventManager.changeBrowserAction).toHaveBeenCalledTimes(1);
+});
+
+test("sets error in changeBrowserAction", () => {
+  mockBrowser.browserAction.setIcon
+    .expect({ path: "../assets/logo_error.svg" })
+    .andResolve();
+  mockBrowser.browserAction.setBadgeBackgroundColor
+    .expect({ color: "#d32f2f" })
+    .andResolve();
+  mockBrowser.browserAction.setBadgeText.expect({ text: "!" }).andResolve();
+
+  app.getErrorMessage = jest.fn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return <any>{
+      hello: "World",
+    };
+  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  expect(eventManager.changeBrowserAction(<any>{})).toEqual(undefined);
+});
+
+test("calls export log", () => {
+  app.exportLogs = jest.fn();
+  eventManager.receiveMessage({ type: "exportLogs" });
+  expect(app.exportLogs).toHaveBeenCalledTimes(1);
+});
+
+test("returns error on export log", async () => {
+  app.exportLogs = jest.fn(() => {
+    throw new Error();
+  });
+
+  await expect(
+    eventManager.receiveMessage({ type: "exportLogs" })
+  ).rejects.toBeInstanceOf(Error);
+});
+
+test("calls remove log", () => {
+  app.removeLogs = jest.fn();
+  eventManager.receiveMessage({ type: "removeLogs" });
+  expect(app.removeLogs).toHaveBeenCalledTimes(1);
+});
+
+test("returns error on remove log", async () => {
+  app.removeLogs = jest.fn(() => {
+    throw new Error();
+  });
+
+  await expect(
+    eventManager.receiveMessage({ type: "removeLogs" })
+  ).rejects.toBeInstanceOf(Error);
+});
+
+test("relay tabData", () => {
+  app.resetTabData = jest.fn();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  eventManager.resetTabData(<any>{});
+  expect(app.resetTabData).toHaveBeenCalledTimes(1);
 });

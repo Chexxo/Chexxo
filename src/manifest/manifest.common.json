@@ -33,6 +33,10 @@
     }
   },
 
+  "options_ui": {
+    "page": "options.html"
+  },
+
   "background": {
     "scripts": ["js/background.js"]
   }

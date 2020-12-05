@@ -10,10 +10,9 @@ export abstract class CertificateError extends CodedError {
   readonly publicMessage: string = this.message;
 
   /**
-   * @param uuid The uuid that identifies this particular error.
    * @param trace Can optionally include the stacktrace of the undelying error.
    */
-  constructor(readonly uuid: string, readonly trace?: string) {
+  constructor(readonly trace?: string) {
     super();
   }
 }
