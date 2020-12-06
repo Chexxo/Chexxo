@@ -46,7 +46,7 @@ export class App {
 
   async fetchCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<boolean> {
+  ): Promise<void> {
     const { tabId } = requestDetails;
     const tabData = this.tabCache.get(tabId) || new TabData();
 
@@ -54,18 +54,35 @@ export class App {
       const certificateResponse = await this.certificateService.getCertificate(
         requestDetails
       );
+      tabData.certificate = certificateResponse.certificate;
+
+      if (tabData.certificate) {
+        tabData.quality = this.qualityService.getQuality(tabData.certificate);
+      }
 
       this.logger.log(
         certificateResponse.requestUuid,
         LogLevel.INFO,
         `Request ${requestDetails.url} Response: 200`
       );
-      tabData.certificate = certificateResponse.certificate;
+    } catch (errorResponse) {
+      this.logError(requestDetails.url, errorResponse);
+      tabData.errorMessage = ErrorMessage.fromError(errorResponse);
+    }
 
-      if (tabData.certificate) {
-        tabData.quality = this.qualityService.getQuality(tabData.certificate);
+    this.tabCache.set(tabId, tabData);
+  }
+
+  async analyzeQuality(requestDetails: {
+    tabId: number;
+    url: string;
+  }): Promise<boolean> {
+    const { tabId, url } = requestDetails;
+    const tabData = this.tabCache.get(tabId);
+    if (tabData) {
+      if (tabData.quality) {
         const hasQualityDecreased = await this.qualityService.hasQualityDecreased(
-          requestDetails.url,
+          url,
           tabData.quality
         );
 
@@ -73,20 +90,14 @@ export class App {
           tabData.errorMessage = new ErrorMessage(
             "The websites certificate has decreased in quality since your last visit."
           );
+          this.tabCache.set(tabId, tabData);
           return true;
         } else {
-          await this.qualityService.setQuality(
-            requestDetails.url,
-            tabData.quality
-          );
+          this.qualityService.setQuality(url, tabData.quality);
         }
       }
-    } catch (errorResponse) {
-      this.logError(requestDetails.url, errorResponse);
-      tabData.errorMessage = ErrorMessage.fromError(errorResponse);
     }
 
-    this.tabCache.set(tabId, tabData);
     return false;
   }
 

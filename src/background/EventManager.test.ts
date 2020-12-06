@@ -202,7 +202,7 @@ test("calls changeBrowserAction on receiveWebRequestError", () => {
   app.analyzeError = jest.fn();
   eventManager.changeBrowserAction = jest.fn();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventManager.receiveWebRequestError(<any>{});
+  eventManager.receiveWebNavigationError(<any>{});
   expect(eventManager.changeBrowserAction).toHaveBeenCalledTimes(1);
 });
 

@@ -40,7 +40,7 @@ export class EventManager {
       extraInfoSpec
     );
     this.webNavigation.onErrorOccurred.addListener(
-      this.receiveWebRequestError.bind(this)
+      this.receiveWebNavigationError.bind(this)
     );
     this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
     this.tabs.onActivated.addListener(this.changeBrowserAction.bind(this));
@@ -53,19 +53,22 @@ export class EventManager {
   public async receiveWebRequestHeaders(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<WebRequest.BlockingResponse> {
-    const hasQualityDecreased = await this.app.fetchCertificate(requestDetails);
+    await this.app.fetchCertificate(requestDetails);
+    const hasQualityDecreased = await this.app.analyzeQuality(requestDetails);
     this.changeBrowserAction(requestDetails);
 
     if (hasQualityDecreased) {
       const path = `blocked.html?url=${requestDetails.url}`;
-      this.tabs.create({ url: this.runtime.getURL(path) });
+      this.tabs.update(requestDetails.tabId, {
+        url: this.runtime.getURL(path),
+      });
       return { cancel: true };
     } else {
       return {};
     }
   }
 
-  public receiveWebRequestError(
+  public receiveWebNavigationError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
     /*
