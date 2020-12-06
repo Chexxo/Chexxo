@@ -26,6 +26,7 @@ export class Home extends Component<Props> {
     super(props);
   }
 
+  // eslint-disable-next-line max-lines-per-function
   render(): JSX.Element {
     return (
       <Container textAlign="center">

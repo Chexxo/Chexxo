@@ -127,7 +127,6 @@ export default class Options extends Component<Props, State> {
       const logEntries = (await this.props.sendMessage({
         type: "exportLogs",
       })) as LogEntry[];
-      const element = document.createElement("a");
 
       let file;
       if (logEntries === null) {
@@ -136,13 +135,11 @@ export default class Options extends Component<Props, State> {
         let fileExport = "";
         for (let i = 0; i < logEntries.length; i++) {
           fileExport += LogFactory.formatLogEntry(logEntries[i]) + "\n";
-          file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
         }
+        file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
       }
-      element.href = URL.createObjectURL(file);
-      element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
-      document.body.appendChild(element);
-      element.click();
+      this.downloadFile(file);
+
       this.generateMessage(
         MessageStatus.SUCCESS,
         "Log exported",
@@ -156,6 +153,14 @@ export default class Options extends Component<Props, State> {
         typedError.message
       );
     }
+  }
+
+  private downloadFile(file: Blob) {
+    const element = document.createElement("a");
+    element.href = URL.createObjectURL(file);
+    element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
+    document.body.appendChild(element);
+    element.click();
   }
 
   public async removeLogs(): Promise<void> {
@@ -195,6 +200,7 @@ export default class Options extends Component<Props, State> {
     });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   render(): JSX.Element {
     return (
       <Form style={{ padding: "0.5rem" }}>

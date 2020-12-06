@@ -8,6 +8,7 @@ interface Props {
 }
 
 export class CertificateView extends Component<Props> {
+  // eslint-disable-next-line max-lines-per-function, complexity
   render(): JSX.Element {
     return (
       <Container textAlign="center">

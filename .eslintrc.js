@@ -55,7 +55,6 @@ module.exports = {
       version: "detect",
     },
   },
-  /*
   rules: {
     "max-lines": ["error", {
       "max": 300
@@ -70,5 +69,5 @@ module.exports = {
     "max-params": ["error",
       5
     ]
-  }*/
+  }
 };

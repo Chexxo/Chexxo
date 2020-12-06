@@ -1,4 +1,5 @@
 export class DistinguishedName {
+  // eslint-disable-next-line max-params
   constructor(
     readonly commonName: string,
     readonly organization: string,
