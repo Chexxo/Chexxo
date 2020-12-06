@@ -4,6 +4,9 @@ import { LoggerPersistenceManager } from "../../shared/logger/LoggerPersistenceM
 import { LogEntry } from "../../shared/types/logger/LogEntry";
 import { Storage } from "webextension-polyfill-ts";
 
+/**
+ * Class to persist log entries within the browsers storage.
+ */
 export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   private static millisecondsADay = 86_400_000;
   private static logDays = 2;
@@ -44,8 +47,9 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   }
 
   /**
-   * Returns all log entries currently saved inside the
-   * browser.
+   * Gets all persistet log entries and returns them.
+   *
+   * @returns all log entries persistet up until invokation.
    */
   public async getAll(): Promise<LogEntry[] | null> {
     const storageResponse = await this.storageArea.get(["log"]);
@@ -56,7 +60,7 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   }
 
   /**
-   * Removes all log entries.
+   * Removes all log entries from the browsers storage.
    */
   public async removeAll(): Promise<void> {
     await this.storageArea.remove("log");

@@ -6,6 +6,11 @@ import { CertificateFactory } from "../factories/RawCertificateFactory";
 import { CertificateProvider } from "./CertificateProvider";
 import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 
+/**
+ * Class to get the certificate of a given domain. This
+ * is done by analyzing the security details given by
+ * the browser.
+ */
 export class InBrowserProvider implements CertificateProvider {
   constructor(
     private getSecurityInfo: (
@@ -14,6 +19,14 @@ export class InBrowserProvider implements CertificateProvider {
     ) => Promise<WebRequest.SecurityInfo>
   ) {}
 
+  /**
+   * Gets the certificate of the domain specified
+   * within the request details.
+   *
+   * @param requestDetails The request details of
+   * the request which lead to this method being
+   * invoked.
+   */
   public async getCertificate(
     requestDetails: WebRequest.OnHeadersReceivedDetailsType
   ): Promise<RawCertificateResponse> {
