@@ -70,7 +70,7 @@ export class Popup extends Component<Props, State> {
   }
 
   /**
-   * Returns the current tab's id
+   * Queries the current tab's id
    * @returns the current tab's id
    */
   private async getCurrentTabId(): Promise<number | undefined> {
@@ -82,6 +82,10 @@ export class Popup extends Component<Props, State> {
     return currentTab.id;
   }
 
+  /**
+   * Queries the current tab's {@link TabData} object
+   * @returns Either the {@link TabData} object associated with the tabId or undefined
+   */
   private async getTabData(): Promise<TabData | undefined> {
     const tabData = (await this.sendMessage({
       type: "getTabData",
@@ -91,8 +95,8 @@ export class Popup extends Component<Props, State> {
   }
 
   /**
-   * Renders the popup component
-   * @returns the rendered popup component
+   * Renders the Popup component
+   * @returns the rendered Popup component
    */
   render(): JSX.Element {
     return (

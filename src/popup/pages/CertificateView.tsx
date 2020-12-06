@@ -3,11 +3,22 @@ import { Container, Divider, Message } from "semantic-ui-react";
 import { Certificate } from "../../types/certificate/Certificate";
 import { PageHeader } from "../components/PageHeader";
 
+/**
+ * Represents the required props for the CertificateView component
+ */
 interface Props {
   certificate: Certificate | undefined;
 }
 
+/**
+ * Represents the popup window's certificate view
+ * @noInheritDoc
+ */
 export class CertificateView extends Component<Props> {
+  /**
+   * Renders the CertificateView component
+   * @returns the rendered CertificateView component
+   */
   render(): JSX.Element {
     return (
       <Container textAlign="center">

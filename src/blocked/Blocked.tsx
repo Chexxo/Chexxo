@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import { Button, Header, Modal } from "semantic-ui-react";
 import { Runtime } from "webextension-polyfill-ts";
 
+/**
+ * Represents the required props for the Blocked component
+ */
 interface Props {
   sendMessage: (
     message: { type: string; params: unknown },
@@ -9,9 +12,17 @@ interface Props {
   ) => Promise<unknown>;
 }
 
+/**
+ * Represents the error page for blocked websites
+ * @noInheritDoc
+ */
 export class Blocked extends Component<Props> {
   readonly url: string;
 
+  /**
+   * Queries the current location's url and bind methods to the components context
+   * @param props the required props for the component
+   */
   constructor(props: Props) {
     super(props);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -19,6 +30,9 @@ export class Blocked extends Component<Props> {
     this.acknowledgeRisk = this.acknowledgeRisk.bind(this);
   }
 
+  /**
+   * Sends a message for resetting the current urls quality to the background script
+   */
   public async acknowledgeRisk(): Promise<void> {
     await this.props.sendMessage({
       type: "resetQuality",
@@ -27,6 +41,10 @@ export class Blocked extends Component<Props> {
     window.location.href = this.url;
   }
 
+  /**
+   * Renders the Blocked component
+   * @returns the rendered Blocked component
+   */
   render(): JSX.Element {
     return (
       <Modal open={true}>

@@ -6,12 +6,18 @@ import { LogEntry } from "../shared/types/logger/LogEntry";
 
 import { Configuration } from "../types/Configuration";
 
+/**
+ * Represents the different message status for the Options component
+ */
 enum MessageStatus {
   NONE,
   FAILURE,
   SUCCESS,
 }
 
+/**
+ * Represents the required props for the Options component
+ */
 interface Props {
   sendMessage: (
     message: { type: string; params?: unknown },
@@ -20,6 +26,9 @@ interface Props {
   hasServer: boolean;
 }
 
+/**
+ * Represents the state object for the Options component
+ */
 interface State {
   configuration: Configuration;
   isUrlValid: boolean;
@@ -29,7 +38,15 @@ interface State {
   messageTimeoutId: number;
 }
 
+/**
+ * Represents the options page
+ * @noInheritDoc
+ */
 export class Options extends Component<Props, State> {
+  /**
+   * Initializes the component's default state
+   * @param props the required props for the component
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -45,6 +62,9 @@ export class Options extends Component<Props, State> {
     };
   }
 
+  /**
+   * Binds methods to the component's context and queries the current configuration
+   */
   async componentDidMount(): Promise<void> {
     this.changeServerUrl = this.changeServerUrl.bind(this);
     this.toggleCacheDomainQualities = this.toggleCacheDomainQualities.bind(
@@ -70,6 +90,9 @@ export class Options extends Component<Props, State> {
     }
   }
 
+  /**
+   * Synchronizes the state's configuration with the stored configuration on update
+   */
   async componentDidUpdate(): Promise<void> {
     try {
       const configuration = this.state.configuration;
@@ -87,6 +110,10 @@ export class Options extends Component<Props, State> {
     }
   }
 
+  /**
+   * Changes the state's server url
+   * @param event form input change event
+   */
   public changeServerUrl(event: React.FormEvent<HTMLInputElement>): void {
     const newValue = event.currentTarget.value;
 
@@ -103,6 +130,9 @@ export class Options extends Component<Props, State> {
     }
   }
 
+  /**
+   * Toggles the cacheDomainQualities property in the component's state
+   */
   public toggleCacheDomainQualities(): void {
     const newValue = !this.state.configuration.cacheDomainQualities;
     this.setState((prevState) => ({
@@ -113,6 +143,9 @@ export class Options extends Component<Props, State> {
     }));
   }
 
+  /**
+   * Sends a message for removing the stored cache to the background script
+   */
   public removeCache(): void {
     this.props.sendMessage({ type: "removeCache" });
     this.generateMessage(
@@ -122,6 +155,9 @@ export class Options extends Component<Props, State> {
     );
   }
 
+  /**
+   * Queries the current logs and exports them to the GUI
+   */
   public async exportLogs(): Promise<void> {
     try {
       const logEntries = (await this.props.sendMessage({
@@ -158,6 +194,9 @@ export class Options extends Component<Props, State> {
     }
   }
 
+  /**
+   * Sends a message for removing the stored logs to the background script
+   */
   public async removeLogs(): Promise<void> {
     try {
       await this.props.sendMessage({ type: "removeLogs" });
@@ -176,6 +215,11 @@ export class Options extends Component<Props, State> {
     }
   }
 
+  /**
+   * Checks if the parameter is a valid http/https url
+   * @param url The url which needs to be checked
+   * @returns True if it is a valid url, false if not
+   */
   private isValidUrl(url: string): boolean {
     let validUrl;
     try {
@@ -187,7 +231,17 @@ export class Options extends Component<Props, State> {
     return validUrl.protocol === "http:" || validUrl.protocol === "https:";
   }
 
-  private generateMessage(status: MessageStatus, header: string, body: string) {
+  /**
+   * Updates the state with a new message
+   * @param status The message's status
+   * @param header The message's header text
+   * @param body The message's body text
+   */
+  private generateMessage(
+    status: MessageStatus,
+    header: string,
+    body: string
+  ): void {
     this.setState({
       messageStatus: status,
       messageHeader: header,
@@ -195,6 +249,10 @@ export class Options extends Component<Props, State> {
     });
   }
 
+  /**
+   * Renders the Options component
+   * @returns the rendered Options component
+   */
   render(): JSX.Element {
     return (
       <Form style={{ padding: "0.5rem" }}>

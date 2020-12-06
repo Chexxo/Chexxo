@@ -14,6 +14,9 @@ import { Quality, maxQuality } from "../../types/Quality";
 import { Navigation } from "../components/Navigation";
 import { PageHeader } from "../components/PageHeader";
 
+/**
+ * Represents the required props for the Home component
+ */
 interface Props {
   errorMessage: ErrorMessage | undefined;
   certificate: Certificate | undefined;
@@ -21,11 +24,15 @@ interface Props {
   openOptionsPage: () => Promise<void>;
 }
 
+/**
+ * Represents the popup window's home view
+ * @noInheritDoc
+ */
 export class Home extends Component<Props> {
-  constructor(props: Props) {
-    super(props);
-  }
-
+  /**
+   * Renders the Home component
+   * @returns the rendered Home component
+   */
   render(): JSX.Element {
     return (
       <Container textAlign="center">
