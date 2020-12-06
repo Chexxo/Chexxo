@@ -220,7 +220,7 @@ export default class Options extends Component<Props, State> {
         <Divider horizontal>Domains</Divider>
         <Form.Checkbox
           toggle
-          label="Cache domain qualities and compare them on the next visit"
+          label="Cache domain qualities to compare them on the next visit"
           checked={this.state.configuration.cacheDomainQualities}
           onChange={this.toggleCacheDomainQualities}
         />

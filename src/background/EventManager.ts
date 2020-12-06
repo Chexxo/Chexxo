@@ -134,20 +134,10 @@ export class EventManager {
     return new Promise((resolve, reject) => {
       let params;
       switch (message.type) {
-        case "getCertificate":
+        case "getTabData":
           params = message.params as { tabId: number };
-          const certificate = this.app.getCertificate(params.tabId);
-          resolve(certificate);
-          break;
-        case "getQuality":
-          params = message.params as { tabId: number };
-          const quality = this.app.getQuality(params.tabId);
-          resolve(quality);
-          break;
-        case "getErrorMessage":
-          params = message.params as { tabId: number };
-          const errorMessage = this.app.getErrorMessage(params.tabId);
-          resolve(errorMessage);
+          const tabData = this.app.getTabData(params.tabId);
+          resolve(tabData);
           break;
         case "resetQuality":
           params = message.params as { url: string };
@@ -213,7 +203,9 @@ export class EventManager {
       this.browserAction.enable(tabId);
     }
 
-    if (this.app.getErrorMessage(tabId)) {
+    const tabData = this.app.getTabData(tabId);
+
+    if (tabData?.errorMessage) {
       this.browserAction.setIcon({
         tabId,
         path: "../assets/logo_error.svg",
@@ -227,9 +219,8 @@ export class EventManager {
       this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
       this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
 
-      const quality = this.app.getQuality(tabId);
-      if (quality) {
-        const stars = "*".repeat(quality.level);
+      if (tabData?.quality) {
+        const stars = "*".repeat(tabData.quality.level);
         this.browserAction.setBadgeText({ tabId, text: stars });
       } else {
         this.browserAction.setBadgeText({ tabId, text: "" });

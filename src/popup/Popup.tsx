@@ -5,6 +5,7 @@ import { Tabs, Runtime } from "webextension-polyfill-ts";
 import { Certificate } from "../types/certificate/Certificate";
 import { ErrorMessage } from "../types/errors/ErrorMessage";
 import { Quality } from "../types/Quality";
+import { TabData } from "../types/TabData";
 import { CertificateView } from "./pages/CertificateView";
 import { Home } from "./pages/Home";
 
@@ -61,50 +62,12 @@ export class Popup extends Component<Props, State> {
     const tabId = await this.getCurrentTabId();
     this.setState({ tabId });
 
-    const certificate = await this.getCertificate();
-    const quality = await this.getQuality();
-    const errorMessage = await this.getErrorMessage();
+    const tabData = await this.getTabData();
     this.setState({
-      certificate,
-      quality,
-      errorMessage,
+      certificate: tabData?.certificate,
+      quality: tabData?.quality,
+      errorMessage: tabData?.errorMessage,
     });
-  }
-
-  /**
-   * Fetches the current tab's certificate
-   * @returns the current tab's certificate or undefined
-   */
-  async getCertificate(): Promise<Certificate | undefined> {
-    const certificate = (await this.sendMessage({
-      type: "getCertificate",
-      params: { tabId: this.state.tabId },
-    })) as Certificate;
-    return certificate;
-  }
-
-  /**
-   * Fetches the current tab's certificate quality
-   * @returns the current tab's certificate quality or undefined
-   */
-  async getQuality(): Promise<Quality | undefined> {
-    const quality = (await this.sendMessage({
-      type: "getQuality",
-      params: { tabId: this.state.tabId },
-    })) as Quality;
-    return quality;
-  }
-
-  /**
-   * Fetches the current tab's error message
-   * @returns the current tab's error message or undefined
-   */
-  async getErrorMessage(): Promise<ErrorMessage | undefined> {
-    const errorMessage = (await this.sendMessage({
-      type: "getErrorMessage",
-      params: { tabId: this.state.tabId },
-    })) as ErrorMessage;
-    return errorMessage;
   }
 
   /**
@@ -118,6 +81,14 @@ export class Popup extends Component<Props, State> {
     });
     const currentTab = tabs[0];
     return currentTab.id;
+  }
+
+  async getTabData(): Promise<TabData | undefined> {
+    const tabData = (await this.sendMessage({
+      type: "getTabData",
+      params: { tabId: this.state.tabId },
+    })) as TabData;
+    return tabData;
   }
 
   /**

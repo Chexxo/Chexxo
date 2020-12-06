@@ -56,7 +56,7 @@ test("sets quality for provided url, if quality is stored already", async () => 
     .andResolve();
 
   await expect(
-    qualityProvider.setQuality(
+    qualityProvider.defineQuality(
       "https://www.example.com",
       Quality.DomainValidated
     )
@@ -70,7 +70,7 @@ test("sets quality for provided url, if quality is not stored already", async ()
     .andResolve();
 
   await expect(
-    qualityProvider.setQuality(
+    qualityProvider.defineQuality(
       "https://www.example.com",
       Quality.DomainValidated
     )
@@ -84,7 +84,7 @@ test("throws Storage, if storage set operation fails", async () => {
     .andReject(new Error());
 
   await expect(
-    qualityProvider.setQuality(
+    qualityProvider.defineQuality(
       "https://www.example.com",
       Quality.DomainValidated
     )
