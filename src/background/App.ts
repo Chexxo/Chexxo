@@ -152,36 +152,31 @@ export class App {
   }
 
   private logError(url: string, errorResponse: unknown) {
+    let logLevel = LogLevel.ERROR;
+    let responseMessage = "Unknown Error";
+    let responseError: CodedError | undefined;
+
     if (
       errorResponse instanceof CertificateResponse ||
       errorResponse instanceof RawCertificateResponse
     ) {
       if (errorResponse.error instanceof CodedError) {
-        let logLevel = LogLevel.WARNING;
-        if (errorResponse.error.code === 500) {
-          logLevel = LogLevel.ERROR;
+        if (errorResponse.error.code !== 500) {
+          logLevel = LogLevel.WARNING;
         }
-        this.logger.log(
-          UUIDFactory.uuidv4(),
-          logLevel,
-          `Request: ${url} Response: ${errorResponse.error.message}`,
-          errorResponse.error
-        );
+        responseMessage = errorResponse.error.message;
+        responseError = errorResponse.error;
       } else {
-        this.logger.log(
-          UUIDFactory.uuidv4(),
-          LogLevel.ERROR,
-          `Request: ${url} Response: Unknown Error`,
-          new UnknownError(errorResponse.error)
-        );
+        responseError = new UnknownError(<Error>errorResponse.error);
       }
     } else {
-      this.logger.log(
-        UUIDFactory.uuidv4(),
-        LogLevel.ERROR,
-        `Request: ${url} Response: Unknown Error`,
-        new UnknownError(<Error>errorResponse)
-      );
+      responseError = new UnknownError(<Error>errorResponse);
     }
+    this.logger.log(
+      UUIDFactory.uuidv4(),
+      logLevel,
+      `Request: ${url} Response: ${responseMessage}`,
+      responseError
+    );
   }
 }

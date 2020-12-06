@@ -22,6 +22,7 @@ afterEach(() => {
   container.remove();
 });
 
+// eslint-disable-next-line max-lines-per-function
 test("renders component with certificate", () => {
   const certificate = new Certificate(
     "",

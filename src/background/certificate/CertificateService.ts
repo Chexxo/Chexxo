@@ -26,11 +26,15 @@ export class CertificateService {
       requestDetails
     );
 
-    let certificate;
     if (rawCertificateResponse.rawCertificate !== undefined) {
       try {
-        certificate = CertificateParser.getCertificate(
+        const certificate = CertificateParser.getCertificate(
           rawCertificateResponse.rawCertificate
+        );
+
+        return new CertificateResponse(
+          rawCertificateResponse.requestUuid,
+          certificate
         );
       } catch (error) {
         throw new CertificateResponse(
@@ -39,11 +43,6 @@ export class CertificateService {
           new UnknownCertificateError(error.message)
         );
       }
-
-      return new CertificateResponse(
-        rawCertificateResponse.requestUuid,
-        certificate
-      );
     }
 
     throw new CertificateResponse(

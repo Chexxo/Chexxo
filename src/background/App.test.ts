@@ -109,6 +109,9 @@ beforeEach(() => {
 
 afterEach(() => {
   windowSpy.mockRestore();
+});
+
+afterAll(() => {
   global.console = consoleSave;
 });
 

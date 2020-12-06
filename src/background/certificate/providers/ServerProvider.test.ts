@@ -1,4 +1,5 @@
 import { APIResponseBody } from "../../../shared/types/api/APIResponseBody";
+import { InvalidUrlError } from "../../../shared/types/errors/InvalidUrlError";
 import { ServerError } from "../../../shared/types/errors/ServerError";
 import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 import { ServerUnavailableError } from "../../../types/errors/ServerUnavailableError";
@@ -6,10 +7,30 @@ import { ServerProvider } from "./ServerProvider";
 
 const fetchSave = global.fetch;
 let provider: ServerProvider;
+let windowSpy = jest.spyOn(window, "window", "get");
 
 beforeEach(() => {
   provider = new ServerProvider();
   global.fetch = jest.fn();
+
+  windowSpy = jest.spyOn(window, "window", "get");
+  windowSpy.mockImplementation(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      <any>{
+        crypto: {
+          getRandomValues: jest.fn(),
+        },
+      }
+  );
+});
+
+afterEach(() => {
+  windowSpy.mockRestore();
+});
+
+afterAll(() => {
+  global.fetch = fetchSave;
 });
 
 test("adjusts server url according to config", () => {
@@ -49,6 +70,19 @@ test("throws error if fetch had unexpected error", () => {
       })
       .catch((error) => {
         expect(error).toBeInstanceOf(Error);
+      })
+  );
+});
+
+test("returns error if url not correct", () => {
+  return (
+    provider
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .getCertificate(<any>{
+        url: "file://example.com",
+      })
+      .catch((response: RawCertificateResponse) => {
+        expect(response.error).toBeInstanceOf(InvalidUrlError);
       })
   );
 });
@@ -172,8 +206,4 @@ test("sunny case", () => {
         expect(data.rawCertificate!.pem).toBe("123");
       })
   );
-});
-
-afterAll(() => {
-  global.fetch = fetchSave;
 });

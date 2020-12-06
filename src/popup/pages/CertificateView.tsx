@@ -19,6 +19,7 @@ export class CertificateView extends Component<CertificateViewProps> {
    * Renders the CertificateView component
    * @returns the rendered CertificateView component
    */
+  // eslint-disable-next-line max-lines-per-function, complexity
   render(): JSX.Element {
     return (
       <Container textAlign="center">

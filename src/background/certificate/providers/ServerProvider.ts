@@ -58,8 +58,8 @@ export class ServerProvider implements CertificateProvider {
     if (url) {
       return this.fetchCertificateFromServer(url);
     } else {
-      return new Promise((resolve) => {
-        resolve(
+      return new Promise((resolve, reject) => {
+        reject(
           new RawCertificateResponse(
             UUIDFactory.uuidv4(),
             undefined,
@@ -81,39 +81,34 @@ export class ServerProvider implements CertificateProvider {
   private async fetchCertificateFromServer(
     url: string
   ): Promise<RawCertificateResponse> {
-    return new Promise((resolve, reject) => {
-      let urlToFetch: string = this.serverUrl;
-      if (!this.serverUrl.endsWith("/")) {
-        urlToFetch += "/";
+    let urlToFetch: string = this.serverUrl;
+    if (!this.serverUrl.endsWith("/")) {
+      urlToFetch += "/";
+    }
+    urlToFetch += ServerProvider.endpoint + url;
+
+    try {
+      const response = await fetch(urlToFetch);
+      const apiResponse = response.json();
+      if (!(apiResponse instanceof APIResponseBody)) {
+        throw new ServerError(new Error("Server returned invalid response."));
       }
-      urlToFetch += ServerProvider.endpoint + url;
 
-      fetch(urlToFetch)
-        .then((response) => response.json())
-        .then((apiResponse: APIResponseBody) => {
-          if (!(apiResponse instanceof APIResponseBody)) {
-            reject(
-              new ServerError(new Error("Server returned invalid response."))
-            );
-          }
+      const result = this.analyzeAPIResponse(apiResponse);
 
-          const result = this.analyzeAPIResponse(apiResponse);
-
-          if (result.error !== undefined) {
-            reject(result);
-          } else {
-            resolve(result);
-          }
-        })
-        .catch((error) => {
-          const typedError = error as Error;
-          if (typedError.message === "Failed to fetch") {
-            reject(new ServerUnavailableError());
-          } else {
-            reject(error);
-          }
-        });
-    });
+      if (result.error !== undefined) {
+        throw result;
+      } else {
+        return result;
+      }
+    } catch (error) {
+      const typedError = error as Error;
+      if (typedError.message === "Failed to fetch") {
+        throw new ServerUnavailableError();
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**

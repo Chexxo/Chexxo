@@ -14,6 +14,7 @@ class CertificatePolicyEntry {
 }
 
 export abstract class CertificateParser {
+  // eslint-disable-next-line max-lines-per-function
   public static getCertificate(rawCert: RawCertificate): Certificate {
     const fullCert = new X509();
     fullCert.readCertPEM(rawCert.pem);
@@ -42,7 +43,7 @@ export abstract class CertificateParser {
     const fingerprint256 = CertificateParser.getFingerprint256(fullCert.hex);
 
     const subjectAltNames: string[] = [];
-    if (fullCert.getExtSubjectAltName) {
+    if (fullCert.getExtSubjectAltName()) {
       fullCert.getExtSubjectAltName().array.forEach((element: AltNameEntry) => {
         subjectAltNames.push(element.dns);
       });

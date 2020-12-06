@@ -9,10 +9,12 @@ import {
 import { Configuration } from "../types/Configuration";
 import { StorageError } from "../types/errors/StorageError";
 import { UnhandledMessageError } from "../types/errors/UnhandledMessageError";
+import { Quality } from "../types/Quality";
 
 import { App } from "./App";
 
 export class EventManager {
+  // eslint-disable-next-line max-params
   constructor(
     private webNavigation: WebNavigation.Static,
     private runtime: Runtime.Static,
@@ -96,9 +98,8 @@ export class EventManager {
         url: this.runtime.getURL(path),
       });
       return { cancel: true };
-    } else {
-      return {};
     }
+    return {};
   }
 
   public receiveWebNavigationError(
@@ -126,10 +127,12 @@ export class EventManager {
     this.changeBrowserAction(requestDetails);
   }
 
+  // eslint-disable-next-line max-lines-per-function
   public receiveMessage(message: {
     type: string;
     params?: unknown;
   }): Promise<unknown> {
+    // eslint-disable-next-line complexity, max-lines-per-function
     return new Promise((resolve, reject) => {
       let params;
       switch (message.type) {
@@ -201,32 +204,40 @@ export class EventManager {
       this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
       this.browserAction.disable(tabId);
       return;
-    } else {
-      this.browserAction.enable(tabId);
     }
+
+    this.browserAction.enable(tabId);
 
     const tabData = this.app.getTabData(tabId);
 
     if (tabData?.errorMessage) {
-      this.browserAction.setIcon({
-        tabId,
-        path: "../assets/logo_error.svg",
-      });
-      this.browserAction.setBadgeBackgroundColor({
-        tabId,
-        color: "#d32f2f",
-      });
-      this.browserAction.setBadgeText({ tabId, text: "!" });
+      this.setErrorIcon(tabId);
     } else {
-      this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
-      this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
+      this.setQualityIcon(tabId, tabData?.quality);
+    }
+  }
 
-      if (tabData?.quality) {
-        const stars = "*".repeat(tabData.quality.level);
-        this.browserAction.setBadgeText({ tabId, text: stars });
-      } else {
-        this.browserAction.setBadgeText({ tabId, text: "" });
-      }
+  private setErrorIcon(tabId: number) {
+    this.browserAction.setIcon({
+      tabId,
+      path: "../assets/logo_error.svg",
+    });
+    this.browserAction.setBadgeBackgroundColor({
+      tabId,
+      color: "#d32f2f",
+    });
+    this.browserAction.setBadgeText({ tabId, text: "!" });
+  }
+
+  private setQualityIcon(tabId: number, quality?: Quality) {
+    this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
+    this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
+
+    if (quality) {
+      const stars = "*".repeat(quality.level);
+      this.browserAction.setBadgeText({ tabId, text: stars });
+    } else {
+      this.browserAction.setBadgeText({ tabId, text: "" });
     }
   }
 

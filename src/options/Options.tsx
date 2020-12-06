@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, { Component } from "react";
 import { Divider, Form, Label, Message } from "semantic-ui-react";
 import { Runtime } from "webextension-polyfill-ts";
@@ -163,7 +164,6 @@ export class Options extends Component<OptionsProps, OptionsState> {
       const logEntries = (await this.props.sendMessage({
         type: "exportLogs",
       })) as LogEntry[];
-      const element = document.createElement("a");
 
       let file;
       if (logEntries === null) {
@@ -172,13 +172,11 @@ export class Options extends Component<OptionsProps, OptionsState> {
         let fileExport = "";
         for (let i = 0; i < logEntries.length; i++) {
           fileExport += LogFactory.formatLogEntry(logEntries[i]) + "\n";
-          file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
         }
+        file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
       }
-      element.href = URL.createObjectURL(file);
-      element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
-      document.body.appendChild(element);
-      element.click();
+      this.downloadFile(file);
+
       this.generateMessage(
         OptionsMessageStatus.SUCCESS,
         "Log exported",
@@ -250,9 +248,22 @@ export class Options extends Component<OptionsProps, OptionsState> {
   }
 
   /**
+   * Makes a file available to be downloaded in the GUI
+   * @param file The file to be downloaded
+   */
+  private downloadFile(file: Blob) {
+    const element = document.createElement("a");
+    element.href = URL.createObjectURL(file);
+    element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
+    document.body.appendChild(element);
+    element.click();
+  }
+
+  /**
    * Renders the Options component
    * @returns the rendered Options component
    */
+  // eslint-disable-next-line max-lines-per-function
   render(): JSX.Element {
     return (
       <Form style={{ padding: "0.5rem" }}>
