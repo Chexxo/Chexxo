@@ -130,7 +130,7 @@ test("returns false, if provided quality is equal with stored quality", async ()
   ).resolves.toEqual(false);
 });
 
-test("sets quality of provided url to unknown", async () => {
+test("resets quality of provided url to unknown", async () => {
   mockBrowser.storage.local.get.expect(["qualities"]).andResolve({});
   mockBrowser.storage.local.set
     .expect({

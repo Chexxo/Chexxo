@@ -17,11 +17,7 @@
   },
 
   "content_security_policy": "script-src 'self'; object-src 'self';",
-  "permissions": [
-    "storage",
-    "webNavigation",
-    "<all_urls>"
-  ],
+  "permissions": ["storage", "webNavigation", "<all_urls>"],
 
   "browser_action": {
     "default_popup": "popup.html",
@@ -29,6 +25,10 @@
       "19": "./assets/logo.svg",
       "38": "./assets/logo.svg"
     }
+  },
+
+  "options_ui": {
+    "page": "options.html"
   },
 
   "background": {

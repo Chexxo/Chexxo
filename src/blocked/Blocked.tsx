@@ -33,16 +33,14 @@ export class Blocked extends Component<Props> {
         <Modal.Header>
           <img className="header-logo" src="../assets/logo.svg" /> Chexxo
         </Modal.Header>
-        <Modal.Content image>
-          <Modal.Description>
-            <Header>Certificate Quality decreased</Header>
-            <p>
-              The certificate quality for <strong>{this.url}</strong> was lower
-              than expected, thereby further communication with this website is
-              website is blocked.
-            </p>
-            <p>Do you want to continue using this website?</p>
-          </Modal.Description>
+        <Modal.Content>
+          <Header>Certificate Quality decreased</Header>
+          <p style={{ wordWrap: "break-word" }}>
+            The certificate quality for <strong>{this.url}</strong> was lower
+            than expected, therefore further communication with this website is
+            blocked.
+          </p>
+          <p>Do you want to continue using this website?</p>
         </Modal.Content>
         <Modal.Actions>
           <Button

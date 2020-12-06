@@ -2,7 +2,20 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, Icon, Popup as Tooltip } from "semantic-ui-react";
 
-export class Navigation extends Component {
+interface Props {
+  openOptionsPage: () => Promise<void>;
+}
+
+export class Navigation extends Component<Props> {
+  constructor(props: Props) {
+    super(props);
+    this.openOptionsPage = this.openOptionsPage.bind(this);
+  }
+
+  openOptionsPage(): void {
+    this.props.openOptionsPage();
+  }
+
   render(): JSX.Element {
     return (
       <Menu compact icon>
@@ -17,7 +30,7 @@ export class Navigation extends Component {
         <Tooltip
           content="Configuration"
           trigger={
-            <Menu.Item disabled>
+            <Menu.Item onClick={this.openOptionsPage}>
               <Icon name="cog" />
             </Menu.Item>
           }

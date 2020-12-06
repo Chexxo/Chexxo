@@ -10,8 +10,5 @@
     }
   },
 
-  "permissions": [
-    "webRequest",
-    "webRequestBlocking"
-  ]
+  "permissions": ["webRequest", "webRequestBlocking"]
 }

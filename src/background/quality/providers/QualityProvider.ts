@@ -4,16 +4,24 @@ import { Quality } from "../../../types/Quality";
 import { StorageError } from "../../../types/errors/StorageError";
 
 export class QualityProvider {
+  private isCacheActive = true;
+
   constructor(private storageArea: Storage.StorageArea) {}
 
+  updateIsCacheActive(isCacheActive: boolean): void {
+    this.isCacheActive = isCacheActive;
+  }
+
   async setQuality(url: string, quality: Quality): Promise<void> {
-    try {
-      const storageData = await this.storageArea.get(["qualities"]);
-      const qualities: Record<string, Quality> = storageData.qualities || {};
-      qualities[this.stripUrl(url)] = quality;
-      await this.storageArea.set({ qualities });
-    } catch (error) {
-      throw new StorageError();
+    if (this.isCacheActive) {
+      try {
+        const storageData = await this.storageArea.get(["qualities"]);
+        const qualities: Record<string, Quality> = storageData.qualities || {};
+        qualities[this.stripUrl(url)] = quality;
+        await this.storageArea.set({ qualities });
+      } catch (error) {
+        throw new StorageError();
+      }
     }
   }
 
@@ -24,6 +32,10 @@ export class QualityProvider {
 
   async resetQuality(url: string): Promise<void> {
     await this.setQuality(url, Quality.Unknown);
+  }
+
+  async removeQualities(): Promise<void> {
+    return this.storageArea.remove(["qualities"]);
   }
 
   private async getQuality(url: string): Promise<Quality> {

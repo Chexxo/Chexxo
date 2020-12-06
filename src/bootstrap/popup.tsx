@@ -10,6 +10,7 @@ ReactDOM.render(
   <Popup
     getTabs={browser.tabs.query}
     sendMessage={browser.runtime.sendMessage}
+    openOptionsPage={browser.runtime.openOptionsPage}
   />,
   document.getElementById("popup")
 );

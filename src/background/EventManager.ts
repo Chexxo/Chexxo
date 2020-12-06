@@ -5,6 +5,9 @@ import {
   WebNavigation,
   WebRequest,
 } from "webextension-polyfill-ts";
+
+import { Configuration } from "../types/Configuration";
+import { StorageError } from "../types/errors/StorageError";
 import { UnhandledMessageError } from "../types/errors/UnhandledMessageError";
 
 import { App } from "./App";
@@ -40,7 +43,7 @@ export class EventManager {
     }
 
     this.webNavigation.onErrorOccurred.addListener(
-      this.receiveWebRequestError.bind(this)
+      this.receiveWebNavigationError.bind(this)
     );
     this.webNavigation.onCompleted.addListener(
       this.changeBrowserAction.bind(this)
@@ -81,26 +84,25 @@ export class EventManager {
       parentFrameId: number;
     };
 
-    if (fixedDetails.parentFrameId !== -1) {
-      return {};
-    }
     if (!this.isHttps(fixedDetails.url)) {
       return {};
     }
 
-    this.app.resetTabData(fixedDetails.tabId);
+    await this.app.fetchCertificate(requestDetails);
+    const hasQualityDecreased = await this.app.analyzeQuality(requestDetails);
 
-    const hasQualityDecreased = await this.app.fetchCertificate(fixedDetails);
     if (hasQualityDecreased) {
-      const path = `blocked.html?url=${fixedDetails.url}`;
-      this.tabs.create({ url: this.runtime.getURL(path) });
+      const path = `blocked.html?url=${requestDetails.url}`;
+      this.tabs.update(requestDetails.tabId, {
+        url: this.runtime.getURL(path),
+      });
       return { cancel: true };
     } else {
       return {};
     }
   }
 
-  receiveWebRequestError(
+  public receiveWebNavigationError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
     /*
@@ -108,6 +110,7 @@ export class EventManager {
       OnErrorOccuredDetailsType incorrectly
     */
     const fixedDetails = (requestDetails as unknown) as {
+      url: string;
       tabId: number;
       frameId: number;
       error: string;
@@ -124,7 +127,10 @@ export class EventManager {
     this.changeBrowserAction(requestDetails);
   }
 
-  receiveMessage(message: { type: string; params: unknown }): Promise<unknown> {
+  receiveMessage(message: {
+    type: string;
+    params?: unknown;
+  }): Promise<unknown> {
     return new Promise((resolve, reject) => {
       let params;
       switch (message.type) {
@@ -146,7 +152,42 @@ export class EventManager {
         case "resetQuality":
           params = message.params as { url: string };
           this.app.resetQuality(params.url);
-          resolve(true);
+          resolve();
+          break;
+        case "getConfiguration":
+          try {
+            const configuration = this.app.getConfiguration();
+            resolve(configuration);
+          } catch (error) {
+            reject(error as StorageError);
+          }
+          break;
+        case "setConfiguration":
+          params = message.params as { configuration: Configuration };
+          try {
+            this.app.setConfiguration(params.configuration);
+            resolve();
+          } catch (error) {
+            reject(error as Error);
+          }
+          break;
+        case "removeCache":
+          resolve(this.app.removeCache());
+          break;
+        case "exportLogs":
+          try {
+            resolve(this.app.exportLogs());
+          } catch (error) {
+            reject(error as Error);
+          }
+          break;
+        case "removeLogs":
+          try {
+            resolve(this.app.removeLogs());
+          } catch (error) {
+            reject(error as Error);
+          }
+          break;
         default:
           reject(new UnhandledMessageError(JSON.stringify(message)));
       }
@@ -172,8 +213,7 @@ export class EventManager {
       this.browserAction.enable(tabId);
     }
 
-    const errorMessage = this.app.getErrorMessage(tabId);
-    if (errorMessage) {
+    if (this.app.getErrorMessage(tabId)) {
       this.browserAction.setIcon({
         tabId,
         path: "../assets/logo_error.svg",
