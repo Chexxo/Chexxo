@@ -1,7 +1,7 @@
 import { ErrorFactory } from "../factories/ErrorFactory";
 
 export abstract class CertificateErrorAnalyzer {
-  static analyzeError(requestDetails: {
+  public static analyzeError(requestDetails: {
     url: string;
     frameId: number;
     error: string;

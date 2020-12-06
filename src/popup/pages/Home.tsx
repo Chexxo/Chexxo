@@ -6,7 +6,6 @@ import {
   Message,
   Popup as Tooltip,
   Rating,
-  Placeholder,
 } from "semantic-ui-react";
 
 import { Certificate } from "../../types/certificate/Certificate";
@@ -29,42 +28,47 @@ export class Home extends Component<Props> {
 
   render(): JSX.Element {
     return (
-      <div className="flex-container">
-        <PageHeader title="Chexxo" hasHomeButton={false} />
-
-        <Divider section />
+      <Container textAlign="center">
+        <div className="sticky-wrapper">
+          <PageHeader title="Chexxo" hasHomeButton={false} />
+          <Divider section />
+        </div>
 
         {this.props.certificate && this.props.quality ? (
-          <Container textAlign="center">
-            <p>{this.props.certificate.subject.commonName}</p>
+          <div className="quality-wrapper">
+            <h4>{this.props.certificate.subject.commonName}</h4>
+
             <Tooltip
-              content="Useful information about certificate quality"
+              content={this.props.quality.info}
+              position="bottom center"
               trigger={
-                <p>
+                <h3>
                   <span className="quality-text">
                     {this.props.quality?.text}
                   </span>
-                  <Icon name="info circle" />
-                </p>
+                  <Icon name="question circle" />
+                </h3>
               }
             />
-            <p>
-              <Rating
-                icon="star"
-                defaultRating={this.props.quality?.level}
-                maxRating={maxQuality}
-                size="massive"
-                disabled
-              />
-            </p>
-          </Container>
+
+            <Rating
+              icon="star"
+              defaultRating={this.props.quality?.level}
+              maxRating={maxQuality}
+              size="massive"
+              disabled
+            />
+          </div>
         ) : (
           !this.props.errorMessage && (
-            <Placeholder>
-              <Placeholder.Line />
-              <Placeholder.Line />
-              <Placeholder.Line />
-            </Placeholder>
+            <Message
+              floating
+              info
+              header="Info"
+              icon="info circle"
+              size="tiny"
+              content="Please load a page to evaluate certificate quality."
+            />
           )
         )}
 
@@ -80,11 +84,8 @@ export class Home extends Component<Props> {
         )}
 
         <Divider section />
-
-        <Container textAlign="center">
-          <Navigation openOptionsPage={this.props.openOptionsPage} />
-        </Container>
-      </div>
+        <Navigation openOptionsPage={this.props.openOptionsPage} />
+      </Container>
     );
   }
 }

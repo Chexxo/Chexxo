@@ -38,7 +38,10 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({ filename: "../styles/[name].css" }),
     new CopyWebpackPlugin({
-      patterns: [{ from: "src/static/", to: "../" }],
+      patterns: [
+        { from: "src/static/", to: "../" },
+        { from: "node_modules/semantic-ui-css/", to: "../styles/semantic-ui" },
+      ],
     }),
   ],
   resolve: {

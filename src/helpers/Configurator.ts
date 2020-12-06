@@ -16,7 +16,7 @@ export class Configurator {
     this.storage.onChanged.addListener(this.notifyListeners.bind(this));
   }
 
-  async getConfiguration(): Promise<Configuration> {
+  public async getConfiguration(): Promise<Configuration> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let storedData: { [s: string]: any } | undefined = undefined;
     try {
@@ -32,7 +32,7 @@ export class Configurator {
     return storedData["configuration"];
   }
 
-  async setConfiguration(configuration: Configuration): Promise<void> {
+  public async setConfiguration(configuration: Configuration): Promise<void> {
     try {
       await this.storageArea?.set({ configuration });
     } catch (error) {
@@ -40,11 +40,11 @@ export class Configurator {
     }
   }
 
-  addListener(listener: (configuration: Configuration) => void): void {
+  public addListener(listener: (configuration: Configuration) => void): void {
     this.changeListeners.push(listener);
   }
 
-  async notifyListeners(changes: {
+  public async notifyListeners(changes: {
     [s: string]: Storage.StorageChange;
   }): Promise<void> {
     if (changes.configuration) {

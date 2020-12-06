@@ -8,33 +8,35 @@ export class QualityProvider {
 
   constructor(private storageArea: Storage.StorageArea) {}
 
-  updateIsCacheActive(isCacheActive: boolean): void {
+  public updateIsCacheActive(isCacheActive: boolean): void {
     this.isCacheActive = isCacheActive;
   }
 
-  async setQuality(url: string, quality: Quality): Promise<void> {
+  public async hasQualityDecreased(
+    url: string,
+    quality: Quality
+  ): Promise<boolean> {
     if (this.isCacheActive) {
-      try {
-        const storageData = await this.storageArea.get(["qualities"]);
-        const qualities: Record<string, Quality> = storageData.qualities || {};
-        qualities[this.stripUrl(url)] = quality;
-        await this.storageArea.set({ qualities });
-      } catch (error) {
-        throw new StorageError();
-      }
+      const storedQuality = await this.getQuality(url);
+      return storedQuality.level > quality.level;
+    } else {
+      return false;
     }
   }
 
-  async hasQualityDecreased(url: string, quality: Quality): Promise<boolean> {
-    const storedQuality = await this.getQuality(url);
-    return storedQuality.level > quality.level;
+  public async defineQuality(url: string, quality: Quality): Promise<void> {
+    if (this.isCacheActive) {
+      await this.setQuality(url, quality);
+    }
   }
 
-  async resetQuality(url: string): Promise<void> {
-    await this.setQuality(url, Quality.Unknown);
+  public async resetQuality(url: string): Promise<void> {
+    if (this.isCacheActive) {
+      await this.setQuality(url, Quality.Unknown);
+    }
   }
 
-  async removeQualities(): Promise<void> {
+  public async removeQualities(): Promise<void> {
     return this.storageArea.remove(["qualities"]);
   }
 
@@ -48,6 +50,17 @@ export class QualityProvider {
       } else {
         return Quality.Unknown;
       }
+    } catch (error) {
+      throw new StorageError();
+    }
+  }
+
+  private async setQuality(url: string, quality: Quality): Promise<void> {
+    try {
+      const storageData = await this.storageArea.get(["qualities"]);
+      const qualities: Record<string, Quality> = storageData.qualities || {};
+      qualities[this.stripUrl(url)] = quality;
+      await this.storageArea.set({ qualities });
     } catch (error) {
       throw new StorageError();
     }

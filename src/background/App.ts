@@ -1,8 +1,4 @@
-import { WebRequest } from "webextension-polyfill-ts";
-
-import { Certificate } from "../types/certificate/Certificate";
 import { ErrorMessage } from "../types/errors/ErrorMessage";
-import { Quality } from "../types/Quality";
 import { TabData } from "../types/TabData";
 import { CertificateService } from "./certificate/CertificateService";
 import { QualityService } from "./quality/QualityService";
@@ -18,7 +14,7 @@ import { InBrowserLogger } from "./logger/InBrowserLogger";
 import { LogEntry } from "../shared/types/logger/LogEntry";
 
 export class App {
-  private tabCache: Map<number, TabData>;
+  private tabCache = new Map<number, TabData>();
 
   constructor(
     private certificateService: CertificateService,
@@ -30,24 +26,26 @@ export class App {
     configurator.addListener(this.updateConfiguration.bind(this));
   }
 
-  async init(): Promise<void> {
+  public async init(): Promise<void> {
     const configuration = await this.configurator.getConfiguration();
     this.updateConfiguration(configuration);
   }
 
-  updateConfiguration(configuration: Configuration): void {
+  public updateConfiguration(configuration: Configuration): void {
     this.certificateService.updateConfiguration(configuration);
     this.qualityService.updateConfiguration(configuration);
   }
 
-  resetTabData(tabId: number): void {
+  public resetTabData(tabId: number): void {
     this.tabCache.delete(tabId);
   }
 
-  async fetchCertificate(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<void> {
-    const { tabId } = requestDetails;
+  public async fetchCertificate(requestDetails: {
+    url: string;
+    tabId: number;
+    requestId?: string;
+  }): Promise<void> {
+    const { url, tabId } = requestDetails;
     const tabData = this.tabCache.get(tabId) || new TabData();
 
     try {
@@ -63,7 +61,7 @@ export class App {
       this.logger.log(
         certificateResponse.requestUuid,
         LogLevel.INFO,
-        `Request ${requestDetails.url} Response: 200`
+        `Request ${url} Response: 200`
       );
     } catch (errorResponse) {
       this.logError(requestDetails.url, errorResponse);
@@ -73,7 +71,7 @@ export class App {
     this.tabCache.set(tabId, tabData);
   }
 
-  async analyzeQuality(requestDetails: {
+  public async analyzeQuality(requestDetails: {
     tabId: number;
     url: string;
   }): Promise<boolean> {
@@ -93,7 +91,7 @@ export class App {
           this.tabCache.set(tabId, tabData);
           return true;
         } else {
-          this.qualityService.setQuality(url, tabData.quality);
+          this.qualityService.defineQuality(url, tabData.quality);
         }
       }
     }
@@ -101,7 +99,7 @@ export class App {
     return false;
   }
 
-  analyzeError(requestDetails: {
+  public analyzeError(requestDetails: {
     url: string;
     tabId: number;
     frameId: number;
@@ -122,27 +120,19 @@ export class App {
     }
   }
 
-  getCertificate(tabId: number): Certificate | undefined {
-    return this.tabCache.get(tabId)?.certificate;
+  public getTabData(tabId: number): TabData | undefined {
+    return this.tabCache.get(tabId);
   }
 
-  getQuality(tabId: number): Quality | undefined {
-    return this.tabCache.get(tabId)?.quality;
-  }
-
-  getErrorMessage(tabId: number): ErrorMessage | undefined {
-    return this.tabCache.get(tabId)?.errorMessage;
-  }
-
-  async resetQuality(url: string): Promise<void> {
+  public async resetQuality(url: string): Promise<void> {
     await this.qualityService.resetQuality(url);
   }
 
-  async getConfiguration(): Promise<Configuration> {
+  public async getConfiguration(): Promise<Configuration> {
     return await this.configurator.getConfiguration();
   }
 
-  async setConfiguration(configuration: Configuration): Promise<void> {
+  public async setConfiguration(configuration: Configuration): Promise<void> {
     await this.configurator.setConfiguration(configuration);
   }
 

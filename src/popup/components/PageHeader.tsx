@@ -12,7 +12,12 @@ export class PageHeader extends Component<Props> {
     return (
       <div className="header-container">
         {this.props.hasHomeButton && (
-          <Button icon="arrow left" as={NavLink} to="/" />
+          <Button
+            className="header-button"
+            icon="arrow left"
+            as={NavLink}
+            to="/"
+          />
         )}
         <Header as="h2" textAlign="center">
           <Image src="../assets/logo.svg" size="tiny" /> {this.props.title}

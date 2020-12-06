@@ -120,7 +120,7 @@ test("caches certificate from CertificateService", async () => {
   });
 
   await app.fetchCertificate(onHeadersReceivedDetails);
-  expect(app.getCertificate(tabId)).toEqual(certificate);
+  expect(app.getTabData(tabId)?.certificate).toEqual(certificate);
 });
 
 test("caches quality from QualityService", async () => {
@@ -135,7 +135,7 @@ test("caches quality from QualityService", async () => {
   });
 
   await app.fetchCertificate(onHeadersReceivedDetails);
-  expect(app.getQuality(tabId)).toEqual(Quality.DomainValidated);
+  expect(app.getTabData(tabId)?.quality).toEqual(Quality.DomainValidated);
 });
 
 test("catches errormessages from CertificateService", async () => {
@@ -149,7 +149,9 @@ test("catches errormessages from CertificateService", async () => {
     app.fetchCertificate(onHeadersReceivedDetails)
   ).resolves.not.toThrowError();
 
-  await expect(app.getErrorMessage(tabId)).toBeInstanceOf(ErrorMessage);
+  await expect(app.getTabData(tabId)?.errorMessage).toBeInstanceOf(
+    ErrorMessage
+  );
 });
 
 test("writes unknown error to log", async () => {
@@ -332,7 +334,7 @@ test("caches errormessages from OnErrorOccured event", () => {
   });
 
   app.analyzeError(requestDetails);
-  expect(app.getErrorMessage(requestDetails.tabId)).toBeInstanceOf(
+  expect(app.getTabData(requestDetails.tabId)?.errorMessage).toBeInstanceOf(
     ErrorMessage
   );
 });

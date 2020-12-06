@@ -1,5 +1,3 @@
-import { WebRequest } from "webextension-polyfill-ts";
-
 import { APIResponseBody } from "../../../shared/types/api/APIResponseBody";
 import { RawCertificate } from "../../../shared/types/certificate/RawCertificate";
 import { ServerUnavailableError } from "../../../types/errors/ServerUnavailableError";
@@ -7,6 +5,8 @@ import { ErrorFactory } from "../factories/ErrorFactory";
 import { CertificateProvider } from "./CertificateProvider";
 import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 import { ServerError } from "../../../shared/types/errors/ServerError";
+import { UUIDFactory } from "../../../helpers/UUIDFactory";
+import { InvalidUrlError } from "../../../shared/types/errors/InvalidUrlError";
 
 /**
  * Class to get the certificate of a given domain. This
@@ -51,19 +51,23 @@ export class ServerProvider implements CertificateProvider {
     }
   }
 
-  /**
-   * Gets the certificate of the domain specified
-   * within the request details.
-   *
-   * @param requestDetails The request details of
-   * the request which lead to this method being
-   * invoked.
-   */
-  public getCertificate(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<RawCertificateResponse> {
+  public getCertificate(requestDetails: {
+    url: string;
+  }): Promise<RawCertificateResponse> {
     const url = this.cleanUrl(requestDetails.url);
-    return this.fetchCertificateFromServer(url);
+    if (url) {
+      return this.fetchCertificateFromServer(url);
+    } else {
+      return new Promise((resolve) => {
+        resolve(
+          new RawCertificateResponse(
+            UUIDFactory.uuidv4(),
+            undefined,
+            new InvalidUrlError()
+          )
+        );
+      });
+    }
   }
 
   /**
@@ -124,7 +128,7 @@ export class ServerProvider implements CertificateProvider {
 
     matches = regex.exec(url);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return matches!.groups!.url;
+    return matches?.groups?.url || "";
   }
 
   /**

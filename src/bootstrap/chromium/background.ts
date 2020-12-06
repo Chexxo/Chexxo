@@ -24,7 +24,6 @@ const app = new App(certificateService, qualityService, configurator, logger);
 app.init();
 
 const eventManager = new EventManager(
-  browser.webRequest,
   browser.webNavigation,
   browser.runtime,
   browser.tabs,

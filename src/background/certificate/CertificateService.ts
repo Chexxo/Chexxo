@@ -1,7 +1,7 @@
-import { WebRequest } from "webextension-polyfill-ts";
-
+import { UUIDFactory } from "../../helpers/UUIDFactory";
 import { CertificateResponse } from "../../types/certificate/CertificateResponse";
 import { Configuration } from "../../types/Configuration";
+import { UnknownCertificateError } from "../../types/errors/certificate/UnknownCertificateError";
 import { CertificateErrorAnalyzer } from "./helpers/CertificateErrorAnalyzer";
 import { CertificateParser } from "./helpers/CertificateParser";
 import { CertificateProvider } from "./providers/CertificateProvider";
@@ -10,7 +10,7 @@ import { ServerProvider } from "./providers/ServerProvider";
 export class CertificateService {
   constructor(private certificateProvider: CertificateProvider) {}
 
-  updateConfiguration(configuration: Configuration): void {
+  public updateConfiguration(configuration: Configuration): void {
     if (this.certificateProvider instanceof ServerProvider) {
       (this.certificateProvider as ServerProvider).updateServerUrl(
         configuration.serverUrl
@@ -18,17 +18,28 @@ export class CertificateService {
     }
   }
 
-  async getCertificate(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<CertificateResponse> {
+  public async getCertificate(requestDetails: {
+    url: string;
+    requestId?: string;
+  }): Promise<CertificateResponse> {
     const rawCertificateResponse = await this.certificateProvider.getCertificate(
       requestDetails
     );
 
+    let certificate;
     if (rawCertificateResponse.rawCertificate !== undefined) {
-      const certificate = CertificateParser.getCertificate(
-        rawCertificateResponse.rawCertificate
-      );
+      try {
+        certificate = CertificateParser.getCertificate(
+          rawCertificateResponse.rawCertificate
+        );
+      } catch (error) {
+        throw new CertificateResponse(
+          UUIDFactory.uuidv4(),
+          undefined,
+          new UnknownCertificateError(error.message)
+        );
+      }
+
       return new CertificateResponse(
         rawCertificateResponse.requestUuid,
         certificate
@@ -42,7 +53,7 @@ export class CertificateService {
     );
   }
 
-  analyzeError(requestDetails: {
+  public analyzeError(requestDetails: {
     url: string;
     frameId: number;
     error: string;
