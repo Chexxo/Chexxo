@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2020-12-06
+### Added
+- Information regarding the different certificate qualities.
+
+### Changed
+- Improved Semantic UI import to be more effizient.
+- Improved webpack build to be more effizient.
+- Logo for certificate view.
+- The chromium version now needs less permissions.
+
+### Fixed
+- Error with regex in CertificateParser which lead to an internal error message being exposed.
+- Error which occured if no altname was defined on the certificate.
+- Icon now shows up correctly even if multiple browser windows are opened.
+
 ## [0.5.0] - 2020-12-06
 ### Added
 - Domain caching.
