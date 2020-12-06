@@ -6,18 +6,19 @@ import { ServerUnavailableError } from "../../../types/errors/ServerUnavailableE
 import { ErrorFactory } from "../factories/ErrorFactory";
 import { CertificateProvider } from "./CertificateProvider";
 import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
+import { ServerError } from "../../../shared/types/errors/ServerError";
 
 export class ServerProvider implements CertificateProvider {
-  static readonly defaultServerUrl =
+  private static defaultServerUrl =
     "https://cmsrvsfj03.execute-api.eu-central-1.amazonaws.com/";
-  static readonly endpoint = "certificate/";
+  private static endpoint = "certificate/";
   private serverUrl: string;
 
   constructor() {
     this.serverUrl = ServerProvider.defaultServerUrl;
   }
 
-  public updateServerUrl(serverUrl: string): void {
+  public updateServerUrl(serverUrl?: string): void {
     if (serverUrl) {
       this.serverUrl = serverUrl;
     } else {
@@ -45,6 +46,12 @@ export class ServerProvider implements CertificateProvider {
       fetch(urlToFetch)
         .then((response) => response.json())
         .then((apiResponse: APIResponseBody) => {
+          if (!(apiResponse instanceof APIResponseBody)) {
+            reject(
+              new ServerError(new Error("Server returned invalid response."))
+            );
+          }
+
           const result = this.analyzeAPIResponse(apiResponse);
 
           if (result.error !== undefined) {
@@ -82,11 +89,19 @@ export class ServerProvider implements CertificateProvider {
         undefined,
         ErrorFactory.fromErrorDto(response.error)
       );
+    } else if (response.certificate !== null) {
+      return new RawCertificateResponse(
+        response.requestUuid,
+        new RawCertificate(response.certificate)
+      );
     }
 
     return new RawCertificateResponse(
       response.requestUuid,
-      new RawCertificate(response.certificate)
+      undefined,
+      new ServerError(
+        new Error("APIResponse contained neither error nor certificate.")
+      )
     );
   }
 }

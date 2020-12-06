@@ -35,7 +35,7 @@ export class CertificateService {
       );
     }
 
-    return new CertificateResponse(
+    throw new CertificateResponse(
       rawCertificateResponse.requestUuid,
       undefined,
       rawCertificateResponse.error
