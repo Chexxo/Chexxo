@@ -87,7 +87,7 @@ export default class Options extends Component<Props, State> {
     }
   }
 
-  changeServerUrl(event: React.FormEvent<HTMLInputElement>): void {
+  public changeServerUrl(event: React.FormEvent<HTMLInputElement>): void {
     const newValue = event.currentTarget.value;
 
     if (this.isValidUrl(newValue) || newValue === "") {
@@ -103,7 +103,7 @@ export default class Options extends Component<Props, State> {
     }
   }
 
-  toggleCacheDomainQualities(): void {
+  public toggleCacheDomainQualities(): void {
     const newValue = !this.state.configuration.cacheDomainQualities;
     this.setState((prevState) => ({
       configuration: {
@@ -113,7 +113,7 @@ export default class Options extends Component<Props, State> {
     }));
   }
 
-  removeCache(): void {
+  public removeCache(): void {
     this.props.sendMessage({ type: "removeCache" });
     this.generateMessage(
       MessageStatus.SUCCESS,
@@ -220,7 +220,7 @@ export default class Options extends Component<Props, State> {
         <Divider horizontal>Domains</Divider>
         <Form.Checkbox
           toggle
-          label="Cache domain qualities to compare them on the next visit"
+          label="Cache domain qualities to block future website access, should the quality decrease."
           checked={this.state.configuration.cacheDomainQualities}
           onChange={this.toggleCacheDomainQualities}
         />

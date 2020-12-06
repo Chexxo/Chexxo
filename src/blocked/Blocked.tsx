@@ -19,7 +19,7 @@ export class Blocked extends Component<Props> {
     this.acknowledgeRisk = this.acknowledgeRisk.bind(this);
   }
 
-  async acknowledgeRisk(): Promise<void> {
+  public async acknowledgeRisk(): Promise<void> {
     await this.props.sendMessage({
       type: "resetQuality",
       params: { url: this.url },

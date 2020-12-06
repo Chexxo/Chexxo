@@ -14,7 +14,7 @@ class CertificatePolicyEntry {
 }
 
 export abstract class CertificateParser {
-  static getCertificate(rawCert: RawCertificate): Certificate {
+  public static getCertificate(rawCert: RawCertificate): Certificate {
     const fullCert = new X509();
     fullCert.readCertPEM(rawCert.pem);
 

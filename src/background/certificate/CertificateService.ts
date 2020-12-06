@@ -10,7 +10,7 @@ import { ServerProvider } from "./providers/ServerProvider";
 export class CertificateService {
   constructor(private certificateProvider: CertificateProvider) {}
 
-  updateConfiguration(configuration: Configuration): void {
+  public updateConfiguration(configuration: Configuration): void {
     if (this.certificateProvider instanceof ServerProvider) {
       (this.certificateProvider as ServerProvider).updateServerUrl(
         configuration.serverUrl
@@ -18,7 +18,7 @@ export class CertificateService {
     }
   }
 
-  async getCertificate(requestDetails: {
+  public async getCertificate(requestDetails: {
     url: string;
     requestId?: string;
   }): Promise<CertificateResponse> {
@@ -53,7 +53,7 @@ export class CertificateService {
     );
   }
 
-  analyzeError(requestDetails: {
+  public analyzeError(requestDetails: {
     url: string;
     frameId: number;
     error: string;

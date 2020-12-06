@@ -22,7 +22,7 @@ export class EventManager {
     private webRequest?: WebRequest.Static
   ) {}
 
-  init(): void {
+  public init(): void {
     this.webNavigation.onBeforeNavigate.addListener(this.resetTab.bind(this));
 
     if (this.webRequest) {
@@ -51,12 +51,7 @@ export class EventManager {
     this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
   }
 
-  isHttps(url: string): boolean {
-    const realUrl = new URL(url);
-    return realUrl.protocol === "https:";
-  }
-
-  resetTab(requestDetails: {
+  public resetTab(requestDetails: {
     url: string;
     tabId: number;
     parentFrameId: number;
@@ -70,7 +65,7 @@ export class EventManager {
     }
   }
 
-  async receiveWebRequestHeaders(requestDetails: {
+  public async receiveWebRequestHeaders(requestDetails: {
     url: string;
     tabId: number;
   }): Promise<WebRequest.BlockingResponse> {
@@ -131,7 +126,7 @@ export class EventManager {
     this.changeBrowserAction(requestDetails);
   }
 
-  receiveMessage(message: {
+  public receiveMessage(message: {
     type: string;
     params?: unknown;
   }): Promise<unknown> {
@@ -188,7 +183,10 @@ export class EventManager {
     });
   }
 
-  changeBrowserAction(requestDetails: { url: string; tabId: number }): void {
+  public changeBrowserAction(requestDetails: {
+    url: string;
+    tabId: number;
+  }): void {
     const { url, tabId } = requestDetails;
     const { parentFrameId } = (requestDetails as unknown) as {
       parentFrameId: number;
@@ -230,5 +228,10 @@ export class EventManager {
         this.browserAction.setBadgeText({ tabId, text: "" });
       }
     }
+  }
+
+  private isHttps(url: string): boolean {
+    const realUrl = new URL(url);
+    return realUrl.protocol === "https:";
   }
 }

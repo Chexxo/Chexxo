@@ -2,7 +2,7 @@ import { Certificate } from "../../../types/certificate/Certificate";
 import { Quality } from "../../../types/Quality";
 
 export abstract class QualityAnalyzer {
-  static getQuality(certificate: Certificate): Quality {
+  public static getQuality(certificate: Certificate): Quality {
     if (this.isDomainValidated(certificate)) {
       return Quality.DomainValidated;
     }

@@ -36,7 +36,7 @@ export class QualityProvider {
     }
   }
 
-  async removeQualities(): Promise<void> {
+  public async removeQualities(): Promise<void> {
     return this.storageArea.remove(["qualities"]);
   }
 
