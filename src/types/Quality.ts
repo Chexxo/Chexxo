@@ -23,7 +23,8 @@ export const Quality = {
     level: 3,
     text: "Extended Validated",
     info:
-      "The certificate authority verifies ownership of the certificate's domain and organization.",
+      "The certificate authority verifies ownership of the certificate's domain and performs extensive background checks on the organization.",
+
   },
 };
 
