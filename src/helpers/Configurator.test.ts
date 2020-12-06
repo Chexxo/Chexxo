@@ -15,7 +15,7 @@ beforeEach(() => {
 });
 
 test("retrieves configuration when it is defined", async () => {
-  const configuration = new Configuration("http://localhost:3000", false, true);
+  const configuration = new Configuration("http://localhost:3000", false);
 
   mockBrowser.storage.local.get
     .expect(expect.anything())
@@ -41,7 +41,7 @@ test("throws error when storage get operation failed", async () => {
 });
 
 test("sets provided configuration", async () => {
-  const configuration = new Configuration("http://localhost:3000", false, true);
+  const configuration = new Configuration("http://localhost:3000", false);
 
   mockBrowser.storage.local.set.expect({ configuration }).andResolve();
   await expect(configurator.setConfiguration(configuration)).resolves.toEqual(
@@ -50,7 +50,7 @@ test("sets provided configuration", async () => {
 });
 
 test("throws error when storage set operation failed", async () => {
-  const configuration = new Configuration("http://localhost:3000", false, true);
+  const configuration = new Configuration("http://localhost:3000", false);
 
   mockBrowser.storage.local.set
     .expect(expect.anything())
