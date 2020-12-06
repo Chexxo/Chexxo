@@ -22,9 +22,9 @@ import { CertificateResponse } from "../types/certificate/CertificateResponse";
 import { LogLevel } from "../shared/logger/Logger";
 import { InBrowserPersistenceManager } from "./logger/InBrowserPersistenceManager";
 import { InsecureConnectionError } from "../types/errors/InsecureConnectionError";
-import { InvalidUrlError } from "../shared/types/errors/InvalidUrlError";
 import { ServerError } from "../shared/types/errors/ServerError";
 import { InBrowserLogger } from "./logger/InBrowserLogger";
+import { InvalidUrlError } from "../shared/types/errors/InvalidUrlError";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -49,9 +49,10 @@ beforeEach(() => {
   mockBrowser.storage.mockAllow();
   mockBrowser.storage.local.mockAllow();
   mockBrowser.storage.onChanged.addListener.expect(expect.anything());
+
   certificateProvider = new MockCertificateProvider();
   certificateService = new CertificateService(certificateProvider);
-  qualityProvider = new QualityProvider();
+  qualityProvider = new QualityProvider(browser.storage.local);
   qualityService = new QualityService(qualityProvider);
   configurator = new Configurator(browser.storage);
   logger = new InBrowserLogger(

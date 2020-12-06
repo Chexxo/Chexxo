@@ -39,59 +39,46 @@ beforeEach(() => {
   mockBrowser.storage.mockAllow();
   mockBrowser.storage.local.mockAllow();
   mockBrowser.storage.onChanged.addListener.expect(expect.anything());
-  certificateProvider = new MockCertificateProvider();
-  certificateService = new CertificateService(certificateProvider);
-  qualityProvider = new QualityProvider();
-  qualityService = new QualityService(qualityProvider);
-  configurator = new Configurator(browser.storage);
-  logger = new InBrowserLogger(
-    new InBrowserPersistenceManager(browser.storage.local)
-  );
-
-  app = new App(certificateService, qualityService, configurator, logger);
-  app.init();
-
+  mockBrowser.webRequest.mockAllow();
+  mockBrowser.webNavigation.mockAllow();
+  mockBrowser.runtime.mockAllow();
+  mockBrowser.tabs.mockAllow();
+  mockBrowser.browserAction.mockAllow();
   mockBrowser.webRequest.onBeforeRequest.addListener.expect(
     expect.anything(),
-    {
-      urls: ["<all_urls>"],
-      types: ["main_frame"],
-    },
-    []
+    expect.anything(),
+    expect.anything()
   );
   mockBrowser.webRequest.onHeadersReceived.addListener.expect(
     expect.anything(),
-    {
-      urls: ["<all_urls>"],
-      types: ["main_frame"],
-    },
-    ["blocking"]
+    expect.anything(),
+    expect.anything()
   );
   mockBrowser.webNavigation.onErrorOccurred.addListener.expect(
     expect.anything()
   );
   mockBrowser.runtime.onMessage.addListener.expect(expect.anything());
   mockBrowser.tabs.onActivated.addListener.expect(expect.anything());
-  mockBrowser.browserAction.setIcon.expect(expect.anything());
-  mockBrowser.browserAction.setBadgeText.expect(expect.anything());
-  mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
+
+  certificateProvider = new MockCertificateProvider();
+  certificateService = new CertificateService(certificateProvider);
+  qualityProvider = new QualityProvider(browser.storage.local);
+  qualityService = new QualityService(qualityProvider);
+  configurator = new Configurator(browser.storage);
+  logger = new InBrowserLogger(
+    new InBrowserPersistenceManager(browser.storage.local)
+  );
+  app = new App(certificateService, qualityService, configurator, logger);
+  app.init();
 
   eventManager = new EventManager(
-    browser.webRequest.onBeforeRequest,
-    browser.webRequest.onHeadersReceived,
-    browser.webNavigation.onErrorOccurred,
-    browser.runtime.onMessage,
-    browser.tabs.onActivated,
-    browser.browserAction.setIcon,
-    browser.browserAction.setBadgeText,
-    browser.browserAction.setBadgeBackgroundColor,
+    browser.webRequest,
+    browser.webNavigation,
+    browser.runtime,
+    browser.tabs,
+    browser.browserAction,
     app
   );
-});
-
-// eslint-disable-next-line jest/expect-expect
-test("initializes listeners", () => {
-  eventManager.init();
 });
 
 test("returns Certificate on getCertificate message", () => {
@@ -207,7 +194,7 @@ test("calls fetch on receiveWebRequest", () => {
     });
   });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventManager.receiveWebRequest(<any>{});
+  eventManager.receiveWebRequestHeaders(<any>{});
   expect(app.fetchCertificate).toHaveBeenCalledTimes(1);
 });
 
@@ -215,57 +202,59 @@ test("calls changeBrowserAction on receiveWebRequestError", () => {
   app.analyzeError = jest.fn();
   eventManager.changeBrowserAction = jest.fn();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventManager.receiveWebRequestError(<any>{});
+  eventManager.receiveWebNavigationError(<any>{});
   expect(eventManager.changeBrowserAction).toHaveBeenCalledTimes(1);
 });
 
 test("sets error in changeBrowserAction", () => {
+  mockBrowser.browserAction.setIcon
+    .expect({ path: "../assets/logo_error.svg" })
+    .andResolve();
+  mockBrowser.browserAction.setBadgeBackgroundColor
+    .expect({ color: "#d32f2f" })
+    .andResolve();
+  mockBrowser.browserAction.setBadgeText.expect({ text: "!" }).andResolve();
+
   app.getErrorMessage = jest.fn(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <any>{
       hello: "World",
     };
   });
-  eventManager["setBrowserActionIcon"] = jest.fn();
-  eventManager["setBrowserActionBackground"] = jest.fn();
-  eventManager["setBrowserActionText"] = jest.fn();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventManager.changeBrowserAction(<any>{});
-  expect(eventManager["setBrowserActionText"]).toHaveBeenLastCalledWith({
-    text: "!",
-  });
+  expect(eventManager.changeBrowserAction(<any>{})).toEqual(undefined);
 });
 
 test("calls export log", () => {
   app.exportLogs = jest.fn();
-  eventManager.receiveMessage({ type: "exportLogs" }, {}, jest.fn());
+  eventManager.receiveMessage({ type: "exportLogs" });
   expect(app.exportLogs).toHaveBeenCalledTimes(1);
 });
 
-test("returns error on export log", () => {
-  const error = new Error("Hello");
+test("returns error on export log", async () => {
   app.exportLogs = jest.fn(() => {
-    throw error;
+    throw new Error();
   });
-  const callback = jest.fn();
-  eventManager.receiveMessage({ type: "exportLogs" }, {}, callback);
-  expect(callback).toHaveBeenLastCalledWith(error);
+
+  await expect(
+    eventManager.receiveMessage({ type: "exportLogs" })
+  ).rejects.toBeInstanceOf(Error);
 });
 
 test("calls remove log", () => {
   app.removeLogs = jest.fn();
-  eventManager.receiveMessage({ type: "removeLogs" }, {}, jest.fn());
+  eventManager.receiveMessage({ type: "removeLogs" });
   expect(app.removeLogs).toHaveBeenCalledTimes(1);
 });
 
-test("returns error on remove log", () => {
-  const error = new Error("Hello");
+test("returns error on remove log", async () => {
   app.removeLogs = jest.fn(() => {
-    throw error;
+    throw new Error();
   });
-  const callback = jest.fn();
-  eventManager.receiveMessage({ type: "removeLogs" }, {}, callback);
-  expect(callback).toHaveBeenLastCalledWith(error);
+
+  await expect(
+    eventManager.receiveMessage({ type: "removeLogs" })
+  ).rejects.toBeInstanceOf(Error);
 });
 
 test("relay tabData", () => {

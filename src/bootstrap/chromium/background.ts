@@ -10,22 +10,13 @@ import { QualityProvider } from "../../background/quality/providers/QualityProvi
 import { QualityService } from "../../background/quality/QualityService";
 import { Configurator } from "../../helpers/Configurator";
 
-const {
-  browserAction: { setIcon, setBadgeText, setBadgeBackgroundColor },
-  runtime: { onMessage },
-  storage,
-  tabs: { onActivated },
-  webNavigation: { onErrorOccurred },
-  webRequest: { onBeforeRequest, onHeadersReceived },
-} = browser;
-
 const certificateProvider = new ServerProvider();
 const certificateService = new CertificateService(certificateProvider);
-const qualityProvider = new QualityProvider();
+const qualityProvider = new QualityProvider(browser.storage.local);
 const qualityService = new QualityService(qualityProvider);
-const configurator = new Configurator(storage);
+const configurator = new Configurator(browser.storage);
 const logger = new InBrowserLogger(
-  new InBrowserPersistenceManager(storage.local)
+  new InBrowserPersistenceManager(browser.storage.local)
 );
 
 const app = new App(certificateService, qualityService, configurator, logger);
@@ -33,14 +24,11 @@ const app = new App(certificateService, qualityService, configurator, logger);
 app.init();
 
 const eventManager = new EventManager(
-  onBeforeRequest,
-  onHeadersReceived,
-  onErrorOccurred,
-  onMessage,
-  onActivated,
-  setIcon,
-  setBadgeText,
-  setBadgeBackgroundColor,
+  browser.webRequest,
+  browser.webNavigation,
+  browser.runtime,
+  browser.tabs,
+  browser.browserAction,
   app
 );
 

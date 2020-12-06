@@ -37,6 +37,7 @@ export class App {
 
   updateConfiguration(configuration: Configuration): void {
     this.certificateService.updateConfiguration(configuration);
+    this.qualityService.updateConfiguration(configuration);
   }
 
   resetTabData(tabId: number): void {
@@ -53,7 +54,6 @@ export class App {
       const certificateResponse = await this.certificateService.getCertificate(
         requestDetails
       );
-
       tabData.certificate = certificateResponse.certificate;
 
       if (tabData.certificate) {
@@ -71,6 +71,34 @@ export class App {
     }
 
     this.tabCache.set(tabId, tabData);
+  }
+
+  async analyzeQuality(requestDetails: {
+    tabId: number;
+    url: string;
+  }): Promise<boolean> {
+    const { tabId, url } = requestDetails;
+    const tabData = this.tabCache.get(tabId);
+    if (tabData) {
+      if (tabData.quality) {
+        const hasQualityDecreased = await this.qualityService.hasQualityDecreased(
+          url,
+          tabData.quality
+        );
+
+        if (hasQualityDecreased) {
+          tabData.errorMessage = new ErrorMessage(
+            "The websites certificate has decreased in quality since your last visit."
+          );
+          this.tabCache.set(tabId, tabData);
+          return true;
+        } else {
+          this.qualityService.setQuality(url, tabData.quality);
+        }
+      }
+    }
+
+    return false;
   }
 
   analyzeError(requestDetails: {
@@ -106,6 +134,10 @@ export class App {
     return this.tabCache.get(tabId)?.errorMessage;
   }
 
+  async resetQuality(url: string): Promise<void> {
+    await this.qualityService.resetQuality(url);
+  }
+
   async getConfiguration(): Promise<Configuration> {
     return await this.configurator.getConfiguration();
   }
@@ -116,6 +148,7 @@ export class App {
 
   public async removeCache(): Promise<void> {
     this.logger.log(UUIDFactory.uuidv4(), LogLevel.INFO, `Cache was removed.`);
+    return this.qualityService.removeQualities();
   }
 
   public async exportLogs(): Promise<LogEntry[] | null> {

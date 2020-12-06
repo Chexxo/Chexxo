@@ -1,0 +1,12 @@
+.header {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+
+  .header-logo {
+    display: inline-block;
+    height: 3rem;
+    width: auto;
+    margin-right: 1rem;
+  }
+}
