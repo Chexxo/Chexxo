@@ -14,9 +14,10 @@ export class InBrowserProvider implements CertificateProvider {
     ) => Promise<WebRequest.SecurityInfo>
   ) {}
 
-  public async getCertificate(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<RawCertificateResponse> {
+  public async getCertificate(requestDetails: {
+    url: string;
+    requestId: string;
+  }): Promise<RawCertificateResponse> {
     const requestUuid = UUIDFactory.uuidv4();
     const { requestId } = requestDetails;
     const securityInfo = await this.getSecurityInfo(requestId, {

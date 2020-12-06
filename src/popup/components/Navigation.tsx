@@ -23,7 +23,7 @@ export class Navigation extends Component<Props> {
           content="Certificate"
           trigger={
             <Menu.Item as={NavLink} to="/certificate">
-              <Icon name="clipboard outline" />
+              <Icon name="info" />
             </Menu.Item>
           }
         />

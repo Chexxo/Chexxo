@@ -1,59 +1,52 @@
+html,
+body {
+  height: initial;
+}
+
 body {
   max-width: 500px;
+  padding: 5.5rem 1rem 1rem 1rem;
 }
 
-.container {
-  padding: 2rem 1rem;
+.sticky-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem 1rem 0 1rem;
+  background: #ffffff;
+  z-index: 1;
 }
 
-.flex-container {
-  @extend .container;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.header-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
 }
 
-.header-container {
-  display: flex;
-  flex-direction: row;
-
-  h2 {
-    flex: 1;
-    margin: 0 !important;
-    align-self: center;
-    justify-self: center;
+.quality-wrapper {
+  h3,
+  h4 {
+    font-weight: normal;
   }
 }
 
-.quality-text {
-  margin-right: 0.25rem;
-  font-size: 1.2rem;
-}
-
-.data-table {
-  text-align: left;
+div.data-table {
   width: 30rem;
+  text-align: left;
 
-  tr {
-    display: block;
-    margin-bottom: 0.25rem;
+  .row {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.1rem;
   }
 
-  th,
-  td {
-    padding: 0 0.25rem;
+  .head {
+    flex: 0 0 10rem;
+    font-weight: bold;
   }
 
-  th {
-    width: 10rem;
-    vertical-align: top;
-  }
-
-  td {
-    width: 20rem;
-  }
-
-  .word-wrap {
+  .data {
     max-width: 20rem;
     word-wrap: break-word;
   }
@@ -61,12 +54,35 @@ body {
 
 .data-multi-list {
   overflow: hidden;
+  text-align: left;
 
   .item {
     float: left;
     width: 50%;
     word-wrap: break-word;
-    padding: 0.25rem 0.5rem 0.25rem 2.5rem;
+    padding: 0 0.5rem 0.1rem 2.5rem;
     text-indent: -2rem;
   }
+}
+
+// overwrite semantic ui header
+.ui.header {
+  margin-top: 0;
+}
+
+// overwrite semantic ui sectioned divider
+.ui.section.divider {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+// overwrite semantic ui centered container
+.ui.center.aligned.container {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+// overwrite semantic ui floating message
+.ui.tiny.floating.icon.info.message {
+  margin-top: 0.75rem;
 }

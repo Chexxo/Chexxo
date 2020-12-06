@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Divider, Message } from "semantic-ui-react";
+import { Container, Divider, Message } from "semantic-ui-react";
 import { Certificate } from "../../types/certificate/Certificate";
 import { PageHeader } from "../components/PageHeader";
 
@@ -10,52 +10,63 @@ interface Props {
 export class CertificateView extends Component<Props> {
   render(): JSX.Element {
     return (
-      <div className="container">
-        <PageHeader title="Certificate" hasHomeButton={true} />
-
-        <Divider section hidden />
+      <Container textAlign="center">
+        <div className="sticky-wrapper">
+          <PageHeader title="Certificate" hasHomeButton={true} />
+          <Divider section hidden />
+        </div>
 
         {this.props.certificate ? (
           <div>
             <Divider horizontal>Subject</Divider>
-            <table className="data-table">
-              <tbody>
-                <tr>
-                  <th>Common Name</th>
-                  <td>{this.props.certificate.subject.commonName}</td>
-                </tr>
-                {this.props.certificate.subject.organization && (
-                  <tr>
-                    <th>Organization</th>
-                    <td>{this.props.certificate.subject.organization}</td>
-                  </tr>
-                )}
-                {this.props.certificate.subject.organizationalUnit && (
-                  <tr>
-                    <th>Organizational Unit</th>
-                    <td>{this.props.certificate.subject.organizationalUnit}</td>
-                  </tr>
-                )}
-                {this.props.certificate.subject.location && (
-                  <tr>
-                    <th>Location</th>
-                    <td>{this.props.certificate.subject.location}</td>
-                  </tr>
-                )}
-                {this.props.certificate.subject.state && (
-                  <tr>
-                    <th>State</th>
-                    <td>{this.props.certificate.subject.state}</td>
-                  </tr>
-                )}
-                {this.props.certificate.subject.country && (
-                  <tr>
-                    <th>Country</th>
-                    <td>{this.props.certificate.subject.country}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            <div className="data-table">
+              <div className="row">
+                <div className="head">Common Name</div>
+                <div className="data">
+                  {this.props.certificate.subject.commonName}
+                </div>
+              </div>
+              {this.props.certificate.subject.organization && (
+                <div className="row">
+                  <div className="head">Organization</div>
+                  <div className="data">
+                    {this.props.certificate.subject.organization}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.subject.organizationalUnit && (
+                <div className="row">
+                  <div className="head">Organizational Unit</div>
+                  <div className="data">
+                    {this.props.certificate.subject.organizationalUnit}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.subject.location && (
+                <div className="row">
+                  <div className="head">Location</div>
+                  <div className="data">
+                    {this.props.certificate.subject.location}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.subject.state && (
+                <div className="row">
+                  <div className="head">State</div>
+                  <div className="data">
+                    {this.props.certificate.subject.state}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.subject.country && (
+                <div className="row">
+                  <div className="head">Country</div>
+                  <div className="data">
+                    {this.props.certificate.subject.country}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {this.props.certificate.subjectAltName && (
               <div>
@@ -73,66 +84,68 @@ export class CertificateView extends Component<Props> {
             )}
 
             <Divider horizontal>Issuer</Divider>
-            <table className="data-table">
-              <tbody>
-                <tr>
-                  <th>Common Name</th>
-                  <td>{this.props.certificate.issuer.commonName}</td>
-                </tr>
-                {this.props.certificate.issuer.organization && (
-                  <tr>
-                    <th>Organization</th>
-                    <td>{this.props.certificate.issuer.organization}</td>
-                  </tr>
-                )}
-                {this.props.certificate.issuer.organizationalUnit && (
-                  <tr>
-                    <th>Organizational Unit</th>
-                    <td>{this.props.certificate.issuer.organizationalUnit}</td>
-                  </tr>
-                )}
-                {this.props.certificate.issuer.location && (
-                  <tr>
-                    <th>Location</th>
-                    <td>{this.props.certificate.issuer.location}</td>
-                  </tr>
-                )}
-                {this.props.certificate.issuer.state && (
-                  <tr>
-                    <th>State</th>
-                    <td>{this.props.certificate.issuer.state}</td>
-                  </tr>
-                )}
-                {this.props.certificate.issuer.country && (
-                  <tr>
-                    <th>Country</th>
-                    <td>{this.props.certificate.issuer.country}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            <div className="data-table">
+              <div className="row">
+                <div className="head">Common Name</div>
+                <div className="data">
+                  {this.props.certificate.issuer.commonName}
+                </div>
+              </div>
+              {this.props.certificate.issuer.organization && (
+                <div className="row">
+                  <div className="head">Organization</div>
+                  <div className="data">
+                    {this.props.certificate.issuer.organization}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.issuer.organizationalUnit && (
+                <div className="row">
+                  <div className="head">Organizational Unit</div>
+                  <div className="data">
+                    {this.props.certificate.issuer.organizationalUnit}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.issuer.location && (
+                <div className="row">
+                  <div className="head">Location</div>
+                  <div className="data">
+                    {this.props.certificate.issuer.location}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.issuer.state && (
+                <div className="row">
+                  <div className="head">State</div>
+                  <div className="data">
+                    {this.props.certificate.issuer.state}
+                  </div>
+                </div>
+              )}
+              {this.props.certificate.issuer.country && (
+                <div className="row">
+                  <div className="head">Country</div>
+                  <div className="data">
+                    {this.props.certificate.issuer.country}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <Divider horizontal>Fingerprints</Divider>
-            <table className="data-table">
-              <tbody>
-                <tr>
-                  <th>SHA-1</th>
-                  <td>
-                    <div className="word-wrap">
-                      {this.props.certificate.fingerprint}
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th>SHA-256</th>
-                  <td>
-                    <div className="word-wrap">
-                      {this.props.certificate.fingerprint256}
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="data-table">
+              <div className="row">
+                <div className="head">SHA-1</div>
+                <div className="data">{this.props.certificate.fingerprint}</div>
+              </div>
+              <div className="row">
+                <div className="head">SHA-256</div>
+                <div className="data">
+                  {this.props.certificate.fingerprint256}
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <Message
@@ -144,7 +157,7 @@ export class CertificateView extends Component<Props> {
             content="No certificate found."
           />
         )}
-      </div>
+      </Container>
     );
   }
 }

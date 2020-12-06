@@ -14,48 +14,81 @@ import { App } from "./App";
 
 export class EventManager {
   constructor(
-    private webRequest: WebRequest.Static,
     private webNavigation: WebNavigation.Static,
     private runtime: Runtime.Static,
     private tabs: Tabs.Static,
     private browserAction: BrowserAction.Static,
-    private app: App
+    private app: App,
+    private webRequest?: WebRequest.Static
   ) {}
 
   public init(): void {
-    const filter: WebRequest.RequestFilter = {
-      urls: ["<all_urls>"],
-      types: ["main_frame"],
-    };
-    const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
+    this.webNavigation.onBeforeNavigate.addListener(this.resetTab.bind(this));
 
-    this.webRequest.onBeforeRequest.addListener(
-      this.resetTabData.bind(this),
-      filter,
-      []
-    );
-    this.webRequest.onHeadersReceived.addListener(
-      this.receiveWebRequestHeaders.bind(this),
-      filter,
-      extraInfoSpec
-    );
+    if (this.webRequest) {
+      const filter: WebRequest.RequestFilter = {
+        urls: ["<all_urls>"],
+        types: ["main_frame"],
+      };
+      const extraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking"];
+      this.webRequest.onHeadersReceived.addListener(
+        this.receiveWebRequestHeaders.bind(this),
+        filter,
+        extraInfoSpec
+      );
+    } else {
+      this.webNavigation.onCommitted.addListener(
+        this.receiveWebRequestHeaders.bind(this)
+      );
+    }
+
     this.webNavigation.onErrorOccurred.addListener(
       this.receiveWebNavigationError.bind(this)
     );
+    this.webNavigation.onCompleted.addListener(
+      this.changeBrowserAction.bind(this)
+    );
     this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
-    this.tabs.onActivated.addListener(this.changeBrowserAction.bind(this));
   }
 
-  public resetTabData(requestDetails: { tabId: number }): void {
-    this.app.resetTabData(requestDetails.tabId);
+  public resetTab(requestDetails: {
+    url: string;
+    tabId: number;
+    parentFrameId: number;
+  }): void {
+    if (requestDetails.parentFrameId !== -1) {
+      return;
+    }
+
+    if (!this.isHttps(requestDetails.url)) {
+      this.app.resetTabData(requestDetails.tabId);
+    }
   }
 
-  public async receiveWebRequestHeaders(
-    requestDetails: WebRequest.OnHeadersReceivedDetailsType
-  ): Promise<WebRequest.BlockingResponse> {
+  public async receiveWebRequestHeaders(requestDetails: {
+    url: string;
+    tabId: number;
+  }): Promise<WebRequest.BlockingResponse> {
+    /*
+      has to be asserted twice, because 'webextension-polyfill-ts' has declared 
+      OnCommittedDetailsType incorrectly
+    */
+    const fixedDetails = (requestDetails as unknown) as {
+      url: string;
+      tabId: number;
+      parentFrameId: number;
+    };
+
+    if (fixedDetails.parentFrameId !== -1) {
+      return {};
+    }
+
+    if (!this.isHttps(fixedDetails.url)) {
+      return {};
+    }
+
     await this.app.fetchCertificate(requestDetails);
     const hasQualityDecreased = await this.app.analyzeQuality(requestDetails);
-    this.changeBrowserAction(requestDetails);
 
     if (hasQualityDecreased) {
       const path = `blocked.html?url=${requestDetails.url}`;
@@ -82,31 +115,28 @@ export class EventManager {
       error: string;
     };
 
+    if (requestDetails.frameId !== 0) {
+      return;
+    }
+    if (!this.isHttps(requestDetails.url)) {
+      return;
+    }
+
     this.app.analyzeError(fixedDetails);
-    this.changeBrowserAction(fixedDetails);
+    this.changeBrowserAction(requestDetails);
   }
 
-  receiveMessage(message: {
+  public receiveMessage(message: {
     type: string;
     params?: unknown;
   }): Promise<unknown> {
     return new Promise((resolve, reject) => {
       let params;
       switch (message.type) {
-        case "getCertificate":
+        case "getTabData":
           params = message.params as { tabId: number };
-          const certificate = this.app.getCertificate(params.tabId);
-          resolve(certificate);
-          break;
-        case "getQuality":
-          params = message.params as { tabId: number };
-          const quality = this.app.getQuality(params.tabId);
-          resolve(quality);
-          break;
-        case "getErrorMessage":
-          params = message.params as { tabId: number };
-          const errorMessage = this.app.getErrorMessage(params.tabId);
-          resolve(errorMessage);
+          const tabData = this.app.getTabData(params.tabId);
+          resolve(tabData);
           break;
         case "resetQuality":
           params = message.params as { url: string };
@@ -153,23 +183,55 @@ export class EventManager {
     });
   }
 
-  public changeBrowserAction(tabInfo: { tabId: number }): void {
-    const { tabId } = tabInfo;
-    if (this.app.getErrorMessage(tabId)) {
-      this.browserAction.setIcon({ path: "../assets/logo_error.svg" });
-      this.browserAction.setBadgeBackgroundColor({ color: "#d32f2f" });
-      this.browserAction.setBadgeText({ text: "!" });
-    } else {
-      this.browserAction.setIcon({ path: "../assets/logo.svg" });
-      this.browserAction.setBadgeBackgroundColor({ color: "#1976d2" });
+  public changeBrowserAction(requestDetails: {
+    url: string;
+    tabId: number;
+  }): void {
+    const { url, tabId } = requestDetails;
+    const { parentFrameId } = (requestDetails as unknown) as {
+      parentFrameId: number;
+    };
 
-      const quality = this.app.getQuality(tabId);
-      if (quality) {
-        const stars = "*".repeat(quality.level);
-        this.browserAction.setBadgeText({ text: stars });
+    if (parentFrameId !== -1) {
+      return;
+    }
+
+    if (!this.isHttps(url)) {
+      this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
+      this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
+      this.browserAction.disable(tabId);
+      return;
+    } else {
+      this.browserAction.enable(tabId);
+    }
+
+    const tabData = this.app.getTabData(tabId);
+
+    if (tabData?.errorMessage) {
+      this.browserAction.setIcon({
+        tabId,
+        path: "../assets/logo_error.svg",
+      });
+      this.browserAction.setBadgeBackgroundColor({
+        tabId,
+        color: "#d32f2f",
+      });
+      this.browserAction.setBadgeText({ tabId, text: "!" });
+    } else {
+      this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
+      this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
+
+      if (tabData?.quality) {
+        const stars = "*".repeat(tabData.quality.level);
+        this.browserAction.setBadgeText({ tabId, text: stars });
       } else {
-        this.browserAction.setBadgeText({ text: "" });
+        this.browserAction.setBadgeText({ tabId, text: "" });
       }
     }
+  }
+
+  private isHttps(url: string): boolean {
+    const realUrl = new URL(url);
+    return realUrl.protocol === "https:";
   }
 }
