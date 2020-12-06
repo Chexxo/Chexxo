@@ -16,8 +16,12 @@ export class QualityProvider {
     url: string,
     quality: Quality
   ): Promise<boolean> {
-    const storedQuality = await this.getQuality(url);
-    return storedQuality.level > quality.level;
+    if (this.isCacheActive) {
+      const storedQuality = await this.getQuality(url);
+      return storedQuality.level > quality.level;
+    } else {
+      return false;
+    }
   }
 
   public async defineQuality(url: string, quality: Quality): Promise<void> {
@@ -27,7 +31,9 @@ export class QualityProvider {
   }
 
   public async resetQuality(url: string): Promise<void> {
-    await this.setQuality(url, Quality.Unknown);
+    if (this.isCacheActive) {
+      await this.setQuality(url, Quality.Unknown);
+    }
   }
 
   async removeQualities(): Promise<void> {
