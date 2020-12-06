@@ -29,7 +29,7 @@ interface State {
   messageTimeoutId: number;
 }
 
-export default class Options extends Component<Props, State> {
+export class Options extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {

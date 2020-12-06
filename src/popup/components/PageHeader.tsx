@@ -20,7 +20,8 @@ export class PageHeader extends Component<Props> {
           />
         )}
         <Header as="h2" textAlign="center">
-          <Image src="../assets/logo.svg" size="tiny" /> {this.props.title}
+          <Image src="../assets/logo.svg" size="tiny" />
+          {this.props.title}
         </Header>
       </div>
     );

@@ -61,7 +61,6 @@ export class Popup extends Component<Props, State> {
   async componentDidMount(): Promise<void> {
     const tabId = await this.getCurrentTabId();
     this.setState({ tabId });
-
     const tabData = await this.getTabData();
     this.setState({
       certificate: tabData?.certificate,

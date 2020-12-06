@@ -1,37 +1,68 @@
+import { deepMock, MockzillaDeep } from "mockzilla";
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, unmountComponentAtNode } from "react-dom";
+import { act } from "react-dom/test-utils";
+import { Browser } from "webextension-polyfill-ts";
 
 import { Popup } from "./Popup";
-import { Tabs } from "webextension-polyfill-ts";
 
-function getTabs(): Promise<Tabs.Tab[]> {
-  return new Promise((resolve) => {
-    resolve();
-  });
-}
+let browser: Browser;
+let mockBrowser: MockzillaDeep<Browser>;
+let container: HTMLDivElement;
 
-function sendMessage(): Promise<unknown> {
-  return new Promise((resolve) => {
-    resolve();
-  });
-}
+beforeEach(() => {
+  [browser, mockBrowser] = deepMock<Browser>("browser", false);
+  mockBrowser.runtime.sendMessage.expect(expect.anything());
+  mockBrowser.runtime.openOptionsPage.mockAllowMethod();
+  mockBrowser.tabs.query.expect(expect.anything()).andResolve([
+    {
+      id: 1,
+      index: 0,
+      highlighted: true,
+      active: true,
+      pinned: false,
+      incognito: false,
+    },
+  ]);
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function openOptionsPage(): Promise<void> {
-  return new Promise((resolve) => {
-    resolve();
-  });
-}
+  container = document.createElement("div");
+  document.body.appendChild(container);
+});
 
-describe("<Popup />", () => {
-  test("should render correctly", async () => {
-    const { getByText } = render(
+afterEach(() => {
+  unmountComponentAtNode(container);
+  container.remove();
+});
+
+test("renders component", () => {
+  act(() => {
+    render(
       <Popup
-        getTabs={getTabs}
-        sendMessage={sendMessage}
-        openOptionsPage={openOptionsPage}
-      />
+        sendMessage={browser.runtime.sendMessage}
+        getTabs={browser.tabs.query}
+        openOptionsPage={browser.runtime.openOptionsPage}
+      />,
+      container
     );
-    expect(getByText("Chexxo")).toBeDefined();
   });
+  expect(container.hasChildNodes).toBeTruthy();
+});
+
+test("queries tabId on mount", () => {
+  act(() => {
+    render(
+      <Popup
+        sendMessage={browser.runtime.sendMessage}
+        getTabs={browser.tabs.query}
+        openOptionsPage={browser.runtime.openOptionsPage}
+      />,
+      container
+    );
+  });
+  expect(mockBrowser.tabs.query.getMockCalls().length).toBeGreaterThan(0);
+});
+
+test("queries tabData on mount", () => {
+  // TODO: implement test
+  expect(1).toBe(1);
 });
