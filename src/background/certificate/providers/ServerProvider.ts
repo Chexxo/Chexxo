@@ -4,6 +4,8 @@ import { ServerUnavailableError } from "../../../types/errors/ServerUnavailableE
 import { ErrorFactory } from "../factories/ErrorFactory";
 import { CertificateProvider } from "./CertificateProvider";
 import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
+import { UUIDFactory } from "../../../helpers/UUIDFactory";
+import { InvalidUrlError } from "../../../shared/types/errors/InvalidUrlError";
 
 export class ServerProvider implements CertificateProvider {
   static readonly defaultServerUrl =
@@ -27,7 +29,19 @@ export class ServerProvider implements CertificateProvider {
     url: string;
   }): Promise<RawCertificateResponse> {
     const url = this.cleanUrl(requestDetails.url);
-    return this.fetchCertificateFromServer(url);
+    if (url) {
+      return this.fetchCertificateFromServer(url);
+    } else {
+      return new Promise((resolve) => {
+        resolve(
+          new RawCertificateResponse(
+            UUIDFactory.uuidv4(),
+            undefined,
+            new InvalidUrlError()
+          )
+        );
+      });
+    }
   }
 
   private async fetchCertificateFromServer(
@@ -68,7 +82,7 @@ export class ServerProvider implements CertificateProvider {
 
     matches = regex.exec(url);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return matches!.groups!.url;
+    return matches?.groups?.url || "";
   }
 
   private analyzeAPIResponse(

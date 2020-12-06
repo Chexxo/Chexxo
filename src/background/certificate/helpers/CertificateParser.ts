@@ -42,9 +42,11 @@ export abstract class CertificateParser {
     const fingerprint256 = CertificateParser.getFingerprint256(fullCert.hex);
 
     const subjectAltNames: string[] = [];
-    fullCert.getExtSubjectAltName().array.forEach((element: AltNameEntry) => {
-      subjectAltNames.push(element.dns);
-    });
+    if (fullCert.getExtSubjectAltName) {
+      fullCert.getExtSubjectAltName().array.forEach((element: AltNameEntry) => {
+        subjectAltNames.push(element.dns);
+      });
+    }
 
     const issuer = CertificateParser.IssuerFromString(fullCert.getIssuer().str);
     const subject = CertificateParser.SubjectFromString(

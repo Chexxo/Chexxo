@@ -6,4 +6,11 @@ export class UnknownCertificateError extends CertificateError {
   readonly message: string =
     "The browser provided an unknown certificate error.";
   readonly publicMessage: string = this.message;
+
+  constructor(message?: string) {
+    super();
+    if (message) {
+      this.message = message;
+    }
+  }
 }

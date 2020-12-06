@@ -1,5 +1,7 @@
+import { UUIDFactory } from "../../helpers/UUIDFactory";
 import { CertificateResponse } from "../../types/certificate/CertificateResponse";
 import { Configuration } from "../../types/Configuration";
+import { UnknownCertificateError } from "../../types/errors/certificate/UnknownCertificateError";
 import { CertificateErrorAnalyzer } from "./helpers/CertificateErrorAnalyzer";
 import { CertificateParser } from "./helpers/CertificateParser";
 import { CertificateProvider } from "./providers/CertificateProvider";
@@ -24,17 +26,27 @@ export class CertificateService {
       requestDetails
     );
 
+    let certificate;
     if (rawCertificateResponse.rawCertificate !== undefined) {
-      const certificate = CertificateParser.getCertificate(
-        rawCertificateResponse.rawCertificate
-      );
+      try {
+        certificate = CertificateParser.getCertificate(
+          rawCertificateResponse.rawCertificate
+        );
+      } catch (error) {
+        throw new CertificateResponse(
+          UUIDFactory.uuidv4(),
+          undefined,
+          new UnknownCertificateError(error.message)
+        );
+      }
+
       return new CertificateResponse(
         rawCertificateResponse.requestUuid,
         certificate
       );
     }
 
-    return new CertificateResponse(
+    throw new CertificateResponse(
       rawCertificateResponse.requestUuid,
       undefined,
       rawCertificateResponse.error
