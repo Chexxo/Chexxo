@@ -9,7 +9,7 @@ import { Configuration } from "../types/Configuration";
 /**
  * Represents the different message status for the Options component
  */
-enum MessageStatus {
+enum OptionsMessageStatus {
   NONE,
   FAILURE,
   SUCCESS,
@@ -18,7 +18,7 @@ enum MessageStatus {
 /**
  * Represents the required props for the Options component
  */
-interface Props {
+interface OptionsProps {
   sendMessage: (
     message: { type: string; params?: unknown },
     options?: Runtime.SendMessageOptionsType | undefined
@@ -29,10 +29,10 @@ interface Props {
 /**
  * Represents the state object for the Options component
  */
-interface State {
+interface OptionsState {
   configuration: Configuration;
   isUrlValid: boolean;
-  messageStatus: MessageStatus;
+  messageStatus: OptionsMessageStatus;
   messageHeader: string;
   messageBody: string;
   messageTimeoutId: number;
@@ -42,12 +42,12 @@ interface State {
  * Represents the options page
  * @noInheritDoc
  */
-export class Options extends Component<Props, State> {
+export class Options extends Component<OptionsProps, OptionsState> {
   /**
    * Initializes the component's default state
    * @param props the required props for the component
    */
-  constructor(props: Props) {
+  constructor(props: OptionsProps) {
     super(props);
     this.state = {
       configuration: {
@@ -55,7 +55,7 @@ export class Options extends Component<Props, State> {
         cacheDomainQualities: false,
       },
       isUrlValid: true,
-      messageStatus: MessageStatus.NONE,
+      messageStatus: OptionsMessageStatus.NONE,
       messageHeader: "",
       messageBody: "",
       messageTimeoutId: 0,
@@ -83,7 +83,7 @@ export class Options extends Component<Props, State> {
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.FAILURE,
+        OptionsMessageStatus.FAILURE,
         "Could not get current configuration",
         typedError.message
       );
@@ -103,7 +103,7 @@ export class Options extends Component<Props, State> {
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.FAILURE,
+        OptionsMessageStatus.FAILURE,
         "Could not persist current configuration",
         typedError.message
       );
@@ -149,7 +149,7 @@ export class Options extends Component<Props, State> {
   public removeCache(): void {
     this.props.sendMessage({ type: "removeCache" });
     this.generateMessage(
-      MessageStatus.SUCCESS,
+      OptionsMessageStatus.SUCCESS,
       "Cache removed",
       "Your domain-cache has been removed successfully."
     );
@@ -180,14 +180,14 @@ export class Options extends Component<Props, State> {
       document.body.appendChild(element);
       element.click();
       this.generateMessage(
-        MessageStatus.SUCCESS,
+        OptionsMessageStatus.SUCCESS,
         "Log exported",
         "The log has been exported successfully."
       );
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.FAILURE,
+        OptionsMessageStatus.FAILURE,
         "Log could not be exported",
         typedError.message
       );
@@ -201,14 +201,14 @@ export class Options extends Component<Props, State> {
     try {
       await this.props.sendMessage({ type: "removeLogs" });
       this.generateMessage(
-        MessageStatus.SUCCESS,
+        OptionsMessageStatus.SUCCESS,
         "Log removed",
         "The log has been removed successfully."
       );
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.SUCCESS,
+        OptionsMessageStatus.SUCCESS,
         "Log could not be removed",
         typedError.message
       );
@@ -238,7 +238,7 @@ export class Options extends Component<Props, State> {
    * @param body The message's body text
    */
   private generateMessage(
-    status: MessageStatus,
+    status: OptionsMessageStatus,
     header: string,
     body: string
   ): void {
@@ -287,13 +287,13 @@ export class Options extends Component<Props, State> {
         <Divider horizontal>Logs</Divider>
         <Form.Button content="Export" fluid onClick={this.exportLogs} />
         <Form.Button content="Remove" fluid onClick={this.removeLogs} />
-        {this.state.messageStatus === MessageStatus.SUCCESS && (
+        {this.state.messageStatus === OptionsMessageStatus.SUCCESS && (
           <Message positive>
             <Message.Header>{this.state.messageHeader}</Message.Header>
             <p>{this.state.messageBody}</p>
           </Message>
         )}
-        {this.state.messageStatus === MessageStatus.FAILURE && (
+        {this.state.messageStatus === OptionsMessageStatus.FAILURE && (
           <Message negative>
             <Message.Header>{this.state.messageHeader}</Message.Header>
             <p>{this.state.messageBody}</p>

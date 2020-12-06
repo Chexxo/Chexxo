@@ -6,7 +6,7 @@ import { PageHeader } from "../components/PageHeader";
 /**
  * Represents the required props for the CertificateView component
  */
-interface Props {
+interface CertificateViewProps {
   certificate: Certificate | undefined;
 }
 
@@ -14,7 +14,7 @@ interface Props {
  * Represents the popup window's certificate view
  * @noInheritDoc
  */
-export class CertificateView extends Component<Props> {
+export class CertificateView extends Component<CertificateViewProps> {
   /**
    * Renders the CertificateView component
    * @returns the rendered CertificateView component

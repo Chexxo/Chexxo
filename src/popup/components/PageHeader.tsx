@@ -5,7 +5,7 @@ import { Button, Header, Image } from "semantic-ui-react";
 /**
  * Represents the required props for the Popup component
  */
-interface Props {
+interface PageHeaderProps {
   title: string;
   hasHomeButton: boolean;
 }
@@ -14,7 +14,7 @@ interface Props {
  * Represents the popup window's page header
  * @noInheritDoc
  */
-export class PageHeader extends Component<Props> {
+export class PageHeader extends Component<PageHeaderProps> {
   /**
    * Renders the PageHeader component
    * @returns the rendered PageHeader component

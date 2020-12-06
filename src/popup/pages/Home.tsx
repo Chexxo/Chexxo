@@ -17,7 +17,7 @@ import { PageHeader } from "../components/PageHeader";
 /**
  * Represents the required props for the Home component
  */
-interface Props {
+interface HomeProps {
   errorMessage: ErrorMessage | undefined;
   certificate: Certificate | undefined;
   quality: Quality | undefined;
@@ -28,7 +28,7 @@ interface Props {
  * Represents the popup window's home view
  * @noInheritDoc
  */
-export class Home extends Component<Props> {
+export class Home extends Component<HomeProps> {
   /**
    * Renders the Home component
    * @returns the rendered Home component

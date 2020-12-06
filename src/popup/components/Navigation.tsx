@@ -5,7 +5,7 @@ import { Menu, Icon, Popup as Tooltip } from "semantic-ui-react";
 /**
  * Represents the required props for the Navigation component
  */
-interface Props {
+interface NavigationProps {
   openOptionsPage: () => Promise<void>;
 }
 
@@ -13,12 +13,12 @@ interface Props {
  * Represents the popup window's navigation
  * @noInheritDoc
  */
-export class Navigation extends Component<Props> {
+export class Navigation extends Component<NavigationProps> {
   /**
    * Binds methods to the component's context
    * @param props the required props for the component
    */
-  constructor(props: Props) {
+  constructor(props: NavigationProps) {
     super(props);
     this.openOptionsPage = this.openOptionsPage.bind(this);
   }
