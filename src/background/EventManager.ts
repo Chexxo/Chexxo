@@ -84,6 +84,10 @@ export class EventManager {
       parentFrameId: number;
     };
 
+    if (fixedDetails.parentFrameId !== -1) {
+      return {};
+    }
+
     if (!this.isHttps(fixedDetails.url)) {
       return {};
     }
