@@ -48,9 +48,9 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   }
 
   /**
-   * Gets all persistet log entries and returns them.
+   * Gets all persisted log entries and returns them.
    *
-   * @returns all log entries persistet up until invokation.
+   * @returns all log entries persisted up until invocation.
    */
   public async getAll(): Promise<LogEntry[] | null> {
     try {
