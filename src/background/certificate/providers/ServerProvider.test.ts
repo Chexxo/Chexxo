@@ -158,31 +158,6 @@ test("handles invalid response body", () => {
   );
 });
 
-test("handles unknown object", () => {
-  global.fetch = jest.fn(() => {
-    return new Promise((resolve) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      resolve(<any>{
-        json: () => {
-          return { hello: "world" };
-        },
-      });
-    });
-  });
-  return (
-    provider
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .getCertificate(<any>{
-        url: "https://example.com",
-      })
-      .catch((data: ServerError) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(data).toBeInstanceOf(ServerError);
-        expect(data.message).toBe("Server returned invalid response.");
-      })
-  );
-});
-
 test("sunny case", () => {
   global.fetch = jest.fn(() => {
     return new Promise((resolve) => {

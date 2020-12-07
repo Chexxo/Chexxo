@@ -89,10 +89,7 @@ export class ServerProvider implements CertificateProvider {
 
     try {
       const response = await fetch(urlToFetch);
-      const apiResponse = response.json();
-      if (!(apiResponse instanceof APIResponseBody)) {
-        throw new ServerError(new Error("Server returned invalid response."));
-      }
+      const apiResponse = await response.json();
 
       const result = this.analyzeAPIResponse(apiResponse);
 
