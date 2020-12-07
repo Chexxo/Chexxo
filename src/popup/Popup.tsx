@@ -12,7 +12,7 @@ import { Home } from "./pages/Home";
 /**
  * Represents the required props for the Popup component
  */
-interface Props {
+interface PopupProps {
   getTabs: (queryInfo: Tabs.QueryQueryInfoType) => Promise<Tabs.Tab[]>;
   openOptionsPage: () => Promise<void>;
   sendMessage: (
@@ -24,7 +24,7 @@ interface Props {
 /**
  * Represents the state object for the Popup component
  */
-interface State {
+interface PopupState {
   tabId: number | undefined;
   certificate: Certificate | undefined;
   quality: Quality | undefined;
@@ -35,7 +35,7 @@ interface State {
  * Represents a browser action popup window
  * @noInheritDoc
  */
-export class Popup extends Component<Props, State> {
+export class Popup extends Component<PopupProps, PopupState> {
   private sendMessage;
   private getTabs;
 
@@ -43,7 +43,7 @@ export class Popup extends Component<Props, State> {
    * Initializes the component's default state and registers browser API methods
    * @param props the required props for the component
    */
-  constructor(props: Props) {
+  constructor(props: PopupProps) {
     super(props);
     this.sendMessage = props.sendMessage;
     this.getTabs = props.getTabs;
@@ -61,7 +61,6 @@ export class Popup extends Component<Props, State> {
   async componentDidMount(): Promise<void> {
     const tabId = await this.getCurrentTabId();
     this.setState({ tabId });
-
     const tabData = await this.getTabData();
     this.setState({
       certificate: tabData?.certificate,
@@ -71,7 +70,7 @@ export class Popup extends Component<Props, State> {
   }
 
   /**
-   * Returns the current tab's id
+   * Queries the current tab's id
    * @returns the current tab's id
    */
   private async getCurrentTabId(): Promise<number | undefined> {
@@ -83,6 +82,10 @@ export class Popup extends Component<Props, State> {
     return currentTab.id;
   }
 
+  /**
+   * Queries the current tab's {@link TabData} object
+   * @returns Either the {@link TabData} object associated with the tabId or undefined
+   */
   private async getTabData(): Promise<TabData | undefined> {
     const tabData = (await this.sendMessage({
       type: "getTabData",
@@ -92,8 +95,8 @@ export class Popup extends Component<Props, State> {
   }
 
   /**
-   * Renders the popup component
-   * @returns the rendered popup component
+   * Renders the Popup component
+   * @returns the rendered Popup component
    */
   render(): JSX.Element {
     return (

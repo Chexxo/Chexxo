@@ -55,4 +55,19 @@ module.exports = {
       version: "detect",
     },
   },
+  rules: {
+    "max-lines": ["error", {
+      "max": 300
+    }],
+    "complexity": ["error", {
+      "max": 10
+    }],
+    "max-lines-per-function": ["error", {
+      "max": 30,
+      "skipBlankLines": true
+    }],
+    "max-params": ["error",
+      5
+    ]
+  }
 };

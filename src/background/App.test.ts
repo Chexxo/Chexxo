@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 jest.mock("./certificate/providers/__mocks__/MockCertificateProvider");
 jest.mock("./certificate/CertificateService");
 jest.mock("./quality/helpers/QualityAnalyzer");
@@ -44,6 +45,7 @@ const requestUuid = "abc123";
 let windowSpy = jest.spyOn(window, "window", "get");
 const consoleSave = global.console;
 
+// eslint-disable-next-line max-lines-per-function
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   mockBrowser.storage.mockAllow();
@@ -107,6 +109,9 @@ beforeEach(() => {
 
 afterEach(() => {
   windowSpy.mockRestore();
+});
+
+afterAll(() => {
   global.console = consoleSave;
 });
 

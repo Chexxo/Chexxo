@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, { Component } from "react";
 import { Divider, Form, Label, Message } from "semantic-ui-react";
 import { Runtime } from "webextension-polyfill-ts";
@@ -6,13 +7,19 @@ import { LogEntry } from "../shared/types/logger/LogEntry";
 
 import { Configuration } from "../types/Configuration";
 
-enum MessageStatus {
+/**
+ * Represents the different message status for the Options component
+ */
+enum OptionsMessageStatus {
   NONE,
   FAILURE,
   SUCCESS,
 }
 
-interface Props {
+/**
+ * Represents the required props for the Options component
+ */
+interface OptionsProps {
   sendMessage: (
     message: { type: string; params?: unknown },
     options?: Runtime.SendMessageOptionsType | undefined
@@ -20,17 +27,28 @@ interface Props {
   hasServer: boolean;
 }
 
-interface State {
+/**
+ * Represents the state object for the Options component
+ */
+interface OptionsState {
   configuration: Configuration;
   isUrlValid: boolean;
-  messageStatus: MessageStatus;
+  messageStatus: OptionsMessageStatus;
   messageHeader: string;
   messageBody: string;
   messageTimeoutId: number;
 }
 
-export default class Options extends Component<Props, State> {
-  constructor(props: Props) {
+/**
+ * Represents the options page
+ * @noInheritDoc
+ */
+export class Options extends Component<OptionsProps, OptionsState> {
+  /**
+   * Initializes the component's default state
+   * @param props the required props for the component
+   */
+  constructor(props: OptionsProps) {
     super(props);
     this.state = {
       configuration: {
@@ -38,13 +56,16 @@ export default class Options extends Component<Props, State> {
         cacheDomainQualities: false,
       },
       isUrlValid: true,
-      messageStatus: MessageStatus.NONE,
+      messageStatus: OptionsMessageStatus.NONE,
       messageHeader: "",
       messageBody: "",
       messageTimeoutId: 0,
     };
   }
 
+  /**
+   * Binds methods to the component's context and queries the current configuration
+   */
   async componentDidMount(): Promise<void> {
     this.changeServerUrl = this.changeServerUrl.bind(this);
     this.toggleCacheDomainQualities = this.toggleCacheDomainQualities.bind(
@@ -63,13 +84,16 @@ export default class Options extends Component<Props, State> {
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.FAILURE,
+        OptionsMessageStatus.FAILURE,
         "Could not get current configuration",
         typedError.message
       );
     }
   }
 
+  /**
+   * Synchronizes the state's configuration with the stored configuration on update
+   */
   async componentDidUpdate(): Promise<void> {
     try {
       const configuration = this.state.configuration;
@@ -80,13 +104,17 @@ export default class Options extends Component<Props, State> {
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.FAILURE,
+        OptionsMessageStatus.FAILURE,
         "Could not persist current configuration",
         typedError.message
       );
     }
   }
 
+  /**
+   * Changes the state's server url
+   * @param event form input change event
+   */
   public changeServerUrl(event: React.FormEvent<HTMLInputElement>): void {
     const newValue = event.currentTarget.value;
 
@@ -103,6 +131,9 @@ export default class Options extends Component<Props, State> {
     }
   }
 
+  /**
+   * Toggles the cacheDomainQualities property in the component's state
+   */
   public toggleCacheDomainQualities(): void {
     const newValue = !this.state.configuration.cacheDomainQualities;
     this.setState((prevState) => ({
@@ -113,21 +144,26 @@ export default class Options extends Component<Props, State> {
     }));
   }
 
+  /**
+   * Sends a message for removing the stored cache to the background script
+   */
   public removeCache(): void {
     this.props.sendMessage({ type: "removeCache" });
     this.generateMessage(
-      MessageStatus.SUCCESS,
+      OptionsMessageStatus.SUCCESS,
       "Cache removed",
       "Your domain-cache has been removed successfully."
     );
   }
 
+  /**
+   * Queries the current logs and exports them to the GUI
+   */
   public async exportLogs(): Promise<void> {
     try {
       const logEntries = (await this.props.sendMessage({
         type: "exportLogs",
       })) as LogEntry[];
-      const element = document.createElement("a");
 
       let file;
       if (logEntries === null) {
@@ -136,46 +172,52 @@ export default class Options extends Component<Props, State> {
         let fileExport = "";
         for (let i = 0; i < logEntries.length; i++) {
           fileExport += LogFactory.formatLogEntry(logEntries[i]) + "\n";
-          file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
         }
+        file = new Blob([fileExport], { type: "text/plain;charset=utf-8" });
       }
-      element.href = URL.createObjectURL(file);
-      element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
-      document.body.appendChild(element);
-      element.click();
+      this.downloadFile(file);
+
       this.generateMessage(
-        MessageStatus.SUCCESS,
+        OptionsMessageStatus.SUCCESS,
         "Log exported",
         "The log has been exported successfully."
       );
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.FAILURE,
+        OptionsMessageStatus.FAILURE,
         "Log could not be exported",
         typedError.message
       );
     }
   }
 
+  /**
+   * Sends a message for removing the stored logs to the background script
+   */
   public async removeLogs(): Promise<void> {
     try {
       await this.props.sendMessage({ type: "removeLogs" });
       this.generateMessage(
-        MessageStatus.SUCCESS,
+        OptionsMessageStatus.SUCCESS,
         "Log removed",
         "The log has been removed successfully."
       );
     } catch (error) {
       const typedError = error as Error;
       this.generateMessage(
-        MessageStatus.SUCCESS,
+        OptionsMessageStatus.SUCCESS,
         "Log could not be removed",
         typedError.message
       );
     }
   }
 
+  /**
+   * Checks if the parameter is a valid http/https url
+   * @param url The url which needs to be checked
+   * @returns True if it is a valid url, false if not
+   */
   private isValidUrl(url: string): boolean {
     let validUrl;
     try {
@@ -187,7 +229,17 @@ export default class Options extends Component<Props, State> {
     return validUrl.protocol === "http:" || validUrl.protocol === "https:";
   }
 
-  private generateMessage(status: MessageStatus, header: string, body: string) {
+  /**
+   * Updates the state with a new message
+   * @param status The message's status
+   * @param header The message's header text
+   * @param body The message's body text
+   */
+  private generateMessage(
+    status: OptionsMessageStatus,
+    header: string,
+    body: string
+  ): void {
     this.setState({
       messageStatus: status,
       messageHeader: header,
@@ -195,6 +247,23 @@ export default class Options extends Component<Props, State> {
     });
   }
 
+  /**
+   * Makes a file available to be downloaded in the GUI
+   * @param file The file to be downloaded
+   */
+  private downloadFile(file: Blob) {
+    const element = document.createElement("a");
+    element.href = URL.createObjectURL(file);
+    element.download = `ChexxoLog_${Math.floor(Date.now() / 1000)}.txt`;
+    document.body.appendChild(element);
+    element.click();
+  }
+
+  /**
+   * Renders the Options component
+   * @returns the rendered Options component
+   */
+  // eslint-disable-next-line max-lines-per-function
   render(): JSX.Element {
     return (
       <Form style={{ padding: "0.5rem" }}>
@@ -229,13 +298,13 @@ export default class Options extends Component<Props, State> {
         <Divider horizontal>Logs</Divider>
         <Form.Button content="Export" fluid onClick={this.exportLogs} />
         <Form.Button content="Remove" fluid onClick={this.removeLogs} />
-        {this.state.messageStatus === MessageStatus.SUCCESS && (
+        {this.state.messageStatus === OptionsMessageStatus.SUCCESS && (
           <Message positive>
             <Message.Header>{this.state.messageHeader}</Message.Header>
             <p>{this.state.messageBody}</p>
           </Message>
         )}
-        {this.state.messageStatus === MessageStatus.FAILURE && (
+        {this.state.messageStatus === OptionsMessageStatus.FAILURE && (
           <Message negative>
             <Message.Header>{this.state.messageHeader}</Message.Header>
             <p>{this.state.messageBody}</p>

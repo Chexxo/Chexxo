@@ -15,6 +15,7 @@ let securityInfo: WebRequest.SecurityInfo;
 
 let windowSpy = jest.spyOn(window, "window", "get");
 
+// eslint-disable-next-line max-lines-per-function
 beforeEach(() => {
   requestId = "1";
 

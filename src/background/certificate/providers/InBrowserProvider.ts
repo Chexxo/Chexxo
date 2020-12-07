@@ -6,6 +6,11 @@ import { CertificateFactory } from "../factories/RawCertificateFactory";
 import { CertificateProvider } from "./CertificateProvider";
 import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 
+/**
+ * Class to get the certificate of a given domain. This
+ * is done by analyzing the security details given by
+ * the browser.
+ */
 export class InBrowserProvider implements CertificateProvider {
   constructor(
     private getSecurityInfo: (

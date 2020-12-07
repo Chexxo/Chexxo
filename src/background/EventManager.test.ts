@@ -31,6 +31,7 @@ let app: App;
 let eventManager: EventManager;
 let logger: InBrowserLogger;
 
+// eslint-disable-next-line max-lines-per-function
 beforeEach(() => {
   [browser, mockBrowser] = deepMock<Browser>("browser", false);
   mockBrowser.storage.mockAllow();

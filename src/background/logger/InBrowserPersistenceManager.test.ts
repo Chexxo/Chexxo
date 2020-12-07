@@ -1,8 +1,10 @@
+/* eslint-disable max-lines */
 import { LogLevel } from "../../shared/logger/Logger";
 import { LogEntry } from "../../shared/types/logger/LogEntry";
 import { InBrowserPersistenceManager } from "./InBrowserPersistenceManager";
 import { Storage } from "webextension-polyfill-ts";
 import { ConnectionRefusedError } from "../../shared/types/errors/ConnectionRefusedError";
+import { StorageError } from "../../types/errors/StorageError";
 
 const millisecondsADay = 86_400_000;
 const logDays = InBrowserPersistenceManager["logDays"];
@@ -49,6 +51,8 @@ beforeAll(() => {
 let persistence: InBrowserPersistenceManager;
 
 let windowSpy = jest.spyOn(window, "window", "get");
+
+// eslint-disable-next-line max-lines-per-function
 beforeEach(() => {
   jest.resetAllMocks();
   const logArray = [];
@@ -93,6 +97,7 @@ afterEach(() => {
   windowSpy.mockRestore();
 });
 
+// eslint-disable-next-line max-lines-per-function
 describe("save()", () => {
   test("Writes info to console", () => {
     return persistence.save(logEntryInfo).then(() => {
@@ -199,6 +204,7 @@ describe("save()", () => {
   });
 });
 
+// eslint-disable-next-line max-lines-per-function
 describe("logrotate()", () => {
   test("Removes old logs", () => {
     const logArray = JSON.parse(log);
@@ -266,12 +272,30 @@ describe("getAll()", () => {
       expect(data).toStrictEqual([]);
     });
   });
+
+  test("Returns storage error if get failed", () => {
+    storageArea.get = jest.fn(async () => {
+      throw Error();
+    });
+    return persistence.getAll().catch((error: StorageError) => {
+      expect(error).toBeInstanceOf(StorageError);
+    });
+  });
 });
 
-describe("deleteAll()", () => {
+describe("removeAll()", () => {
   test("removes all logs", () => {
     return persistence.removeAll().then(() => {
       expect(storageArea.remove).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test("Returns storage error if remove failed", () => {
+    storageArea.remove = jest.fn(async () => {
+      throw Error();
+    });
+    return persistence.removeAll().catch((error: StorageError) => {
+      expect(error).toBeInstanceOf(StorageError);
     });
   });
 });

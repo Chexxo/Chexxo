@@ -2,20 +2,38 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, Icon, Popup as Tooltip } from "semantic-ui-react";
 
-interface Props {
+/**
+ * Represents the required props for the Navigation component
+ */
+interface NavigationProps {
   openOptionsPage: () => Promise<void>;
 }
 
-export class Navigation extends Component<Props> {
-  constructor(props: Props) {
+/**
+ * Represents the popup window's navigation
+ * @noInheritDoc
+ */
+export class Navigation extends Component<NavigationProps> {
+  /**
+   * Binds methods to the component's context
+   * @param props the required props for the component
+   */
+  constructor(props: NavigationProps) {
     super(props);
     this.openOptionsPage = this.openOptionsPage.bind(this);
   }
 
+  /**
+   * Opens the browser extensions options page
+   */
   openOptionsPage(): void {
     this.props.openOptionsPage();
   }
 
+  /**
+   * Renders the Navigation component
+   * @returns the rendered Navigation component
+   */
   render(): JSX.Element {
     return (
       <Menu compact icon>

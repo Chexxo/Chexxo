@@ -35,3 +35,9 @@ test("converts a DER certificate to PEM format", () => {
   const certificate = CertificateFactory.fromSecurityInfo(securityInfo);
   expect(certificate.pem).toMatch(regex);
 });
+
+test("returns empty string if no DER has been found", () => {
+  securityInfo.certificates[0].rawDER = undefined;
+  const certificate = CertificateFactory.fromSecurityInfo(securityInfo);
+  expect(certificate.pem).toBe("");
+});

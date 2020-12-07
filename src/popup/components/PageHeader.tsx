@@ -2,12 +2,23 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import { Button, Header, Image } from "semantic-ui-react";
 
-interface Props {
+/**
+ * Represents the required props for the Popup component
+ */
+interface PageHeaderProps {
   title: string;
   hasHomeButton: boolean;
 }
 
-export class PageHeader extends Component<Props> {
+/**
+ * Represents the popup window's page header
+ * @noInheritDoc
+ */
+export class PageHeader extends Component<PageHeaderProps> {
+  /**
+   * Renders the PageHeader component
+   * @returns the rendered PageHeader component
+   */
   render(): JSX.Element {
     return (
       <div className="header-container">
@@ -20,7 +31,8 @@ export class PageHeader extends Component<Props> {
           />
         )}
         <Header as="h2" textAlign="center">
-          <Image src="../assets/logo.svg" size="tiny" /> {this.props.title}
+          <Image src="../assets/logo.svg" size="tiny" />
+          {this.props.title}
         </Header>
       </div>
     );

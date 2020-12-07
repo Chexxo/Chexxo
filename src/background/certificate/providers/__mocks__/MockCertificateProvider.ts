@@ -5,6 +5,7 @@ import { RawCertificateResponse } from "../../../../types/certificate/RawCertifi
 import { CertificateProvider } from "../CertificateProvider";
 
 export class MockCertificateProvider implements CertificateProvider {
+  // eslint-disable-next-line max-lines-per-function
   async getCertificate(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _: WebRequest.OnHeadersReceivedDetailsType

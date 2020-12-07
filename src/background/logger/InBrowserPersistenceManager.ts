@@ -3,7 +3,11 @@ import { LogLevel } from "../../shared/logger/Logger";
 import { LoggerPersistenceManager } from "../../shared/logger/LoggerPersistenceManager";
 import { LogEntry } from "../../shared/types/logger/LogEntry";
 import { Storage } from "webextension-polyfill-ts";
+import { StorageError } from "../../types/errors/StorageError";
 
+/**
+ * Class to persist log entries within the browsers storage.
+ */
 export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   private static millisecondsADay = 86_400_000;
   private static logDays = 2;
@@ -44,28 +48,38 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
   }
 
   /**
-   * Returns all log entries currently saved inside the
-   * browser.
+   * Gets all persisted log entries and returns them.
+   *
+   * @returns all log entries persisted up until invocation.
    */
   public async getAll(): Promise<LogEntry[] | null> {
-    const storageResponse = await this.storageArea.get(["log"]);
-    if (storageResponse.log) {
-      return JSON.parse(storageResponse.log);
+    try {
+      const storageResponse = await this.storageArea.get(["log"]);
+      if (storageResponse.log) {
+        return JSON.parse(storageResponse.log);
+      }
+      return null;
+    } catch (error) {
+      throw new StorageError(error.message);
     }
-    return null;
   }
 
   /**
-   * Removes all log entries.
+   * Removes all log entries from the browsers storage.
    */
   public async removeAll(): Promise<void> {
-    await this.storageArea.remove("log");
+    try {
+      await this.storageArea.remove("log");
+    } catch (error) {
+      throw new StorageError(error.message);
+    }
   }
 
   /**
    * Writes a {@link LogEntry} to the storage
    * @param logEntry The log entry to be written.
    */
+  // eslint-disable-next-line max-lines-per-function
   private async writeLog(logEntry: LogEntry): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let storageResponse: any;
@@ -77,7 +91,8 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
           logEntry.requestUuid,
           LogLevel.WARNING,
           Date.now(),
-          "Log could not be read."
+          "Log could not be read.",
+          new StorageError()
         )
       );
       console.warn(noLogMessage);
@@ -94,7 +109,8 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
           logEntry.requestUuid,
           LogLevel.INFO,
           Date.now(),
-          "No log found. Creating new..."
+          "No log found. Creating new...",
+          new StorageError()
         )
       );
       console.log(noLogMessage);
@@ -108,7 +124,8 @@ export class InBrowserPersistenceManager implements LoggerPersistenceManager {
           logEntry.requestUuid,
           LogLevel.WARNING,
           Date.now(),
-          "Log could not be written."
+          "Log could not be written.",
+          new StorageError()
         )
       );
       console.warn(noLogMessage);

@@ -142,3 +142,34 @@ test("resets quality of provided url to unknown", async () => {
     qualityProvider.resetQuality("https://www.example.com")
   ).resolves.toEqual(undefined);
 });
+
+test("updates cache active", () => {
+  qualityProvider.updateIsCacheActive(false);
+  expect(qualityProvider["isCacheActive"]).toBe(false);
+});
+
+test("returns false on quality decreased if cache is inactive", async () => {
+  qualityProvider.updateIsCacheActive(false);
+  return qualityProvider
+    .hasQualityDecreased("https://example.com", Quality.Unknown)
+    .then((data: boolean) => {
+      expect(data).toBe(false);
+    });
+});
+
+test("does not set quality if cache is disabled", async () => {
+  qualityProvider.updateIsCacheActive(false);
+  qualityProvider["setQuality"] = jest.fn();
+  await qualityProvider.defineQuality(
+    "https://example.com",
+    Quality.DomainValidated
+  );
+  expect(qualityProvider["setQuality"]).not.toHaveBeenCalled();
+});
+
+test("does not reset quality if cache is disabled", async () => {
+  qualityProvider.updateIsCacheActive(false);
+  qualityProvider["setQuality"] = jest.fn();
+  await qualityProvider.resetQuality("https://example.com");
+  expect(qualityProvider["setQuality"]).not.toHaveBeenCalled();
+});

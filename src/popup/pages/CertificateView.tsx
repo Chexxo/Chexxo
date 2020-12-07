@@ -3,11 +3,23 @@ import { Container, Divider, Message } from "semantic-ui-react";
 import { Certificate } from "../../types/certificate/Certificate";
 import { PageHeader } from "../components/PageHeader";
 
-interface Props {
+/**
+ * Represents the required props for the CertificateView component
+ */
+interface CertificateViewProps {
   certificate: Certificate | undefined;
 }
 
-export class CertificateView extends Component<Props> {
+/**
+ * Represents the popup window's certificate view
+ * @noInheritDoc
+ */
+export class CertificateView extends Component<CertificateViewProps> {
+  /**
+   * Renders the CertificateView component
+   * @returns the rendered CertificateView component
+   */
+  // eslint-disable-next-line max-lines-per-function, complexity
   render(): JSX.Element {
     return (
       <Container textAlign="center">

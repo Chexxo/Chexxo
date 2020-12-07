@@ -14,18 +14,26 @@ import { Quality, maxQuality } from "../../types/Quality";
 import { Navigation } from "../components/Navigation";
 import { PageHeader } from "../components/PageHeader";
 
-interface Props {
+/**
+ * Represents the required props for the Home component
+ */
+interface HomeProps {
   errorMessage: ErrorMessage | undefined;
   certificate: Certificate | undefined;
   quality: Quality | undefined;
   openOptionsPage: () => Promise<void>;
 }
 
-export class Home extends Component<Props> {
-  constructor(props: Props) {
-    super(props);
-  }
-
+/**
+ * Represents the popup window's home view
+ * @noInheritDoc
+ */
+export class Home extends Component<HomeProps> {
+  /**
+   * Renders the Home component
+   * @returns the rendered Home component
+   */
+  // eslint-disable-next-line max-lines-per-function
   render(): JSX.Element {
     return (
       <Container textAlign="center">
