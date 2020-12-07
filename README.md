@@ -12,7 +12,23 @@ If the quality of a certificate decreases this is a strong indicated that someth
 - The extension blocks requests to domains from which the quality has decreased. This blocking behaviour can be activated and deactivated in the extension settings.
 
 ## Screenshots
-Coming soon
+### Quality view
+![Home](store/assets/firefox/home.png)
+
+### Certificate view
+![Certificate View](store/assets/firefox/certificate.png)
+
+### Certificate qualities
+![Certificate Qualitites](store/assets/firefox/qualities.png)
+
+### Blocked view 
+![Blocked view](store/assets/firefox/blocked.png)
+
+### Settings Firefox 
+![Settings view](store/assets/firefox/settings.png)
+
+### Settings Chromium 
+![Settings view](store/assets/chrome/settings.png)
 
 ## Certificate Qualities
 ### Domain validated
@@ -36,9 +52,10 @@ In terms of coding rules please use the tooling provided and make sure `prettier
 ### Tooling
 The following tools are used for developing this extension:
 
+- **Typescript** as language
+- **React** as GUI-Framework
 - **Eslint** for linting and finding problems like unused variables or long methods.
 - **Prettier** for formating
-- **Typescript** as language
 - **Webpack** for packaging
 - **Jest** for testing
 - **Typedoc(TsDoc)** for documentation
