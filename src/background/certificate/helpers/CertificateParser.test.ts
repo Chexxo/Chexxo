@@ -23,6 +23,16 @@ test("returns distinguished name from string", () => {
   expect(result.commonName).toBe("My User");
 });
 
+test("returns distinguished name from string with empties", () => {
+  const result = CertificateParser["DistinguishedNameFromString"]("CN=My User");
+  expect(result.commonName).toBe("My User");
+});
+
+test("returns distinguished name from string with other empties", () => {
+  const result = CertificateParser["DistinguishedNameFromString"]("O=My Org");
+  expect(result.organization).toBe("My Org");
+});
+
 // eslint-disable-next-line max-lines-per-function
 test("converts rawCert to certificate", () => {
   const raw = new RawCertificate(
@@ -74,4 +84,26 @@ test("converts rawCert to certificate", () => {
   );
   const result = CertificateParser.getCertificate(raw);
   expect(result.subject.commonName).toBe("digicert.com");
+});
+
+test("converts rawCert without policies and altnames to certificate", () => {
+  const raw = new RawCertificate(
+    "-----BEGIN CERTIFICATE-----" +
+      "MIICZjCCAc+gAwIBAgIUXZbL01c2twhJPaE1saXiI5+W+7kwDQYJKoZIhvcNAQEL" +
+      "BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM" +
+      "GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yMDEyMDcxMDQ1NDFaFw0yMTEy" +
+      "MDcxMDQ1NDFaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw" +
+      "HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwgZ8wDQYJKoZIhvcNAQEB" +
+      "BQADgY0AMIGJAoGBAK28KMh5TsuBAhaE5DIx4CJyy6fIGKmUcWoKrfbYfpIiRqqb" +
+      "SACZhPxlaaRQ07yeq+zmExeNd9B5MZsSkpsLXLun7h3yAnJDfUnoVF5xcv0l3MgZ" +
+      "IzV16Y8oCwN1xmPUQd73aFJUTx5KRQVSm3J6QhWogvbZZdU2Cviv3HWg4AY/AgMB" +
+      "AAGjUzBRMB0GA1UdDgQWBBQdzaKaHgdtzl1r6zphw93X4daQ8jAfBgNVHSMEGDAW" +
+      "gBQdzaKaHgdtzl1r6zphw93X4daQ8jAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3" +
+      "DQEBCwUAA4GBAHk2ouRfG5TRFAdxCJMFC7+rVt24he0tUXoA9z/Y4c/p8Y8qMyWI" +
+      "/H+LVocI5fHTuqpuxKptPR5O72HUu250CIY32BpnvjGd+vNF4SVALFmekaZk4rqf" +
+      "BTpc3riIHmEiO5bD/3XRgTDzvu/mbmNT4RKiJZzw7O7zOhgZo/5sF5Zl" +
+      "-----END CERTIFICATE-----"
+  );
+  const result = CertificateParser.getCertificate(raw);
+  expect(result.subject.commonName).toBe("");
 });

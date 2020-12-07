@@ -1,9 +1,9 @@
+/* eslint-disable max-lines */
 import { LogLevel } from "../../shared/logger/Logger";
 import { LogEntry } from "../../shared/types/logger/LogEntry";
 import { InBrowserPersistenceManager } from "./InBrowserPersistenceManager";
 import { Storage } from "webextension-polyfill-ts";
 import { ConnectionRefusedError } from "../../shared/types/errors/ConnectionRefusedError";
-import { ServerError } from "../../shared/types/errors/ServerError";
 import { StorageError } from "../../types/errors/StorageError";
 
 const millisecondsADay = 86_400_000;

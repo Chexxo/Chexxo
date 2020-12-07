@@ -1,6 +1,5 @@
 import { deepMock, MockzillaDeep } from "mockzilla";
 import { Browser } from "webextension-polyfill-ts";
-import { ServerError } from "../shared/types/errors/ServerError";
 import { Configuration } from "../types/Configuration";
 import { Configurator } from "./Configurator";
 

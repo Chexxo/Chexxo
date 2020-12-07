@@ -5,14 +5,6 @@ import { DistinguishedName } from "../../../types/certificate/DistinguishedName"
 import { Issuer } from "../../../types/certificate/Issuer";
 import { Subject } from "../../../types/certificate/Subject";
 
-class AltNameEntry {
-  readonly dns: string = "";
-}
-
-class CertificatePolicyEntry {
-  readonly policyoid: string = "";
-}
-
 export abstract class CertificateParser {
   // eslint-disable-next-line max-lines-per-function
   public static getCertificate(rawCert: RawCertificate): Certificate {
@@ -30,7 +22,7 @@ export abstract class CertificateParser {
     const certificatePolicies: string[] = [];
     if (certificatePoliciesTemp !== undefined) {
       certificatePoliciesTemp.array.forEach(
-        (element: CertificatePolicyEntry) => {
+        (element: { policyoid: string }) => {
           certificatePolicies.push(element.policyoid);
         }
       );
@@ -44,9 +36,11 @@ export abstract class CertificateParser {
 
     const subjectAltNames: string[] = [];
     if (fullCert.getExtSubjectAltName()) {
-      fullCert.getExtSubjectAltName().array.forEach((element: AltNameEntry) => {
-        subjectAltNames.push(element.dns);
-      });
+      fullCert
+        .getExtSubjectAltName()
+        .array.forEach((element: { dns: string }) => {
+          subjectAltNames.push(element.dns);
+        });
     }
 
     const issuer = CertificateParser.IssuerFromString(fullCert.getIssuer().str);
