@@ -3,6 +3,8 @@ import { LogEntry } from "../../shared/types/logger/LogEntry";
 import { InBrowserPersistenceManager } from "./InBrowserPersistenceManager";
 import { Storage } from "webextension-polyfill-ts";
 import { ConnectionRefusedError } from "../../shared/types/errors/ConnectionRefusedError";
+import { ServerError } from "../../shared/types/errors/ServerError";
+import { StorageError } from "../../types/errors/StorageError";
 
 const millisecondsADay = 86_400_000;
 const logDays = InBrowserPersistenceManager["logDays"];
@@ -270,12 +272,30 @@ describe("getAll()", () => {
       expect(data).toStrictEqual([]);
     });
   });
+
+  test("Returns storage error if get failed", () => {
+    storageArea.get = jest.fn(async () => {
+      throw Error();
+    });
+    return persistence.getAll().catch((error: StorageError) => {
+      expect(error).toBeInstanceOf(StorageError);
+    });
+  });
 });
 
-describe("deleteAll()", () => {
+describe("removeAll()", () => {
   test("removes all logs", () => {
     return persistence.removeAll().then(() => {
       expect(storageArea.remove).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test("Returns storage error if remove failed", () => {
+    storageArea.remove = jest.fn(async () => {
+      throw Error();
+    });
+    return persistence.removeAll().catch((error: StorageError) => {
+      expect(error).toBeInstanceOf(StorageError);
     });
   });
 });

@@ -1,5 +1,6 @@
 import { deepMock, MockzillaDeep } from "mockzilla";
 import { Browser } from "webextension-polyfill-ts";
+import { ServerError } from "../shared/types/errors/ServerError";
 import { Configuration } from "../types/Configuration";
 import { Configurator } from "./Configurator";
 
@@ -32,6 +33,14 @@ test("retrieves default configuration when no configuration defined", async () =
   );
 });
 
+test("retrieves default configuration when no storage area defined", async () => {
+  configurator["storageArea"] = undefined;
+
+  await expect(configurator.getConfiguration()).resolves.toEqual(
+    configurator["defaultConfiguration"]
+  );
+});
+
 test("throws error when storage get operation failed", async () => {
   mockBrowser.storage.local.get
     .expect(expect.anything())
@@ -44,6 +53,17 @@ test("sets provided configuration", async () => {
   const configuration = new Configuration("http://localhost:3000", false);
 
   mockBrowser.storage.local.set.expect({ configuration }).andResolve();
+  await expect(configurator.setConfiguration(configuration)).resolves.toEqual(
+    undefined
+  );
+});
+
+test("sets nothing if storage area undefined", async () => {
+  const configuration = new Configuration("http://localhost:3000", false);
+  configurator["storageArea"] = undefined;
+
+  mockBrowser.storage.local.set.expect({ configuration }).andResolve();
+
   await expect(configurator.setConfiguration(configuration)).resolves.toEqual(
     undefined
   );
@@ -82,4 +102,19 @@ test("listeners are called when configuration changes", async () => {
   );
 
   expect(testListener).toHaveBeenCalled();
+});
+
+test("listeners are not called when configuration did not change", async () => {
+  mockBrowser.storage.local.get.expect(expect.anything()).andResolve({});
+
+  const testListener = jest.fn((configuration: Configuration) => {
+    expect(configuration).toBeDefined();
+  });
+  configurator.addListener(testListener);
+
+  let storageChangeListener = mockBrowser.storage.onChanged.addListener.getMockCalls()[0][0];
+  storageChangeListener = storageChangeListener.bind(configurator);
+  await storageChangeListener({}, "local");
+
+  expect(testListener).not.toHaveBeenCalled();
 });

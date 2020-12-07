@@ -20,7 +20,7 @@ export class Configurator {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let storedData: { [s: string]: any } | undefined = undefined;
     try {
-      storedData = await await this.storageArea?.get(["configuration"]);
+      storedData = await this.storageArea?.get(["configuration"]);
     } catch (error) {
       throw new StorageError();
     }
