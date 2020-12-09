@@ -7,7 +7,7 @@ The extension differentiates three types of qualities as defined by the CA/Brows
 If the quality of a certificate decreases this is a strong indicated that something fishy is going on which is why we developed this extension in order to allow users to react to such a change.
 
 ## Features
-- The certificate quality according to the ones specified by CA/Browser Forum is made visibile by the extension-
+- The certificate quality according to the ones specified by CA/Browser Forum is made visibile by the extension.
 - Details of the certificate can be shown by navigating to the certificate view inside the extension.
 - The extension blocks requests to domains from which the quality has decreased. This blocking behaviour can be activated and deactivated in the extension settings.
 
@@ -32,7 +32,7 @@ If the quality of a certificate decreases this is a strong indicated that someth
 
 ## Certificate Qualities
 ### Domain validated
-If a server maintainer wants to gain a `domain validated` certificate all he has to do is prove that he owns the domain. This may be done by some sort of [challenge](https://letsencrypt.org/docs/challenge-types/). The best known provider of such certificates is `Let's Encrypt`. This type of certificate is also the one most used in phising and malware attacks. Almost all such attacks use this certficate type.
+If a server maintainer wants to gain a `domain validated` certificate all he has to do is prove that he owns the domain. This may be done by some sort of [challenge](https://letsencrypt.org/docs/challenge-types/). The best known provider of such certificates is `Let's Encrypt`. This type of certificate is also the one most used in phishing and malware attacks. Almost all such attacks use this certficate type.
 
 ### Organization validated
 In order to gain a certificate with the quality `organization validated` a server maintainer has to prove that he has the right to obtain such a certificate in the name of the company he claims to belong to. The certificate authority which creates the certificate will verify that the information regarding the company is correct. Additional verified company information is included into the certificate.

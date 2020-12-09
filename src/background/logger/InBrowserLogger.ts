@@ -11,11 +11,11 @@ export class InBrowserLogger extends Logger {
   }
 
   /**
-   * Gets all persistet log entries and
+   * Gets all persisted log entries and
    * returns them.
    *
-   * @returns all log entries persistet up
-   * until invokation.
+   * @returns all log entries persisted up
+   * until invocation.
    */
   public async getAll(): Promise<LogEntry[] | null> {
     return this.persistence.getAll();
