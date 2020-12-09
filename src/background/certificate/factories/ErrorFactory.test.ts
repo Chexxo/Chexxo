@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { APIResponse } from "../../../shared/types/api/APIResponse";
 import { APIResponseError } from "../../../shared/types/api/APIResponseError";
 import { ConnectionRefusedError } from "../../../shared/types/errors/ConnectionRefusedError";
 import { HostUnreachableError } from "../../../shared/types/errors/HostUnreachableError";
