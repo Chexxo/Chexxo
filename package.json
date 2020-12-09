@@ -1,6 +1,6 @@
 {
   "name": "chexxo",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Browser extension that allows users to see the certificate quality of websites.",
   "author": "Carlo Kirchmeier, Yannick Vogt",
   "license": "MIT",

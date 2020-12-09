@@ -1,3 +1,12 @@
+/* eslint-disable max-lines-per-function */
+import { APIResponse } from "../../../shared/types/api/APIResponse";
+import { APIResponseError } from "../../../shared/types/api/APIResponseError";
+import { ConnectionRefusedError } from "../../../shared/types/errors/ConnectionRefusedError";
+import { HostUnreachableError } from "../../../shared/types/errors/HostUnreachableError";
+import { InvalidResponseError } from "../../../shared/types/errors/InvalidResponseError";
+import { InvalidUrlError } from "../../../shared/types/errors/InvalidUrlError";
+import { NoHostError } from "../../../shared/types/errors/NoHostError";
+import { ServerError } from "../../../shared/types/errors/ServerError";
 import { ExpiredError } from "../../../types/errors/certificate/ExpiredError";
 import { InvalidDomainError } from "../../../types/errors/certificate/InvalidDomainError";
 import { RevokedError } from "../../../types/errors/certificate/RevokedError";
@@ -86,4 +95,47 @@ test("returns UnknownError when an unhandled code is provided", () => {
   expect(ErrorFactory.fromBrowserErrorCode("")).toBeInstanceOf(
     UnknownCertificateError
   );
+});
+
+describe("fromErrorDto", () => {
+  test("returns connection refused error", () => {
+    const error = new APIResponseError(501, "Test");
+    expect(ErrorFactory.fromErrorDto(error)).toBeInstanceOf(
+      ConnectionRefusedError
+    );
+  });
+
+  test("returns invalid response error", () => {
+    const error = new APIResponseError(502, "Test");
+    expect(ErrorFactory.fromErrorDto(error)).toBeInstanceOf(
+      InvalidResponseError
+    );
+  });
+
+  test("returns no host error", () => {
+    const error = new APIResponseError(503, "Test");
+    expect(ErrorFactory.fromErrorDto(error)).toBeInstanceOf(NoHostError);
+  });
+
+  test("returns host unreachable error", () => {
+    const error = new APIResponseError(504, "Test");
+    expect(ErrorFactory.fromErrorDto(error)).toBeInstanceOf(
+      HostUnreachableError
+    );
+  });
+
+  test("returns invalid url error", () => {
+    const error = new APIResponseError(505, "Test");
+    expect(ErrorFactory.fromErrorDto(error)).toBeInstanceOf(InvalidUrlError);
+  });
+
+  test("returns server error", () => {
+    const error = new APIResponseError(500, "Test");
+    expect(ErrorFactory.fromErrorDto(error)).toBeInstanceOf(ServerError);
+  });
+
+  test("returns server error on unknown code", () => {
+    const error = new APIResponseError(0, "Test");
+    expect(ErrorFactory.fromErrorDto(error)).toBeInstanceOf(ServerError);
+  });
 });
