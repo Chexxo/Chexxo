@@ -50,8 +50,8 @@ test("updates provider configuration if server provider", () => {
 });
 
 test("does not update provider configuration if in browser provider", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     certificateService.updateConfiguration(<any>{});
   }).not.toThrow();
 });
