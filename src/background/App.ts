@@ -52,11 +52,9 @@ export class App {
       const certificateResponse = await this.certificateService.getCertificate(
         requestDetails
       );
-      tabData.certificate = certificateResponse.certificate;
-
-      if (tabData.certificate) {
-        tabData.quality = this.qualityService.getQuality(tabData.certificate);
-      }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      tabData.certificate = certificateResponse.certificate!;
+      tabData.quality = this.qualityService.getQuality(tabData.certificate);
 
       this.logger.log(
         certificateResponse.requestUuid,
