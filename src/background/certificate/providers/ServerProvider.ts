@@ -15,8 +15,8 @@ import { InvalidUrlError } from "../../../shared/types/errors/InvalidUrlError";
  */
 export class ServerProvider implements CertificateProvider {
   /**
-   * The default url which will be taken. This server is
-   * maintained by Chexxo.
+   * The default url which will be used as api baseurl.
+   * This server is maintained by Chexxo.
    */
   private static defaultServerUrl =
     "https://cmsrvsfj03.execute-api.eu-central-1.amazonaws.com/";
@@ -51,6 +51,14 @@ export class ServerProvider implements CertificateProvider {
     }
   }
 
+  /**
+   * Gets the certificate of the domain specified within the
+   * request details. This is done by fetching it from the
+   * defined chexxo api.
+   *
+   * @param requestDetails The details of the browser request which
+   * lead to this invocation.
+   */
   public getCertificate(requestDetails: {
     url: string;
   }): Promise<RawCertificateResponse> {
