@@ -1,7 +1,8 @@
 import { CertificateError } from "./CertificateError";
 
 /**
- * If a certificate is not valid for the requested domain this error gets thrown.
+ * If a certificate is not valid for the requested domain this error gets
+ * thrown.
  */
 export class InvalidDomainError extends CertificateError {
   readonly name: string = "Certificate invalid host exception";

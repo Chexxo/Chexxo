@@ -1,5 +1,10 @@
 import { CodedError } from "../../shared/types/errors/CodedError";
 
+/**
+ * This error gets thrown if no more specific error could
+ * be identified. This error therefore repsresents an
+ * unhandled error.
+ */
 export class UnknownError extends CodedError {
   readonly code: number = 800;
   readonly name: string = "Unknown Error";
