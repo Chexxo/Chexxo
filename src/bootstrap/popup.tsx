@@ -5,6 +5,9 @@ import { browser } from "webextension-polyfill-ts";
 import "../popup/Popup.scss";
 import { Popup } from "../popup/Popup";
 
+/**
+ * Represents the extensions popup.
+ */
 ReactDOM.render(
   <Popup
     getTabs={browser.tabs.query}

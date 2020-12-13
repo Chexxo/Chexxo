@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   BrowserAction,
   Runtime,
@@ -13,6 +14,10 @@ import { Quality } from "../types/Quality";
 
 import { App } from "./App";
 
+/**
+ * Class which is responsible for detecting and handling browser api
+ * events.
+ */
 export class EventManager {
   // eslint-disable-next-line max-params
   constructor(
@@ -24,6 +29,10 @@ export class EventManager {
     private webRequest?: WebRequest.Static
   ) {}
 
+  /**
+   * Initializes the class by registering the needed callbacks within the
+   * browsers api.
+   */
   public init(): void {
     this.webNavigation.onBeforeNavigate.addListener(this.resetTab.bind(this));
 
@@ -53,6 +62,14 @@ export class EventManager {
     this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
   }
 
+  /**
+   * Resets the cached tab information for the tab specified within
+   * the request details if the tab is a primary tab and the
+   * connection was made with https.
+   *
+   * @param requestDetails The details of the request which lead
+   * to this invocation.
+   */
   public resetTab(requestDetails: {
     url: string;
     tabId: number;
@@ -67,6 +84,19 @@ export class EventManager {
     }
   }
 
+  /**
+   * Fetches the certificate for the tab provided within
+   * the request details given that the tab is a primary
+   * tab and the connection was made with https. This
+   * function also cancels the connection construction
+   * if the quality has decreased since the users last
+   * visit to the domain in question. If the quality has
+   * indeed decreased a redirect will be made to the
+   * extensions blocking view.
+   *
+   * @param requestDetails The details of the request which lead
+   * to this invocation.
+   */
   public async receiveWebRequestHeaders(requestDetails: {
     url: string;
     tabId: number;
@@ -102,6 +132,13 @@ export class EventManager {
     return {};
   }
 
+  /**
+   * Callback for errors which occured within the browsers api. Errors
+   * like expired certificates are handled by this function which will
+   * then set the correct errors within the extension.
+   *
+   * @param requestDetails The request which lead to the error.
+   */
   public receiveWebNavigationError(
     requestDetails: WebNavigation.OnErrorOccurredDetailsType
   ): void {
@@ -127,6 +164,13 @@ export class EventManager {
     this.changeBrowserAction(requestDetails);
   }
 
+  /**
+   * Handles messages from the extensions popup and returns an
+   * appropriate answers.
+   *
+   * @param message The message which was sent by the extensions
+   * popup.
+   */
   // eslint-disable-next-line max-lines-per-function
   public receiveMessage(message: {
     type: string;
@@ -186,6 +230,16 @@ export class EventManager {
     });
   }
 
+  /**
+   * Sets the extensions icon according to the information provided
+   * within the request details. If an error occured the icon will
+   * be set to represent that an error occured. If no error occured
+   * the icon will be set to respresent the quality which was
+   * evaluated for the given tab.
+   *
+   * @param requestDetails The details of the request which lead
+   * to this invocation.
+   */
   public changeBrowserAction(requestDetails: {
     url: string;
     tabId: number;
@@ -217,6 +271,13 @@ export class EventManager {
     }
   }
 
+  /**
+   * Sets the extensions icon to represent that an error
+   * occured.
+   *
+   * @param tabId The id of the tab in which an error
+   * occured.
+   */
   private setErrorIcon(tabId: number) {
     this.browserAction.setIcon({
       tabId,
@@ -229,6 +290,14 @@ export class EventManager {
     this.browserAction.setBadgeText({ tabId, text: "!" });
   }
 
+  /**
+   * Sets the extensions icon to represent the given quality.
+   *
+   * @param tabId The id of the tab of which the icon should
+   * be adjusted.
+   * @param quality Te quality which should be represented by
+   * the icon.
+   */
   private setQualityIcon(tabId: number, quality?: Quality) {
     this.browserAction.setIcon({ tabId, path: "../assets/logo.svg" });
     this.browserAction.setBadgeBackgroundColor({ tabId, color: "#1976d2" });
@@ -241,6 +310,11 @@ export class EventManager {
     }
   }
 
+  /**
+   * Checks if the given url is using the https protocol.
+   *
+   * @param url The url to be checked.
+   */
   private isHttps(url: string): boolean {
     const realUrl = new URL(url);
     return realUrl.protocol === "https:";

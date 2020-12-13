@@ -5,6 +5,9 @@ import "../../options/Options.scss";
 import { Options } from "../../options/Options";
 import { browser } from "webextension-polyfill-ts";
 
+/**
+ * The options page for the chromium version of the extension.
+ */
 ReactDOM.render(
   <Options sendMessage={browser.runtime.sendMessage} hasServer={true} />,
   document.getElementById("options")
