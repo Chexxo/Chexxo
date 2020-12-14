@@ -139,9 +139,11 @@ export class EventManager {
    *
    * @param requestDetails The request which lead to the error.
    */
-  public receiveWebNavigationError(
-    requestDetails: WebNavigation.OnErrorOccurredDetailsType
-  ): void {
+  public receiveWebNavigationError(requestDetails: {
+    url: string;
+    tabId: number;
+    frameId: number;
+  }): void {
     /*
       has to be asserted twice, because 'webextension-polyfill-ts' has declared 
       OnErrorOccuredDetailsType incorrectly
@@ -188,7 +190,7 @@ export class EventManager {
         case "resetQuality":
           params = message.params as { url: string };
           this.app.resetQuality(params.url);
-          resolve();
+          resolve(undefined);
           break;
         case "getConfiguration":
           try {
@@ -202,7 +204,7 @@ export class EventManager {
           params = message.params as { configuration: Configuration };
           try {
             this.app.setConfiguration(params.configuration);
-            resolve();
+            resolve(undefined);
           } catch (error) {
             reject(error as Error);
           }
