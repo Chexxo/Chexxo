@@ -1,5 +1,9 @@
 import { CodedError } from "../../shared/types/errors/CodedError";
 
+/**
+ * If a message was received which could not be handled this
+ * error gets thrown.
+ */
 export class UnhandledMessageError extends CodedError {
   readonly code: number = 803;
   readonly name: string = "UnhandledMessageError";

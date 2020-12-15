@@ -1,3 +1,7 @@
+/**
+ * Enum respresenting the differnt quality types of a
+ * certificate.
+ */
 export const Quality = {
   Unknown: {
     key: "?",

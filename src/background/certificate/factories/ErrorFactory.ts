@@ -13,7 +13,16 @@ import { UnknownCertificateError } from "../../../types/errors/certificate/Unkno
 import { UntrustedRootError } from "../../../types/errors/certificate/UntrustedRootError";
 import { InvalidResponseErrorFactory } from "../../error/factories/InvalidResponseErrorFactory";
 
+/**
+ * Class to convert different objects into well defined errors.
+ */
 export abstract class ErrorFactory {
+  /**
+   * Converts a {@link APIResponseError} into a server
+   * {@link CodedError}.
+   *
+   * @param error The api error to be converted.
+   */
   public static fromErrorDto(error: APIResponseError): CodedError {
     const code = error.code;
 
@@ -34,6 +43,12 @@ export abstract class ErrorFactory {
     }
   }
 
+  /**
+   * Converts a browser error code into a certificate
+   * {@link CodedError}.
+   *
+   * @param code The code to be analysed and converted.
+   */
   public static fromBrowserErrorCode(code: string): Error {
     switch (code) {
       case "Error code 2153390067":

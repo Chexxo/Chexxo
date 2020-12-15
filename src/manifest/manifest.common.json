@@ -3,17 +3,17 @@
   "name": "Chexxo",
   "short_name": "Chexxo",
   "description": "Browser extension that allows users to see the certificate quality of websites.",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": "Chexxo",
   "homepage_url": "https://github.com/Chexxo",
 
   "icons": {
-    "16": "./assets/logo.svg",
-    "19": "./assets/logo.svg",
-    "38": "./assets/logo.svg",
-    "48": "./assets/logo.svg",
-    "96": "./assets/logo.svg",
-    "128": "./assets/logo.svg"
+    "16": "./assets/logo16.png",
+    "19": "./assets/logo19.png",
+    "38": "./assets/logo38.png",
+    "48": "./assets/logo48.png",
+    "96": "./assets/logo96.png",
+    "128": "./assets/logo128.png"
   },
 
   "content_security_policy": "script-src 'self'; object-src 'self';",
@@ -22,8 +22,8 @@
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "19": "./assets/logo.svg",
-      "38": "./assets/logo.svg"
+      "19": "./assets/logo19.png",
+      "38": "./assets/logo38.png"
     }
   },
 

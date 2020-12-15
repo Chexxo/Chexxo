@@ -1,3 +1,7 @@
+/**
+ * Class respresenting the distinguished name
+ * of a certificate.
+ */
 export class DistinguishedName {
   // eslint-disable-next-line max-params
   constructor(

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2020-12-15
+### Added
+- More unit tests.
+- Better and more typedoc documentation.
+
 ## [0.6.0] - 2020-12-07
 ### Added
 - Information regarding the different certificate qualities.

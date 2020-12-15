@@ -19,6 +19,14 @@ export class InBrowserProvider implements CertificateProvider {
     ) => Promise<WebRequest.SecurityInfo>
   ) {}
 
+  /**
+   * Gets the certificate of the domain specified within the
+   * request details. This is done by reading the
+   * securityInfo provided by the browser.
+   *
+   * @param requestDetails The details of the browser request which
+   * lead to this invocation.
+   */
   public async getCertificate(requestDetails: {
     url: string;
     requestId: string;

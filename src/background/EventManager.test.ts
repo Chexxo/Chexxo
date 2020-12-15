@@ -1,10 +1,8 @@
-jest.mock("./certificate/providers/__mocks__/MockCertificateProvider");
-jest.mock("./certificate/CertificateService.ts");
-jest.mock("./quality/helpers/QualityAnalyzer");
+/* eslint-disable max-lines */
 jest.mock("./App");
 
 import { deepMock, MockzillaDeep } from "mockzilla";
-import { Browser, Runtime } from "webextension-polyfill-ts";
+import { Browser } from "webextension-polyfill-ts";
 
 import { ErrorMessage } from "../types/errors/ErrorMessage";
 import { UnhandledMessageError } from "../types/errors/UnhandledMessageError";
@@ -19,6 +17,8 @@ import { Configurator } from "../helpers/Configurator";
 import { InBrowserPersistenceManager } from "./logger/InBrowserPersistenceManager";
 import { InBrowserLogger } from "./logger/InBrowserLogger";
 import { TabData } from "../types/TabData";
+import { Configuration } from "../types/Configuration";
+import { Quality } from "../types/Quality";
 
 let browser: Browser;
 let mockBrowser: MockzillaDeep<Browser>;
@@ -60,7 +60,6 @@ beforeEach(() => {
     new InBrowserPersistenceManager(browser.storage.local)
   );
   app = new App(certificateService, qualityService, configurator, logger);
-  app.init();
 
   eventManager = new EventManager(
     browser.webNavigation,
@@ -71,135 +70,319 @@ beforeEach(() => {
   );
 });
 
-test("returns TabData on getTabData message", () => {
-  const message = { type: "getCertificate", params: { tabId: 1 } };
-  const tabData = new TabData(undefined, undefined, undefined);
-
-  app.getTabData = jest.fn((tabId: number) => {
-    expect(tabId).toEqual(message.params.tabId);
-    return tabData;
+// eslint-disable-next-line max-lines-per-function
+describe("init()", () => {
+  test("initializes browser event listeners for mozilla firefox", () => {
+    mockBrowser.webRequest.mockAllow();
+    mockBrowser.webRequest.onHeadersReceived.addListener.expect(
+      expect.anything(),
+      expect.anything(),
+      expect.anything()
+    );
+    eventManager["webRequest"] = browser.webRequest;
+    eventManager.init();
+    expect(
+      mockBrowser.webRequest.onHeadersReceived.addListener.getMockCalls()
+    ).not.toEqual([]);
   });
 
-  eventManager.init();
-  const receiveMessage: (
-    message: {
-      type: string;
-      params: unknown;
-    },
-    sender: Runtime.MessageSender,
-    sendResponse: (response: unknown) => void
-  ) => void | Promise<
-    unknown
-  > = mockBrowser.runtime.onMessage.addListener.getMockCalls()[0][0];
-
-  receiveMessage(message, {}, (response: unknown) => {
-    expect(response).toEqual(tabData);
+  test("initializes browser event listeners for chromium browsers", () => {
+    eventManager.init();
+    expect(
+      mockBrowser.webNavigation.onCommitted.addListener.getMockCalls()
+    ).not.toEqual([]);
   });
 });
 
-test("returns UnhandledMessageError on unhandled message", () => {
-  const message = { type: "getPotato", params: undefined };
+describe("resetTab()", () => {
+  test("resets tab, if requests is non https and main frame", () => {
+    const requestDetails = {
+      url: "http://example.com",
+      tabId: 0,
+      parentFrameId: -1,
+    };
+    eventManager.resetTab(requestDetails);
+    expect(app.resetTabData).toHaveBeenCalled();
+  });
 
-  eventManager.init();
-  const receiveMessage: (
-    message: {
-      type: string;
-      params: unknown;
-    },
-    sender: Runtime.MessageSender,
-    sendResponse: (response: unknown) => void
-  ) => void | Promise<
-    unknown
-  > = mockBrowser.runtime.onMessage.addListener.getMockCalls()[0][0];
-
-  receiveMessage(message, {}, (response: unknown) => {
-    expect(response).toBeInstanceOf(UnhandledMessageError);
+  test("doesn't reset tab, if request is non main frame", () => {
+    const requestDetails = {
+      url: "http://example.com",
+      tabId: 0,
+      parentFrameId: 1,
+    };
+    eventManager.resetTab(requestDetails);
+    expect(app.resetTabData).not.toHaveBeenCalled();
   });
 });
 
-test("calls fetch on receiveWebRequest", () => {
-  app.fetchCertificate = jest.fn(() => {
-    return new Promise((resolve) => {
-      resolve();
+// eslint-disable-next-line max-lines-per-function
+describe("receiveWebRequestHeaders()", () => {
+  test("returns request continue, if request is https, main frame and without quality decrease", async () => {
+    const requestDetails = {
+      url: "https://example.com",
+      tabId: 0,
+      parentFrameId: -1,
+    };
+    const response = eventManager.receiveWebRequestHeaders(requestDetails);
+    await expect(response).resolves.toEqual({});
+  });
+
+  test("returns request continue, if request is non main frame", async () => {
+    const requestDetails = {
+      url: "https://example.com",
+      tabId: 0,
+      parentFrameId: 1,
+    };
+    const response = eventManager.receiveWebRequestHeaders(requestDetails);
+    await expect(response).resolves.toEqual({});
+  });
+
+  test("returns request continue, if request is non https and main frame", async () => {
+    const requestDetails = {
+      url: "http://example.com",
+      tabId: 0,
+      parentFrameId: -1,
+    };
+    const response = eventManager.receiveWebRequestHeaders(requestDetails);
+    await expect(response).resolves.toEqual({});
+  });
+
+  test("returns request cancel, if request is https, main frame and quality decreased", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (mockBrowser.tabs.update.expect as any)(
+      expect.anything(),
+      expect.anything()
+    );
+    mockBrowser.runtime.getURL.expect(expect.anything()).andReturn("");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (app.analyzeQuality as jest.Mock<any, any>).mockResolvedValueOnce(true);
+    const requestDetails = {
+      url: "https://example.com",
+      tabId: 0,
+      parentFrameId: -1,
+    };
+    const response = eventManager.receiveWebRequestHeaders(requestDetails);
+    await expect(response).resolves.toEqual({ cancel: true });
+  });
+});
+
+// eslint-disable-next-line max-lines-per-function
+describe("receiveWebNavigationError()", () => {
+  test("analyzes error, if request is https and main frame", () => {
+    const requestDetails = {
+      url: "https://example.com",
+      tabId: 0,
+      frameId: 0,
+      error: "error",
+    };
+    eventManager.receiveWebNavigationError(requestDetails);
+    expect(app.analyzeError).toHaveBeenCalled();
+  });
+
+  test("doesn't analyze error, if request is non main frame", () => {
+    const requestDetails = {
+      url: "https://example.com",
+      tabId: 0,
+      frameId: 1,
+      error: "error",
+    };
+    eventManager.receiveWebNavigationError(requestDetails);
+    expect(app.analyzeError).not.toHaveBeenCalled();
+  });
+
+  test("doesn't analyze error, if request is non https", () => {
+    const requestDetails = {
+      url: "http://example.com",
+      tabId: 0,
+      frameId: 0,
+      error: "error",
+    };
+    eventManager.receiveWebNavigationError(requestDetails);
+    expect(app.analyzeError).not.toHaveBeenCalled();
+  });
+});
+
+// eslint-disable-next-line max-lines-per-function
+describe("receiveMessage()", () => {
+  test("delegates getTabData message", () => {
+    const message = {
+      type: "getTabData",
+      params: { tabId: 0 },
+    };
+    eventManager.receiveMessage(message);
+    expect(app.getTabData).toHaveBeenCalled();
+  });
+
+  test("delegates resetQuality message", () => {
+    const message = {
+      type: "resetQuality",
+      params: { url: "" },
+    };
+    eventManager.receiveMessage(message);
+    expect(app.resetQuality).toHaveBeenCalled();
+  });
+
+  test("delegates getConfiguration message", () => {
+    const message = { type: "getConfiguration" };
+    eventManager.receiveMessage(message);
+    expect(app.getConfiguration).toHaveBeenCalled();
+  });
+
+  test("delegates setConfiguration message", () => {
+    const message = {
+      type: "setConfiguration",
+      params: new Configuration("", false),
+    };
+    eventManager.receiveMessage(message);
+    expect(app.setConfiguration).toHaveBeenCalled();
+  });
+
+  test("delegates removeCache message", () => {
+    const message = { type: "removeCache" };
+    eventManager.receiveMessage(message);
+    expect(app.removeCache).toHaveBeenCalled();
+  });
+
+  test("delegates exportLogs message", () => {
+    const message = { type: "exportLogs" };
+    eventManager.receiveMessage(message);
+    expect(app.exportLogs).toHaveBeenCalled();
+  });
+
+  test("delegates removeLogs message", () => {
+    const message = { type: "removeLogs" };
+    eventManager.receiveMessage(message);
+    expect(app.removeLogs).toHaveBeenCalled();
+  });
+
+  test("rejects unhandled message type", async () => {
+    const message = { type: "impossibleMessage" };
+    const response = eventManager.receiveMessage(message);
+    await expect(response).rejects.toBeInstanceOf(UnhandledMessageError);
+  });
+
+  test("rejects getConfiguration message on StorageError", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (app.getConfiguration as jest.Mock<any, any>).mockImplementation(() => {
+      throw new Error();
     });
-  });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventManager.receiveWebRequestHeaders(<any>{
-    url: "https://example.com",
-    tabId: 0,
-    parentFrameId: -1,
-  });
-  expect(app.fetchCertificate).toHaveBeenCalledTimes(1);
-});
-
-test("calls changeBrowserAction on receiveWebRequestError", () => {
-  app.analyzeError = jest.fn();
-  eventManager.changeBrowserAction = jest.fn();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventManager.receiveWebNavigationError(<any>{
-    url: "https://example.com",
-    tabId: 0,
-    frameId: 0,
-    error: "error",
-  });
-  expect(eventManager.changeBrowserAction).toHaveBeenCalledTimes(1);
-});
-
-test("sets error in changeBrowserAction", () => {
-  mockBrowser.browserAction.setIcon
-    .expect({ path: "../assets/logo_error.svg" })
-    .andResolve();
-  mockBrowser.browserAction.setBadgeBackgroundColor
-    .expect({ color: "#d32f2f" })
-    .andResolve();
-  mockBrowser.browserAction.setBadgeText.expect({ text: "!" }).andResolve();
-
-  app.getTabData = jest.fn(() => {
-    return new TabData(undefined, undefined, new ErrorMessage("error"));
-  });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  expect(eventManager.changeBrowserAction(<any>{})).toEqual(undefined);
-});
-
-test("calls export log", () => {
-  app.exportLogs = jest.fn();
-  eventManager.receiveMessage({ type: "exportLogs" });
-  expect(app.exportLogs).toHaveBeenCalledTimes(1);
-});
-
-test("returns error on export log", async () => {
-  app.exportLogs = jest.fn(() => {
-    throw new Error();
+    const message = { type: "getConfiguration" };
+    const response = eventManager.receiveMessage(message);
+    await expect(response).rejects.toBeInstanceOf(Error);
   });
 
-  await expect(
-    eventManager.receiveMessage({ type: "exportLogs" })
-  ).rejects.toBeInstanceOf(Error);
-});
-
-test("calls remove log", () => {
-  app.removeLogs = jest.fn();
-  eventManager.receiveMessage({ type: "removeLogs" });
-  expect(app.removeLogs).toHaveBeenCalledTimes(1);
-});
-
-test("returns error on remove log", async () => {
-  app.removeLogs = jest.fn(() => {
-    throw new Error();
+  test("rejects setConfiguration message on StorageError", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (app.setConfiguration as jest.Mock<any, any>).mockImplementation(() => {
+      throw new Error();
+    });
+    const message = {
+      type: "setConfiguration",
+      params: new Configuration("", false),
+    };
+    const response = eventManager.receiveMessage(message);
+    await expect(response).rejects.toBeInstanceOf(Error);
   });
 
-  await expect(
-    eventManager.receiveMessage({ type: "removeLogs" })
-  ).rejects.toBeInstanceOf(Error);
+  test("rejects exportLogs message on StorageError", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (app.exportLogs as jest.Mock<any, any>).mockImplementation(() => {
+      throw new Error();
+    });
+    const message = { type: "exportLogs" };
+    const response = eventManager.receiveMessage(message);
+    await expect(response).rejects.toBeInstanceOf(Error);
+  });
+
+  test("rejects removeLogs message on StorageError", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (app.removeLogs as jest.Mock<any, any>).mockImplementation(() => {
+      throw new Error();
+    });
+    const message = { type: "removeLogs" };
+    const response = eventManager.receiveMessage(message);
+    await expect(response).rejects.toBeInstanceOf(Error);
+  });
 });
 
-test("relay tabData", () => {
-  app.resetTabData = jest.fn();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventManager.resetTab(<any>{
-    url: "http://example.com",
-    tabId: 0,
-    parentFrameId: -1,
+// eslint-disable-next-line max-lines-per-function
+describe("changeBrowserAction()", () => {
+  test("sets quality icon, if request is https, mainframe and without errors", () => {
+    mockBrowser.browserAction.enable.expect(expect.anything());
+    eventManager["setQualityIcon"] = jest.fn();
+    const requestDetails = {
+      url: "https://example.com",
+      tabId: 0,
+      parentFrameId: -1,
+    };
+    eventManager.changeBrowserAction(requestDetails);
+    expect(eventManager["setQualityIcon"]).toHaveBeenCalled();
   });
-  expect(app.resetTabData).toHaveBeenCalledTimes(1);
+
+  test("disables browserAction, if request is non https", () => {
+    mockBrowser.browserAction.setIcon.expect(expect.anything());
+    mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
+    mockBrowser.browserAction.disable.expect(expect.anything());
+    const requestDetails = {
+      url: "http://example.com",
+      tabId: 0,
+      parentFrameId: -1,
+    };
+    eventManager.changeBrowserAction(requestDetails);
+    expect(mockBrowser.browserAction.disable.getMockCalls()).not.toEqual([]);
+  });
+
+  test("sets error icon, if request has errors", () => {
+    mockBrowser.browserAction.enable.expect(expect.anything());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (app.getTabData as jest.Mock<any, any>).mockReturnValueOnce(
+      new TabData(undefined, undefined, new ErrorMessage("error"))
+    );
+    eventManager["setErrorIcon"] = jest.fn();
+    const requestDetails = {
+      url: "https://example.com",
+      tabId: 0,
+      parentFrameId: -1,
+    };
+    eventManager.changeBrowserAction(requestDetails);
+    expect(eventManager["setErrorIcon"]).toHaveBeenCalled();
+  });
+});
+
+describe("setErrorIcon()", () => {
+  test("sets error icon on tabId", () => {
+    mockBrowser.browserAction.setIcon.expect(expect.anything());
+    mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
+    mockBrowser.browserAction.setBadgeText.expect(expect.anything());
+    eventManager["setErrorIcon"](5);
+    expect(mockBrowser.browserAction.setIcon.getMockCalls()[0]).toEqual([
+      {
+        path: "../assets/logo_error.svg",
+        tabId: 5,
+      },
+    ]);
+  });
+});
+
+describe("setQualityIcon()", () => {
+  test("sets quality icon with quality", () => {
+    mockBrowser.browserAction.setIcon.expect(expect.anything());
+    mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
+    mockBrowser.browserAction.setBadgeText.expect(expect.anything());
+    eventManager["setQualityIcon"](5, Quality.DomainValidated);
+    expect(mockBrowser.browserAction.setBadgeText.getMockCalls()[0]).toEqual([
+      { tabId: 5, text: "*" },
+    ]);
+  });
+
+  test("sets quality icon without quality", () => {
+    mockBrowser.browserAction.setIcon.expect(expect.anything());
+    mockBrowser.browserAction.setBadgeBackgroundColor.expect(expect.anything());
+    mockBrowser.browserAction.setBadgeText.expect(expect.anything());
+    eventManager["setQualityIcon"](5);
+    expect(mockBrowser.browserAction.setBadgeText.getMockCalls()[0]).toEqual([
+      { tabId: 5, text: "" },
+    ]);
+  });
 });

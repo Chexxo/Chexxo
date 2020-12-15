@@ -1,7 +1,8 @@
 import { CertificateError } from "./CertificateError";
 
 /**
- * If a certificate has not been signed by a trusted entity this error gets thrown.
+ * If a certificate has not been signed by a trusted entity
+ * this error gets thrown.
  */
 export class SelfSignedError extends CertificateError {
   readonly name: string = "Certificate self signed exception";
