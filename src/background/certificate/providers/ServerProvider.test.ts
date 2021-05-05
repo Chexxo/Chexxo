@@ -62,29 +62,21 @@ test("throws error if fetch had unexpected error", () => {
       reject(new Error());
     });
   });
-  return (
-    provider
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .getCertificate(<any>{
-        url: "https://example.com",
-      })
-      .catch((error) => {
-        expect(error).toBeInstanceOf(Error);
-      })
-  );
+  return expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider.getCertificate(<any>{
+      url: "https://example.com",
+    })
+  ).rejects.toBeInstanceOf(Error);
 });
 
 test("returns error if url not correct", () => {
-  return (
-    provider
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .getCertificate(<any>{
-        url: "file://example.com",
-      })
-      .catch((response: RawCertificateResponse) => {
-        expect(response.error).toBeInstanceOf(InvalidUrlError);
-      })
-  );
+  return expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider.getCertificate(<any>{
+      url: "file://example.com",
+    })
+  ).rejects.toHaveProperty("error.constructor", InvalidUrlError);
 });
 
 test("throws specific error if fetch failed", () => {
@@ -93,16 +85,12 @@ test("throws specific error if fetch failed", () => {
       reject(new Error("Failed to fetch"));
     });
   });
-  return (
-    provider
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .getCertificate(<any>{
-        url: "https://example.com",
-      })
-      .catch((error) => {
-        expect(error).toBeInstanceOf(ServerUnavailableError);
-      })
-  );
+  return expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider.getCertificate(<any>{
+      url: "https://example.com",
+    })
+  ).rejects.toBeInstanceOf(ServerUnavailableError);
 });
 
 test("cleans url", () => {
@@ -121,17 +109,12 @@ test("handles server error", () => {
       });
     });
   });
-  return (
-    provider
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .getCertificate(<any>{
-        url: "https://example.com",
-      })
-      .catch((data: RawCertificateResponse) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(data.error).toBeInstanceOf(ServerError);
-      })
-  );
+  return expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider.getCertificate(<any>{
+      url: "https://example.com",
+    })
+  ).rejects.toHaveProperty("error.constructor", ServerError);
 });
 
 test("handles invalid response body", () => {
@@ -145,17 +128,12 @@ test("handles invalid response body", () => {
       });
     });
   });
-  return (
-    provider
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .getCertificate(<any>{
-        url: "https://example.com",
-      })
-      .catch((data: RawCertificateResponse) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(data.error).toBeInstanceOf(ServerError);
-      })
-  );
+  return expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider.getCertificate(<any>{
+      url: "https://example.com",
+    })
+  ).rejects.toHaveProperty("error.constructor", ServerError);
 });
 
 test("sunny case", () => {
