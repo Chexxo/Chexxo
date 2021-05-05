@@ -19,7 +19,7 @@ export class ServerProvider implements CertificateProvider {
    * This server is maintained by Chexxo.
    */
   private static defaultServerUrl =
-    "https://cmsrvsfj03.execute-api.eu-central-1.amazonaws.com/";
+    "https://p9m28x1446.execute-api.eu-central-1.amazonaws.com/";
   /**
    * The endpoint which will be used in order to get the
    * certificate.
