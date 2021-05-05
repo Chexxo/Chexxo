@@ -116,6 +116,9 @@ jobs:
       
       - name: Run documentation build
         run: npm run build:documentation
+
+      - name: Copy documentation images
+        run: cp -r store docs/store
       
       - name: Upload documentation
         uses: actions/upload-artifact@v2.2.0
@@ -173,6 +176,9 @@ jobs:
       
       - name: Run documentation build
         run: npm run build:documentation
+
+      - name: Copy documentation images
+        run: cp -r store docs/store
       
       - name: Upload documentation
         uses: actions/upload-artifact@v2.2.0
