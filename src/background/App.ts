@@ -118,10 +118,8 @@ export class App {
     const tabData = this.tabCache.get(tabId);
     if (tabData) {
       if (tabData.quality) {
-        const hasQualityDecreased = await this.qualityService.hasQualityDecreased(
-          url,
-          tabData.quality
-        );
+        const hasQualityDecreased =
+          await this.qualityService.hasQualityDecreased(url, tabData.quality);
 
         if (hasQualityDecreased) {
           tabData.errorMessage = new ErrorMessage(

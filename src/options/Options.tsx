@@ -68,9 +68,8 @@ export class Options extends Component<OptionsProps, OptionsState> {
    */
   async componentDidMount(): Promise<void> {
     this.changeServerUrl = this.changeServerUrl.bind(this);
-    this.toggleCacheDomainQualities = this.toggleCacheDomainQualities.bind(
-      this
-    );
+    this.toggleCacheDomainQualities =
+      this.toggleCacheDomainQualities.bind(this);
     this.removeCache = this.removeCache.bind(this);
     this.exportLogs = this.exportLogs.bind(this);
     this.removeLogs = this.removeLogs.bind(this);
