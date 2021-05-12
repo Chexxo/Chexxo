@@ -38,9 +38,8 @@ export class CertificateService {
     url: string;
     requestId?: string;
   }): Promise<CertificateResponse> {
-    const rawCertificateResponse = await this.certificateProvider.getCertificate(
-      requestDetails
-    );
+    const rawCertificateResponse =
+      await this.certificateProvider.getCertificate(requestDetails);
 
     if (rawCertificateResponse.rawCertificate !== undefined) {
       try {

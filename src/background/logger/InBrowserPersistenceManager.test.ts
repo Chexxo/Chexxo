@@ -277,9 +277,7 @@ describe("getAll()", () => {
     storageArea.get = jest.fn(async () => {
       throw Error();
     });
-    return persistence.getAll().catch((error: StorageError) => {
-      expect(error).toBeInstanceOf(StorageError);
-    });
+    return expect(persistence.getAll()).rejects.toBeInstanceOf(StorageError);
   });
 });
 
@@ -294,9 +292,7 @@ describe("removeAll()", () => {
     storageArea.remove = jest.fn(async () => {
       throw Error();
     });
-    return persistence.removeAll().catch((error: StorageError) => {
-      expect(error).toBeInstanceOf(StorageError);
-    });
+    return expect(persistence.removeAll()).rejects.toBeInstanceOf(StorageError);
   });
 });
 

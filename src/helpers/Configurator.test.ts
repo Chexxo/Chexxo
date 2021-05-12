@@ -93,7 +93,8 @@ test("listeners are called when configuration changes", async () => {
   });
   configurator.addListener(testListener);
 
-  let storageChangeListener = mockBrowser.storage.onChanged.addListener.getMockCalls()[0][0];
+  let storageChangeListener =
+    mockBrowser.storage.onChanged.addListener.getMockCalls()[0][0];
   storageChangeListener = storageChangeListener.bind(configurator);
   await storageChangeListener(
     { configuration: { oldValue: "a", newValue: "b" } },
@@ -111,7 +112,8 @@ test("listeners are not called when configuration did not change", async () => {
   });
   configurator.addListener(testListener);
 
-  let storageChangeListener = mockBrowser.storage.onChanged.addListener.getMockCalls()[0][0];
+  let storageChangeListener =
+    mockBrowser.storage.onChanged.addListener.getMockCalls()[0][0];
   storageChangeListener = storageChangeListener.bind(configurator);
   await storageChangeListener({}, "local");
 

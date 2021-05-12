@@ -2,7 +2,6 @@
 import { deepMock } from "mockzilla";
 import { Browser, WebRequest } from "webextension-polyfill-ts";
 
-import { RawCertificateResponse } from "../../../types/certificate/RawCertificateResponse";
 import { InsecureConnectionError } from "../../../types/errors/InsecureConnectionError";
 import { InBrowserProvider } from "./InBrowserProvider";
 
@@ -99,12 +98,7 @@ test("returns an error when securityInfo is insecure", () => {
     browser.webRequest.getSecurityInfo
   );
 
-  return inBrowserProvider
-    .getCertificate(onHeadersReceivedDetails)
-    .then(() => {
-      expect(false).toBe(true);
-    })
-    .catch((error: RawCertificateResponse) => {
-      expect(error.error).toBeInstanceOf(InsecureConnectionError);
-    });
+  return expect(
+    inBrowserProvider.getCertificate(onHeadersReceivedDetails)
+  ).rejects.toHaveProperty("error.constructor", InsecureConnectionError);
 });

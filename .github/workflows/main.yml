@@ -16,9 +16,9 @@ jobs:
           submodules: true
       
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: 14
       
       - name: Install dependencies
         run: npm ci
@@ -42,9 +42,9 @@ jobs:
           submodules: true
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: 14
 
       - name: Load Cache
         id: load-cache
@@ -80,9 +80,9 @@ jobs:
           submodules: true
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: 14
 
       - name: Load Cache
         id: load-cache
@@ -116,6 +116,9 @@ jobs:
       
       - name: Run documentation build
         run: npm run build:documentation
+
+      - name: Copy documentation images
+        run: cp -r store docs/store
       
       - name: Upload documentation
         uses: actions/upload-artifact@v2.2.0
@@ -137,9 +140,9 @@ jobs:
           submodules: true
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: 14
 
       - name: Load Cache
         id: load-cache
@@ -173,6 +176,9 @@ jobs:
       
       - name: Run documentation build
         run: npm run build:documentation
+
+      - name: Copy documentation images
+        run: cp -r store docs/store
       
       - name: Upload documentation
         uses: actions/upload-artifact@v2.2.0

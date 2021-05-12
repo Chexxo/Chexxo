@@ -67,10 +67,10 @@ test("throws certificate response if certificate undefined", () => {
   certificateProvider.getCertificate = jest.fn(async () => {
     return new RawCertificateResponse("", undefined, new ServerError());
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return certificateService.getCertificate(<any>{}).catch((error) => {
-    expect(error).toBeInstanceOf(CertificateResponse);
-  });
+  return expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    certificateService.getCertificate(<any>{})
+  ).rejects.toBeInstanceOf(CertificateResponse);
 });
 
 test("throws certificate response on certificate parser error", () => {
@@ -80,11 +80,10 @@ test("throws certificate response on certificate parser error", () => {
   CertificateParser.getCertificate = jest.fn(() => {
     throw new Error();
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return certificateService.getCertificate(<any>{}).catch((error) => {
-    expect(CertificateParser.getCertificate).toHaveBeenCalled();
-    expect(error).toBeInstanceOf(CertificateResponse);
-  });
+  return expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    certificateService.getCertificate(<any>{})
+  ).rejects.toBeInstanceOf(CertificateResponse);
 });
 
 test("sunny case", () => {

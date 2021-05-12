@@ -141,7 +141,8 @@ export abstract class CertificateParser {
    * ); //Returns 1293839970 which is 31.12.2010 11:59:30
    */
   private static getTimestampFromUTCTime(utcTime: string): number {
-    const regex = /(?<year>\d{2})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})(?<second>[0-9]{2})Z/gi;
+    const regex =
+      /(?<year>\d{2})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})(?<second>[0-9]{2})Z/gi;
     let matches: RegExpExecArray | null = null;
     matches = regex.exec(utcTime);
 

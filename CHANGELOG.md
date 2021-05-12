@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-05-05
+### Changed
+- Changed backend URL for Chromium Extension.
+- Updated Dependencies.
+
 ## [0.6.1] - 2020-12-15
 ### Added
 - More unit tests.
@@ -16,14 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Information regarding the different certificate qualities.
 
 ### Changed
-- Improved Semantic UI import to be more effizient.
-- Improved webpack build to be more effizient.
+- Improved Semantic UI import to be more efficient.
+- Improved webpack build to be more efficient.
 - Logo for certificate view.
 - The chromium version now needs less permissions.
 
 ### Fixed
 - Error with regex in CertificateParser which lead to an internal error message being exposed.
-- Error which occured if no altname was defined on the certificate.
+- Error which occurred if no altname was defined on the certificate.
 - Icon now shows up correctly even if multiple browser windows are opened.
 
 ## [0.5.0] - 2020-12-06
@@ -41,14 +46,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2020-11-25
 ### Added
-- Certificate errors are now beeing shown to the user.
+- Certificate errors are now being shown to the user.
 - Implemented certificate view which allows the user to see certificate details.
 
 ### Changed
 - Removed unused buttons from navigation.
 
 ### Fixed
-- Fix error which occured on certain domains with a redirect.
+- Fix error which occurred on certain domains with a redirect.
 
 ## [0.2.0] - 2020-11-22
 ### Added

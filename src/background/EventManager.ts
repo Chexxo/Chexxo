@@ -105,7 +105,7 @@ export class EventManager {
       has to be asserted twice, because 'webextension-polyfill-ts' has declared 
       OnCommittedDetailsType incorrectly
     */
-    const fixedDetails = (requestDetails as unknown) as {
+    const fixedDetails = requestDetails as unknown as {
       url: string;
       tabId: number;
       parentFrameId: number;
@@ -148,7 +148,7 @@ export class EventManager {
       has to be asserted twice, because 'webextension-polyfill-ts' has declared 
       OnErrorOccuredDetailsType incorrectly
     */
-    const fixedDetails = (requestDetails as unknown) as {
+    const fixedDetails = requestDetails as unknown as {
       url: string;
       tabId: number;
       frameId: number;
@@ -247,7 +247,7 @@ export class EventManager {
     tabId: number;
   }): void {
     const { url, tabId } = requestDetails;
-    const { parentFrameId } = (requestDetails as unknown) as {
+    const { parentFrameId } = requestDetails as unknown as {
       parentFrameId: number;
     };
 
